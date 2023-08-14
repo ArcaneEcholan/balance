@@ -9,7 +9,7 @@ import com.example.app.dao.utils.base.pagination.PageSize
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
-import java.util.UUID
+import java.util.*
 
 //    var id: Long ?,
 //     var amount: BigDecimal?,
@@ -125,7 +125,7 @@ class TransactionServiceImpl : TransactionService {
     ): TransactionVO {
 
         var location = LocationPO(
-            formattedName = locationInformationMap?.get("name"),
+            formattedName = locationInformationMap?.get("formattedName"),
             latitude = locationInformationMap?.get("latitude"),
             longitude = locationInformationMap?.get("longitude"),
             province = locationInformationMap?.get("province"),

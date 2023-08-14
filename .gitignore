@@ -3,6 +3,8 @@
 **/.idea
 **/.mvn
 
+**/resources/static/*
+
 
 HELP.md
 target/

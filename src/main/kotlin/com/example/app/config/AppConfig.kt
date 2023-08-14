@@ -34,10 +34,10 @@ class RequestCorsFilter {
         val source = UrlBasedCorsConfigurationSource()
         val config = CorsConfiguration()
         config.allowCredentials = true
-        config.setAllowedOrigins(
+        config.setAllowedOriginPatterns(
             listOf(
-                "http://localhost:9529",
-                "https://frp.wenchao.fit/test"
+                "http://localhost:[*]",
+                "https://*.wenchao.fit:[*]",
             )
         );
         config.allowedHeaders = Arrays.asList("Origin", "Content-Type", "Accept", "responseType", "Authorization")

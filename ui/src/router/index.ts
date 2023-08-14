@@ -9,23 +9,13 @@ Vue.use(VueRouter);
 const routes: Array<RouteConfig> = [
     {
         path: '/',
-        redirect: '/hello-world',
-    },
-    {
-        path: '/hello-world',
-        name: 'HelloWorld',
-        component: HelloWorld,
+        redirect: '/test',
     },
     {
         path: '/test',
         name: 'Test',
         component: TestView,
-    },
-    {
-        path: '/about',
-        name: 'About',
-        component: About,
-    },
+    }
 ];
 
 const router = new VueRouter({

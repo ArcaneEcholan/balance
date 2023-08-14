@@ -1,10 +1,16 @@
 <template>
     <div class="">
         <div>location</div>
+        <div id="container" style="height: 300px; width: 300px"></div>
+
+        <el-button @click="onClickRefreshLocation">refresh</el-button>
         latitude
         <el-input readonly v-model="geoLocation.latitude"></el-input>
         longitude
         <el-input readonly v-model="geoLocation.longitude"></el-input>
+        formated_address
+        <el-input readonly v-model="geoLocation.formattedName"></el-input>
+
 
         raw string
         <el-input
@@ -39,7 +45,6 @@
         </div>
 
         <el-button @click="location"></el-button>
-        <div id="container" style="height: 300px; width: 300px"></div>
 
         <!-- <el-select v-model="trans_type">
             <el-option
@@ -68,8 +73,8 @@
 
 <script lang="ts">
 import AMapLoader from '@amap/amap-jsapi-loader';
-import { Component, Vue } from 'vue-property-decorator';
-import { Notification } from 'element-ui';
+import {Component, Vue} from 'vue-property-decorator';
+import {Notification} from 'element-ui';
 import Client from '@/request/client';
 import request from '@/request';
 
@@ -87,6 +92,7 @@ export default class TestView extends Vue {
     geoLocation: any = {
         latitude: null,
         longitude: null,
+        formattedName: null
     };
 
     getDetailLocation(lat: string, long: string) {
@@ -203,7 +209,7 @@ export default class TestView extends Vue {
 
                 let obj = wordsOrder.reduce(
                     (obj, cur, index) =>
-                        Object.assign(obj, { [cur]: words[index] }),
+                        Object.assign(obj, {[cur]: words[index]}),
                     {},
                 );
                 console.log(obj);
@@ -229,6 +235,43 @@ export default class TestView extends Vue {
                 }, objWithViewStatus);
             });
         }
+    }
+
+    onClickRefreshLocation() {
+        this.doGetGeoLocation()
+    }
+
+    doGetGeoLocation() {
+        this.getGeolocation(
+            (status: any, result: any) => {
+                console.log(status);
+                console.log(result);
+
+                if (status === 'complete') {
+                    let position = result.position;
+                    this.geoLocation.latitude = position.lat;
+                    this.geoLocation.longitude = position.lng;
+                    console.log(position);
+
+                    Notification.success(
+                        `'(lat, lng) = (${position.lat}, ${position.lng})`,
+                    );
+
+                    this.getDetailLocation(
+                        position.lat,
+                        position.lng,
+                    );
+                } else {
+                    console.log(result);
+                    Notification.error('定位失败');
+                }
+            },
+            (error: any) => {
+                Notification.error(
+                    `fail to get geollocation: ${error.code}-${error.message}`,
+                );
+            },
+        );
     }
 
     getGeolocation(successCb: any, errorCb: any) {
@@ -262,42 +305,13 @@ export default class TestView extends Vue {
             plugins: [], // 需要使用的的插件列表，如比例尺'AMap.Scale'等
         })
             .then((AMap) => {
-                // this.amap = new AMap.Map('container');
+                this.amap = new AMap.Map('container');
                 AMap.plugin('AMap.Geolocation', () => {
                     // 异步加载插件
                     var geolocation = new AMap.Geolocation();
-                    // this.amap.addControl(geolocation);
+                    this.amap.addControl(geolocation);
                     this.amapGeolocationPlugin = geolocation;
-                    this.getGeolocation(
-                        (status: any, result: any) => {
-                            console.log(status);
-                            console.log(result);
-
-                            if (status === 'complete') {
-                                let position = result.position;
-                                this.geoLocation.latitude = position.lat;
-                                this.geoLocation.longitude = position.lng;
-                                console.log(position);
-
-                                Notification.success(
-                                    `'(lat, lng) = (${position.lat}, ${position.lng})`,
-                                );
-
-                                this.getDetailLocation(
-                                    position.lat,
-                                    position.lng,
-                                );
-                            } else {
-                                console.log(result);
-                                Notification.error('定位失败');
-                            }
-                        },
-                        (error: any) => {
-                            Notification.error(
-                                `fail to get geollocation: ${error.code}-${error.message}`,
-                            );
-                        },
-                    );
+                    this.doGetGeoLocation();
                 });
             })
             .catch((e) => {

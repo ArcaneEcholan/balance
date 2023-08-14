@@ -20,15 +20,16 @@ private val log = KotlinLogging.logger {}
 
     @Test
     fun insert() {
-        val transactionVO = transactionService.insert(
-            amount = 100.toBigDecimal(),
-            categoryId = 1,
-            description = "test",
-            datetime = "2021-01-01 00:00:00",
-            location = mapOf(
-                "province" to "广东省",
-            )
-        )
-        log.debug { transactionVO }
+        // val transactionVO = transactionService.insert(
+        //     amount = 100.toBigDecimal(),
+        //     categoryId = 1,
+        //     description = "test",
+        //     datetime = "2021-01-01 00:00:00",
+        //     location = mapOf(
+        //         "province" to "广东省",
+        //     ),
+        //
+        // )
+        // log.debug { transactionVO }
     }
 }

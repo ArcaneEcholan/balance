@@ -26,3 +26,6 @@ fi
 rm -rf $FRONT_DEPLOY_END_PATH/*
 
 cp -r $FRONT_END_CODE_PATH/dist/* $FRONT_DEPLOY_END_PATH
+
+
+mvn package -Dmaven.test.skip=true

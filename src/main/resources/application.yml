@@ -5,6 +5,8 @@ datasource-password: wc123456
 datasource-db: balance
 
 spring:
+  main:
+    banner-mode: off
   datasource:
     url: jdbc:mysql://${datasource-host}:${datasource-port}/${datasource-db}?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ${datasource-username}
@@ -17,24 +19,23 @@ spring:
 logging:
   level:
     root: debug
-    org.springframework: off
-    org:
-      springframework:
-        test:
-          context:
-            BootstrapUtils: off
-    _org.springframework: off
-    org.hibernate: off
-    org.mybatis.spring.mapper.ClassPathMapperScanner: off
-    com.zaxxer.hikari.HikariConfig: off
-    com.zaxxer.hikari.pool.PoolBase: off
-    com.zaxxer.hikari.pool.HikariPool: off
+#    org.springframework: off
+#    _org.springframework: off
+#    org.hibernate: off
+#    org.mybatis.spring.mapper.ClassPathMapperScanner: off
+#    com.zaxxer.hikari.HikariConfig: off
+#    com.zaxxer.hikari.pool.PoolBase: off
+#    com.zaxxer.hikari.pool.HikariPool: off
+#    sun.rmi: off
+#    javax.management: off
+#    org.apache.tomcat.util: off
+#    org.apache.catalina: off
 
 mybatis-plus:
   global-config:
     banner: off
   configuration:
-    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 server:
   port: 8094
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
