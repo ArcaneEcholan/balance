@@ -3,10 +3,11 @@ package com.example.app.rest
 import cn.hutool.core.date.DateTime
 import com.example.app.dao.TransactionCategoryDao
 import com.example.app.service.TransactionService
-import org.springframework.validation.annotation.Validated
+import com.example.app.service.TransactionVO
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import javax.validation.Valid
@@ -72,6 +73,11 @@ class TransController {
         }.toList().apply {
             return ResponseEntity.ok(this)
         }
+    }
+
+    @GetMapping("/transactions")
+    fun getTransactions(@Valid @NotNull month:String): ResponseEntity<List<TransactionVO>> {
+        return ResponseEntity.ok(transactionService.list(month));
     }
 
 }

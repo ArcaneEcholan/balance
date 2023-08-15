@@ -53,3 +53,21 @@ export function get_display_time(updateTime: number) {
         return '刚刚';
     }
 }
+
+export function convertToShortDateTime(timeString: string) {
+    // Create a Date object from the input time string
+    const dateTime = new Date(timeString);
+
+    // Extract month and day values
+    const month = dateTime.getMonth() + 1; // Months are 0-indexed
+    const day = dateTime.getDate();
+
+    // Format hours and minutes with leading zeros
+    const hours = String(dateTime.getHours()).padStart(2, '0');
+    const minutes = String(dateTime.getMinutes()).padStart(2, '0');
+
+    // Construct the desired formatted string
+    const formattedString = `${month}-${day} ${hours}:${minutes}`;
+
+    return formattedString;
+}

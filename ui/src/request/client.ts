@@ -73,6 +73,13 @@ class Client {
         });
     }
     // endregion
+    static getTransactionList(yearHyphenMonth: string) {
+        return request({
+            url: `/transactions`,
+            method: 'get',
+            params: { month: yearHyphenMonth },
+        });
+    }
 }
 
 export default Client;

@@ -1,14 +1,17 @@
 package com.example.app.service
 
 import cn.hutool.core.date.DateTime
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.example.app.dao.*
 import com.example.app.dao.utils.base.pagination.Page
 import com.example.app.dao.utils.base.pagination.PageConfig
 import com.example.app.dao.utils.base.pagination.PageNo
 import com.example.app.dao.utils.base.pagination.PageSize
+import com.example.app.utils.getMonthRange
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 //    var id: Long ?,
@@ -27,6 +30,8 @@ class TransactionVO {
     var locationId: Long? = null
     var datetime: String? = null
 
+    var count: Int? = null
+
     var categoryValue: String? = null
     var location: Any? = null
 
@@ -41,6 +46,9 @@ interface TransactionService {
     fun fillVO(transaction: TransactionPO): TransactionVO
 
     fun list(pageNo: Long, pageSize: Long): List<TransactionVO>
+
+
+    fun list(mouth: String): List<TransactionVO>
 
     // var id: Long?,
     //     var amount: BigDecimal?,
@@ -90,6 +98,7 @@ class TransactionServiceImpl : TransactionService {
         vo.description = transaction.description
         vo.locationId = transaction.locationId
         vo.datetime = transaction.datetime
+        vo.count = transaction.count
 
         var location = locationDao.getOneByMap(
             "id", transaction.locationId
@@ -99,7 +108,7 @@ class TransactionServiceImpl : TransactionService {
         var category = categoryDao.getOneByMap(
             "id", transaction.categoryId
         )
-        vo.categoryValue = category?.value
+        vo.categoryValue = category?.value ?: "unknown"
         return vo
     }
 
@@ -111,8 +120,22 @@ class TransactionServiceImpl : TransactionService {
 
         data.map {
             fillVO(it)
-
         }.toList().apply { return this }
+    }
+
+    override fun list(mouth: String): List<TransactionVO> {
+        val monthRange = getMonthRange(mouth)
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val startDateTimeStr = monthRange.startDateTime.format(outputFormatter)
+        val endDateTimeStr = monthRange.endDateTime.format(outputFormatter)
+
+        var queryWrapper = QueryWrapper<TransactionPO>()
+            .ge("datetime", startDateTimeStr)
+            .lt("datetime", endDateTimeStr)
+            .orderByDesc("datetime")
+
+        transactionDao.list(queryWrapper).map(::fillVO).toList()
+            .apply { return this }
     }
 
     override fun insert(
@@ -144,7 +167,7 @@ class TransactionServiceImpl : TransactionService {
             township = locationInformationMap?.get("township"),
         )
 
-        if(!location.allNull()) {
+        if (!location.allNull()) {
             locationDao.save(location)
         }
 

@@ -4,15 +4,7 @@
         <div class="mgb8"><span class="bold fs22">Location</span></div>
         <div id="amap" style="width: 100%; height: auto"></div>
         <div class="flex">
-            <!--<el-button @click="onClickRefreshLocation">refresh</el-button>-->
-
             <span style="font-size: 16px">(lat, lng)=({{ geoLocation.latitude }},{{ geoLocation.longitude }})</span>
-            <!--latitude-->
-            <!--<el-input readonly v-model="geoLocation.latitude"></el-input>-->
-            <!--longitude-->
-            <!--<el-input readonly v-model="geoLocation.longitude"></el-input>-->
-            <!--formated_address-->
-            <!--<el-input readonly v-model="geoLocation.formattedName"></el-input>-->
         </div>
         <!--endregion-->
 
@@ -41,7 +33,7 @@
                      ${index === parsedForms.length - 1 ? 'border-bottom: none; border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;' : ''};
                      background-color: white;
                      `
-">
+                ">
                     <div class="flexg5">
                         <div>
                             <span>{{ form.categoryValue ? form.categoryValue.value : "" }}</span>
@@ -56,27 +48,6 @@
                         <span class="bold">{{ form.amount ? form.amount.value : "" }}</span>
                     </div>
                 </div>
-
-                <!--categoryValue-->
-                <!--<el-input-->
-                <!--    v-model="form.categoryValue.value"-->
-                <!--    @input="checkCategory(form)"-->
-                <!--&gt;</el-input>-->
-                <!--amount-->
-                <!--<el-input-->
-                <!--    v-model="form.amount.value"-->
-                <!--    @input="checkAmount(form)"-->
-                <!--&gt;</el-input>-->
-                <!--count-->
-                <!--<el-input-->
-                <!--    v-model="form.count.value"-->
-                <!--    @input="checkCount(form)"-->
-                <!--&gt;</el-input>-->
-                <!--description-->
-                <!--<el-input-->
-                <!--    v-model="form.description.value"-->
-                <!--    @input="checkDescription(form)"-->
-                <!--&gt;</el-input>-->
             </template>
         </div>
         <!--endregion-->
@@ -85,32 +56,66 @@
 
         <!--endregion-->
 
-        <el-button @click="onSaveTrans">save all</el-button>
+        <div @click="onSaveTrans" style="
+        background-color: white;
+        text-align: center;
+"
+             class="br5 pdt10 pdb10"
+        >
+            <i class="el-icon-plus"></i>
+        </div>
 
-        <!--<el-button @click="location"></el-button>-->
 
-        <!-- <el-select v-model="trans_type">
-            <el-option
-                v-for="tran in transactionList"
-                :key="tran.value"
-                :label="tran.label"
-                :value="tran.value"
-            />
-        </el-select> -->
+        <div class="mgb8"></div>
 
-        <el-table :data="transactionList">
-            <el-table-column prop="id" label="id"></el-table-column>
-            <el-table-column prop="amount" label="amount"></el-table-column>
-            <el-table-column
-                prop="categoryId"
-                label="categoryId"
-            ></el-table-column>
-            <el-table-column
-                prop="description"
-                label="description"
-            ></el-table-column>
-            <el-table-column prop="location" label="location"></el-table-column>
-        </el-table>
+        <!--region: this month-->
+        <div style="" class="shadow br5">
+            <!--header-->
+            <div class="record-header" v-show="transactionList.length > 0">This month</div>
+            <!--list-->
+            <template v-for="(form, index) in transactionList">
+                <!--list item-->
+                <div class="flex pd10"
+                     :style="
+                     `border-bottom: 1px solid #f5f5f5;
+                     ${index === transactionList.length - 1 ? 'border-bottom: none; border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;' : ''};
+                     background-color: white;
+                     `
+                ">
+                    <!--card left-->
+                    <div class="flexg5">
+                        <div>
+                            <span class="pdr10">{{ form.categoryValue }}</span>
+                            <span class="fs14 google-gray-400">test location</span>
+                        </div>
+                        <div class="fs14">
+                            <span class="google-gray-400">{{ form.datetime | formatTimeForRecordItem }}</span>
+                            <span class="pd5 google-gray-300">|</span>
+                            <span class="google-gray-400">{{ form.description }}</span>
+                        </div>
+                    </div>
+                    <!--card right-->
+                    <div class="flexg1">
+                        <span class="bold">{{ form.amount }}  {{ `${form.count > 1 ? 'x ' + form.count : ''}` }}</span>
+                    </div>
+                </div>
+            </template>
+        </div>
+        <!--endregion-->
+
+        <!--<el-table :data="transactionList">-->
+        <!--    <el-table-column prop="id" label="id"></el-table-column>-->
+        <!--    <el-table-column prop="amount" label="amount"></el-table-column>-->
+        <!--    <el-table-column-->
+        <!--        prop="categoryId"-->
+        <!--        label="categoryId"-->
+        <!--    ></el-table-column>-->
+        <!--    <el-table-column-->
+        <!--        prop="description"-->
+        <!--        label="description"-->
+        <!--    ></el-table-column>-->
+        <!--    <el-table-column prop="location" label="location"></el-table-column>-->
+        <!--</el-table>-->
     </div>
 </template>
 
@@ -120,12 +125,19 @@ import {Component, Vue} from 'vue-property-decorator';
 import {Notification} from 'element-ui';
 import Client from '@/request/client';
 import request from '@/request';
+import {convertToShortDateTime} from "@/ts/utils";
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
 };
 
-@Component({})
+@Component({
+    filters: {
+        formatTimeForRecordItem: function (timeString: string) {
+            return convertToShortDateTime(timeString);
+        }
+    }
+})
 export default class TestView extends Vue {
     transactionList: any[] = [];
     amap: any;
@@ -215,7 +227,10 @@ export default class TestView extends Vue {
         }
 
         Client.saveTransactions(request).then((resp) => {
-            console.log(resp);
+            Notification.success("save successfully")
+            return Client.getTransactionList("2023-8")
+        }).then(resp => {
+            this.transactionList = resp.data
         });
     }
 
@@ -332,22 +347,10 @@ export default class TestView extends Vue {
     }
 
     created() {
-        this.transactionList = [
-            {
-                id: 1,
-                amount: '14.55',
-                categoryId: 1,
-                description: 'test buying',
-                location: 'test location',
-            },
-            {
-                id: 2,
-                amount: '14.55',
-                categoryId: 1,
-                description: 'test buying',
-                location: 'test location',
-            },
-        ];
+        Client.getTransactionList("2023-8")
+            .then(resp => {
+                this.transactionList = resp.data
+            })
         AMapLoader.load({
             key: '8375fa99f0a19ba66b137bddcb2fceac', // 申请好的Web端开发者Key，首次调用 load 时必填
             version: '2.0', // 指定要加载的 JS API 的版本，缺省时默认为 1.4.15
