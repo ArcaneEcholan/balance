@@ -8,13 +8,13 @@
 		<version>2.7.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+	<groupId>fit.wenchao</groupId>
+	<artifactId>balance-expense</artifactId>
+	<version>0.0.1</version>
 
-	<groupId>com.example</groupId>
-	<artifactId>playground-kotlin-jdk1_8-springboot_2_7_0_RELEASE</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>playground-kotlin-jdk1_8-springboot_2_7_0_RELEASE</name>
-	<description>playground-kotlin-jdk1_8-springboot_2_7_0_RELEASE</description>
 	<properties>
+		<sonar.organization>aron-srider</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<springboot.version>2.7.0</springboot.version>
 		<java.version>1.8</java.version>
 		<kotlin.version>1.8.22</kotlin.version>
