@@ -1,14 +1,12 @@
 <template>
-    <div class="">
-
-
-
+    <div class="page">
+        <!--region: amap-->
         <div class="mgb8"><span class="bold fs22">Location</span></div>
         <div id="amap" style="width: 100%; height: auto"></div>
         <div class="flex">
             <!--<el-button @click="onClickRefreshLocation">refresh</el-button>-->
 
-            <span style="font-size: 16px">(lat, lng)=({{geoLocation.latitude}},{{geoLocation.longitude}})</span>
+            <span style="font-size: 16px">(lat, lng)=({{ geoLocation.latitude }},{{ geoLocation.longitude }})</span>
             <!--latitude-->
             <!--<el-input readonly v-model="geoLocation.latitude"></el-input>-->
             <!--longitude-->
@@ -16,41 +14,76 @@
             <!--formated_address-->
             <!--<el-input readonly v-model="geoLocation.formattedName"></el-input>-->
         </div>
+        <!--endregion-->
 
         <div class="mgb20"></div>
 
-
+        <!--region: input area-->
         <div class="mgb8"><span class="bold fs22">Record</span></div>
 
+        <!--Input-->
         <el-input
             @input="onParseRawString"
             type="textarea"
-            autosize=""
+            :autosize="{ minRows: 2 }"
             v-model="rawFormatString"
         ></el-input>
 
-        <div v-for="form in parsedForms">
-            categoryValue
-            <el-input
-                v-model="form.categoryValue.value"
-                @input="checkCategory(form)"
-            ></el-input>
-            amount
-            <el-input
-                v-model="form.amount.value"
-                @input="checkAmount(form)"
-            ></el-input>
-            count
-            <el-input
-                v-model="form.count.value"
-                @input="checkCount(form)"
-            ></el-input>
-            description
-            <el-input
-                v-model="form.description.value"
-                @input="checkDescription(form)"
-            ></el-input>
+        <div class="mgb8"></div>
+
+        <!--region: Preview-->
+        <div style="" class="shadow br5">
+            <div class="record-header" v-show="parsedForms.length > 0">Preview</div>
+            <template v-for="(form, index) in parsedForms">
+                <div class="flex pd10"
+                     :style="
+                     `border-bottom: 1px solid #f5f5f5;
+                     ${index === parsedForms.length - 1 ? 'border-bottom: none; border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;' : ''};
+                     background-color: white;
+                     `
+">
+                    <div class="flexg5">
+                        <div>
+                            <span>{{ form.categoryValue ? form.categoryValue.value : "" }}</span>
+                        </div>
+                        <div class="fs14">
+                            <span class="google-gray-400">{{ form.count ? form.count.value : "" }}</span>
+                            <span class="pd5 google-gray-300">|</span>
+                            <span class="google-gray-400">{{ form.description ? form.description.value : "" }}</span>
+                        </div>
+                    </div>
+                    <div class="flexg1">
+                        <span class="bold">{{ form.amount ? form.amount.value : "" }}</span>
+                    </div>
+                </div>
+
+                <!--categoryValue-->
+                <!--<el-input-->
+                <!--    v-model="form.categoryValue.value"-->
+                <!--    @input="checkCategory(form)"-->
+                <!--&gt;</el-input>-->
+                <!--amount-->
+                <!--<el-input-->
+                <!--    v-model="form.amount.value"-->
+                <!--    @input="checkAmount(form)"-->
+                <!--&gt;</el-input>-->
+                <!--count-->
+                <!--<el-input-->
+                <!--    v-model="form.count.value"-->
+                <!--    @input="checkCount(form)"-->
+                <!--&gt;</el-input>-->
+                <!--description-->
+                <!--<el-input-->
+                <!--    v-model="form.description.value"-->
+                <!--    @input="checkDescription(form)"-->
+                <!--&gt;</el-input>-->
+            </template>
         </div>
+        <!--endregion-->
+
+        <div class="mgb8"></div>
+
+        <!--endregion-->
 
         <el-button @click="onSaveTrans">save all</el-button>
 
@@ -373,6 +406,17 @@ export default class TestView extends Vue {
 }
 </script>
 <style lang="scss" scoped>
-@import "~@/style/common-style.scss"
+@import "~@/style/common-style.scss";
 
+.page {
+    background-color: $google-gray-300;
+    padding: 5px;
+}
+
+.record-header {
+    background-color: $google-gray-100;
+    padding: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
 </style>
