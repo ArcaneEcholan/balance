@@ -38,7 +38,7 @@ export class PageLocation {
     customBaseURL() {
         return {
             baseURL: 'http://172.27.128.180:8094/api',
-            hardCode: true,
+            hardCode: false,
         };
     }
 }
