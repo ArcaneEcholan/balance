@@ -1,25 +1,33 @@
 <template>
     <div class="">
-        <div>location</div>
-        <div id="container" style="height: 300px; width: 300px"></div>
-
-        <el-button @click="onClickRefreshLocation">refresh</el-button>
-        latitude
-        <el-input readonly v-model="geoLocation.latitude"></el-input>
-        longitude
-        <el-input readonly v-model="geoLocation.longitude"></el-input>
-        formated_address
-        <el-input readonly v-model="geoLocation.formattedName"></el-input>
 
 
-        raw string
+
+        <div class="mgb8"><span class="bold fs22">Location</span></div>
+        <div id="amap" style="width: 100%; height: auto"></div>
+        <div class="flex">
+            <!--<el-button @click="onClickRefreshLocation">refresh</el-button>-->
+
+            <span style="font-size: 16px">(lat, lng)=({{geoLocation.latitude}},{{geoLocation.longitude}})</span>
+            <!--latitude-->
+            <!--<el-input readonly v-model="geoLocation.latitude"></el-input>-->
+            <!--longitude-->
+            <!--<el-input readonly v-model="geoLocation.longitude"></el-input>-->
+            <!--formated_address-->
+            <!--<el-input readonly v-model="geoLocation.formattedName"></el-input>-->
+        </div>
+
+        <div class="mgb20"></div>
+
+
+        <div class="mgb8"><span class="bold fs22">Record</span></div>
+
         <el-input
             @input="onParseRawString"
             type="textarea"
             autosize=""
             v-model="rawFormatString"
         ></el-input>
-        <el-button @click="onSaveTrans">save all</el-button>
 
         <div v-for="form in parsedForms">
             categoryValue
@@ -44,7 +52,9 @@
             ></el-input>
         </div>
 
-        <el-button @click="location"></el-button>
+        <el-button @click="onSaveTrans">save all</el-button>
+
+        <!--<el-button @click="location"></el-button>-->
 
         <!-- <el-select v-model="trans_type">
             <el-option
@@ -94,6 +104,12 @@ export default class TestView extends Vue {
         longitude: null,
         formattedName: null
     };
+
+    mounted() {
+        let amapElem: HTMLElement = document.getElementById("amap")!
+        let amapWidth = amapElem.clientWidth;
+        amapElem.style.height = amapWidth + 'px'
+    }
 
     getDetailLocation(lat: string, long: string) {
         request({
@@ -257,10 +273,10 @@ export default class TestView extends Vue {
                         `'(lat, lng) = (${position.lat}, ${position.lng})`,
                     );
 
-                    this.getDetailLocation(
-                        position.lat,
-                        position.lng,
-                    );
+                    // this.getDetailLocation(
+                    //     position.lat,
+                    //     position.lng,
+                    // );
                 } else {
                     console.log(result);
                     Notification.error('定位失败');
@@ -305,7 +321,7 @@ export default class TestView extends Vue {
             plugins: [], // 需要使用的的插件列表，如比例尺'AMap.Scale'等
         })
             .then((AMap) => {
-                this.amap = new AMap.Map('container');
+                this.amap = new AMap.Map('amap');
                 AMap.plugin('AMap.Geolocation', () => {
                     // 异步加载插件
                     var geolocation = new AMap.Geolocation();
@@ -356,4 +372,7 @@ export default class TestView extends Vue {
     }
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@import "~@/style/common-style.scss"
+
+</style>

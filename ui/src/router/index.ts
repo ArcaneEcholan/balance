@@ -2,18 +2,18 @@ import Vue from 'vue';
 import VueRouter, {RouteConfig} from 'vue-router';
 import HelloWorld from '@/views/HelloWorld.vue';
 import About from '@/views/About.vue';
-import TestView from "@/views/Test.vue";
+import TestView from "@/views/index.vue";
 
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
     {
         path: '/',
-        redirect: '/test',
+        redirect: '/index',
     },
     {
-        path: '/test',
-        name: 'Test',
+        path: '/index',
+        name: 'index',
         component: TestView,
     }
 ];
