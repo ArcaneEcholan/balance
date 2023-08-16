@@ -131,6 +131,19 @@ import {convertToShortDateTime} from "@/ts/utils";
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
 };
 
+class FormItemField {
+    value: string | null = null;
+    key: string | null = null;
+    isValid: string | null = null;
+}
+
+class FormItem {
+    categoryValue: FormItemField | null = null;
+    amount: FormItemField | null = null;
+    count: FormItemField | null = null;
+    description: FormItemField | null = null;
+}
+
 @Component({
     filters: {
         formatTimeForRecordItem: function (timeString: string) {
@@ -143,7 +156,7 @@ export default class TestView extends Vue {
     amap: any;
     amapGeolocationPlugin: any;
     rawFormatString: string | null = null;
-    parsedForms: any[] = [];
+    parsedForms: FormItem[] = [];
     geoLocation: any = {
         latitude: null,
         longitude: null,
@@ -202,10 +215,54 @@ export default class TestView extends Vue {
     }
 
     onSaveTrans() {
+        if(this.parsedForms.length == 0) {
+            Notification.warning("No data to save");
+            return
+        }
+        let error = false
+        let errorType = ""
+        let parseForms = this.parsedForms
+        parseForms.forEach((item: FormItem) => {
+            if (error) {
+                return
+            }
+            let categoryValue = item.categoryValue?.value;
+            let amount = item.amount?.value;
+            let count = item.count?.value;
+            let description = item.description?.value;
+
+            // ensure no null
+            if (categoryValue == null || amount == null || count == null || description == null) {
+                error = true
+                errorType = "Information not complete"
+                return
+            }
+
+            let countValid = this.isPositiveInteger(Number(count));
+            let amountValid = this.isFloat(Number(amount));
+            let amountDecimalPlaces = this.countDecimalPlaces(amount);
+            if (amountDecimalPlaces > 2) {
+                amountValid = false
+            }
+
+            if (!countValid || !amountValid) {
+                error = true
+                errorType = "Information format invalid"
+                return
+            }
+        })
+        // @ts-ignore
+        if(error === true){
+            Notification.error(errorType)
+            return
+        }
         this.saveTransactions(this.parsedForms);
     }
 
+
     saveTransactions(trans: any[]) {
+
+
         let request;
         try {
             request = trans.map((tran) => {
@@ -250,11 +307,25 @@ export default class TestView extends Vue {
         // form.description.isValid = true;
     }
 
-    isFloat(number: number) {
-        return Number(number) === number && !Number.isInteger(number);
+    countDecimalPlaces(number: string) {
+        if (number === '') {
+            return 0; // Not a valid float string
+        }
+
+        const parts = number.split('.');
+
+        if (parts.length === 1) {
+            return 0; // No decimal point found
+        }
+
+        return parts[1].length; // Return the length of the decimal part
     }
 
-    isPositiveInteger(number: number) {
+    isFloat(number: number) {
+        return Number(number) === number && !Number.isInteger(number) || Number.isInteger(number);
+    }
+
+    isPositiveInteger(number: number): boolean {
         return Number.isInteger(number) && number > 0;
     }
 
