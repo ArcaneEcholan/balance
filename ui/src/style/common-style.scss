@@ -20,7 +20,7 @@ $google-gray-400: #bdbdbd;
 
 .el-font-family {
     font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
-        'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+    'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
 }
 
 
@@ -29,7 +29,6 @@ $google-gray-400: #bdbdbd;
     justify-content: center;
     align-items: center;
 }
-
 
 
 .key-value {
@@ -384,6 +383,41 @@ $google-gray-400: #bdbdbd;
     padding-bottom: 15px;
 }
 
+
+.pdl16 {
+    padding-left: 16px;
+}
+
+.pdr16 {
+    padding-right: 16px;
+}
+
+.pdt16 {
+    padding-top: 16px;
+}
+
+.pdb16 {
+    padding-bottom: 16px;
+}
+
+
+.pdl32 {
+    padding-left: 32px;
+}
+
+.pdr32 {
+    padding-right: 32px;
+}
+
+.pdt32 {
+    padding-top: 32px;
+}
+
+.pdb32 {
+    padding-bottom: 32px;
+}
+
+
 .relative {
     position: relative;
 }
@@ -569,4 +603,18 @@ $google-gray-400: #bdbdbd;
 
 .pointer {
     cursor: pointer;
+}
+
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+
+.disable-scroll-y {
+    overflow-y: hidden !important;
+}
+
+.enable-scroll-y {
+    overflow-y: auto !important;
 }
