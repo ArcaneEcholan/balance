@@ -7,6 +7,18 @@
     </div>
 </template>
 
+
+<script type="ts">
+import { Component, Vue } from 'vue-property-decorator';
+@Component
+export default class AppView extends Vue {
+    mounted() {
+
+    }
+}
+
+</script>
+
 <style lang="scss">
 body {
     padding: 0;
@@ -33,9 +45,3 @@ nav {
     }
 }
 </style>
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-
-@Component({})
-export default class App extends Vue {}
-</script>

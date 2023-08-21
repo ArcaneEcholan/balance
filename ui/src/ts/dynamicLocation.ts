@@ -38,7 +38,7 @@ export class PageLocation {
     customBaseURL() {
         return {
             baseURL: 'http://localhost:8094/api',
-            hardCode: false,
+            hardCode: true,
         };
     }
 }

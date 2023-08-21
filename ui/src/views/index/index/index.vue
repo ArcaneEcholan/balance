@@ -1,121 +1,142 @@
 <template>
     <div class="page">
-        <!--region: amap-->
-        <div class="mgb8"><span class="bold fs22">Location</span></div>
-        <div id="amap" style="width: 100%; height: auto"></div>
-        <div class="flex">
-            <span style="font-size: 16px">(lat, lng)=({{ geoLocation.latitude }},{{ geoLocation.longitude }})</span>
-        </div>
-        <!--endregion-->
 
-        <div class="mgb20"></div>
+        <!--edit stack-->
+        <router-view>
+        </router-view>
 
-        <!--region: input area-->
-        <div class="mgb8"><span class="bold fs22">Record</span></div>
+        <div>
+            <van-cell title="Show Popup" is-link @click="showPopup"/>
+            <van-popup v-model:show="show" position="right"
+                       :style="{ width: '100%', height: '100%'}">
+                <div class="pd10">
+                    Content
+                </div>
+            </van-popup>
 
-        <!--Input-->
-        <el-input
-            @input="onParseRawString"
-            type="textarea"
-            :autosize="{ minRows: 2 }"
-            v-model="rawFormatString"
-        ></el-input>
 
-        <div class="mgb8"></div>
+            <!--region: amap-->
+            <div class="mgb8"><span class="bold fs22">Location</span></div>
+            <div id="amap" style="width: 100%; height: auto"></div>
+            <div class="flex">
+                <span style="font-size: 16px">(lat, lng)=({{ geoLocation.latitude }},{{ geoLocation.longitude }})</span>
+            </div>
+            <!--endregion-->
 
-        <!--region: Preview-->
-        <div style="" class="shadow br5">
-            <div class="record-header" v-show="parsedForms.length > 0">Preview</div>
-            <template v-for="(form, index) in parsedForms">
-                <div class="flex pd10"
-                     :style="
+            <div class="mgb20"></div>
+
+            <!--region: input area-->
+            <div class="mgb8"><span class="bold fs22">Record</span></div>
+
+            <!--Input-->
+            <el-input
+                @input="onParseRawString"
+                type="textarea"
+                :autosize="{ minRows: 2 }"
+                v-model="rawFormatString"
+            ></el-input>
+
+            <div class="mgb8"></div>
+
+            <!--region: Preview-->
+            <div style="" class="shadow br5">
+                <div class="record-header" v-show="parsedForms.length > 0">Preview</div>
+                <template v-for="(form, index) in parsedForms">
+                    <div class="flex pd10"
+                         :style="
                      `border-bottom: 1px solid #f5f5f5;
                      ${index === parsedForms.length - 1 ? 'border-bottom: none; border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;' : ''};
                      background-color: white;
                      `
                 ">
-                    <div class="flexg5">
-                        <div>
-                            <span>{{ form.categoryValue ? form.categoryValue.value : "" }}</span>
+                        <div class="flexg5">
+                            <div>
+                                <span>{{ form.categoryValue ? form.categoryValue.value : "" }}</span>
+                            </div>
+                            <div class="fs14">
+                                <span class="google-gray-400">{{ form.count ? form.count.value : "" }}</span>
+                                <span class="pd5 google-gray-300">|</span>
+                                <span class="google-gray-400">{{
+                                        form.description ? form.description.value : ""
+                                    }}</span>
+                            </div>
                         </div>
-                        <div class="fs14">
-                            <span class="google-gray-400">{{ form.count ? form.count.value : "" }}</span>
-                            <span class="pd5 google-gray-300">|</span>
-                            <span class="google-gray-400">{{ form.description ? form.description.value : "" }}</span>
+                        <div class="flexg1">
+                            <span class="bold">{{ form.amount ? form.amount.value : "" }}</span>
                         </div>
                     </div>
-                    <div class="flexg1">
-                        <span class="bold">{{ form.amount ? form.amount.value : "" }}</span>
-                    </div>
-                </div>
-            </template>
-        </div>
-        <!--endregion-->
+                </template>
+            </div>
+            <!--endregion-->
 
-        <div class="mgb8"></div>
+            <div class="mgb8"></div>
 
-        <!--endregion-->
+            <!--endregion-->
 
-        <div @click="onSaveTrans" style="
+            <div @click="onSaveTrans" style="
         background-color: white;
         text-align: center;
 "
-             class="br5 pdt10 pdb10"
-        >
-            <i class="el-icon-plus"></i>
-        </div>
+                 class="br5 pdt10 pdb10"
+            >
+                <i class="el-icon-plus"></i>
+            </div>
 
 
-        <div class="mgb8"></div>
+            <div class="mgb8"></div>
 
-        <!--region: this month-->
-        <div style="" class="shadow br5">
-            <!--header-->
-            <div class="record-header" v-show="transactionList.length > 0">This month</div>
-            <!--list-->
-            <template v-for="(form, index) in transactionList">
-                <!--list item-->
-                <div class="flex pd10"
-                     :style="
+            <!--region: this month-->
+            <div style="" class="shadow br5">
+                <!--header-->
+                <div class="record-header" v-show="transactionList.length > 0">This month</div>
+                <!--list-->
+                <template v-for="(form, index) in transactionList">
+                    <!--list item-->
+                    <div class="flex pd10"
+                         @click="edit"
+                         :style="
                      `border-bottom: 1px solid #f5f5f5;
                      ${index === transactionList.length - 1 ? 'border-bottom: none; border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;' : ''};
                      background-color: white;
                      `
                 ">
-                    <!--card left-->
-                    <div class="flexg5">
-                        <div>
-                            <span class="pdr10">{{ form.categoryValue }}</span>
-                            <span class="fs14 google-gray-400">test location</span>
+                        <!--card left-->
+                        <div class="flexg5">
+                            <div>
+                                <span class="pdr10">{{ form.categoryValue }}</span>
+                                <span class="fs14 google-gray-400">test location</span>
+                            </div>
+                            <div class="fs14">
+                                <span class="google-gray-400">{{ form.datetime | formatTimeForRecordItem }}</span>
+                                <span class="pd5 google-gray-300">|</span>
+                                <span class="google-gray-400">{{ form.description }}</span>
+                            </div>
                         </div>
-                        <div class="fs14">
-                            <span class="google-gray-400">{{ form.datetime | formatTimeForRecordItem }}</span>
-                            <span class="pd5 google-gray-300">|</span>
-                            <span class="google-gray-400">{{ form.description }}</span>
+                        <!--card right-->
+                        <div class="flexg1">
+                            <span class="bold">{{ form.amount }}  {{
+                                    `${form.count > 1 ? 'x ' + form.count : ''}`
+                                }}</span>
                         </div>
                     </div>
-                    <!--card right-->
-                    <div class="flexg1">
-                        <span class="bold">{{ form.amount }}  {{ `${form.count > 1 ? 'x ' + form.count : ''}` }}</span>
-                    </div>
-                </div>
-            </template>
-        </div>
-        <!--endregion-->
+                </template>
+            </div>
+            <!--endregion-->
 
-        <!--<el-table :data="transactionList">-->
-        <!--    <el-table-column prop="id" label="id"></el-table-column>-->
-        <!--    <el-table-column prop="amount" label="amount"></el-table-column>-->
-        <!--    <el-table-column-->
-        <!--        prop="categoryId"-->
-        <!--        label="categoryId"-->
-        <!--    ></el-table-column>-->
-        <!--    <el-table-column-->
-        <!--        prop="description"-->
-        <!--        label="description"-->
-        <!--    ></el-table-column>-->
-        <!--    <el-table-column prop="location" label="location"></el-table-column>-->
-        <!--</el-table>-->
+            <!--<el-table :data="transactionList">-->
+            <!--    <el-table-column prop="id" label="id"></el-table-column>-->
+            <!--    <el-table-column prop="amount" label="amount"></el-table-column>-->
+            <!--    <el-table-column-->
+            <!--        prop="categoryId"-->
+            <!--        label="categoryId"-->
+            <!--    ></el-table-column>-->
+            <!--    <el-table-column-->
+            <!--        prop="description"-->
+            <!--        label="description"-->
+            <!--    ></el-table-column>-->
+            <!--    <el-table-column prop="location" label="location"></el-table-column>-->
+            <!--</el-table>-->
+        </div>
     </div>
 </template>
 
@@ -126,6 +147,7 @@ import {Notification} from 'element-ui';
 import Client from '@/request/client';
 import request from '@/request';
 import {convertToShortDateTime} from "@/ts/utils";
+import PageStack, {pushPage} from "@/ts/pageStack";
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -144,6 +166,12 @@ class FormItem {
     description: FormItemField | null = null;
 }
 
+Component.registerHooks([
+    'beforeRouteEnter',
+    'beforeRouteLeave',
+    'beforeRouteUpdate',
+]);
+
 @Component({
     filters: {
         formatTimeForRecordItem: function (timeString: string) {
@@ -151,7 +179,9 @@ class FormItem {
         }
     }
 })
-export default class TestView extends Vue {
+export default class IndexView extends Vue {
+    showMain = true
+    show = false
     transactionList: any[] = [];
     amap: any;
     amapGeolocationPlugin: any;
@@ -162,6 +192,18 @@ export default class TestView extends Vue {
         longitude: null,
         formattedName: null
     };
+
+    edit() {
+        this.present('/index/edit')
+    }
+
+    present(path: string) {
+        pushPage(path)
+    }
+
+    showPopup() {
+        this.show = true
+    }
 
     mounted() {
         let amapElem: HTMLElement = document.getElementById("amap")!
@@ -215,7 +257,7 @@ export default class TestView extends Vue {
     }
 
     onSaveTrans() {
-        if(this.parsedForms.length == 0) {
+        if (this.parsedForms.length == 0) {
             Notification.warning("No data to save");
             return
         }
@@ -252,7 +294,7 @@ export default class TestView extends Vue {
             }
         })
         // @ts-ignore
-        if(error === true){
+        if (error === true) {
             Notification.error(errorType)
             return
         }
@@ -418,6 +460,27 @@ export default class TestView extends Vue {
     }
 
     created() {
+        this.transactionList = [{
+            id: 1,
+            categoryValue: "food",
+            amount: 44.00,
+            count: 1,
+            description: "kfc",
+            location: {
+                latitude: 0,
+                longitude: 0,
+            }
+        }, {
+            id: 2,
+            categoryValue: "fruit",
+            amount: 33.00,
+            count: 1,
+            description: "watermalon",
+            location: {
+                latitude: 0,
+                longitude: 0,
+            }
+        }]
         Client.getTransactionList("2023-8")
             .then(resp => {
                 this.transactionList = resp.data
