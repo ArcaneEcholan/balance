@@ -14,7 +14,12 @@ import 'vant/lib/index.css';
 
 import {Cell, Field, CellGroup} from 'vant';
 import {Popup} from 'vant';
+import {Button} from 'vant';
+import {Notify} from 'vant';
 
+
+Vue.use(Notify);
+Vue.use(Button);
 Vue.use(Popup);
 Vue.use(Cell);
 Vue.use(Field);

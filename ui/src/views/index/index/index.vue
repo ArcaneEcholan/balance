@@ -1,9 +1,12 @@
 <template>
     <div class="page">
 
+
         <!--edit stack-->
         <router-view>
         </router-view>
+
+
 
         <div>
             <van-cell title="Show Popup" is-link @click="showPopup"/>
@@ -24,6 +27,8 @@
             <!--endregion-->
 
             <div class="mgb20"></div>
+
+            <div style="z-index: 10000000">{{stackSize}}</div>
 
             <!--region: input area-->
             <div class="mgb8"><span class="bold fs22">Record</span></div>
@@ -148,6 +153,7 @@ import Client from '@/request/client';
 import request from '@/request';
 import {convertToShortDateTime} from "@/ts/utils";
 import PageStack, {pushPage} from "@/ts/pageStack";
+import pageStack from "@/ts/pageStack";
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -180,6 +186,9 @@ Component.registerHooks([
     }
 })
 export default class IndexView extends Vue {
+    get stackSize() {
+        return pageStack.getStackSize()
+    }
     showMain = true
     show = false
     transactionList: any[] = [];

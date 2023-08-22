@@ -9,12 +9,9 @@ function isThisTheFirstNav() {
 }
 
 router.beforeEach(async (to, from, next) => {
+    // first nav means user refresh the page, which represent user closing the app
     if (isThisTheFirstNav()) {
         // ok, it's the first time the app starts up
-
-        // we clean up the stack size
-        pageStack.clear()
-
         count ++
 
         // we abandon the non index nav
@@ -27,6 +24,9 @@ router.beforeEach(async (to, from, next) => {
         }
     } else {
         // it's not the first time the app starts up
+        if(to.path === "/" || to.path === "/index") {
+            pageStack.clear()
+        }
         count++
         next()
     }
