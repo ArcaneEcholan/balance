@@ -3,7 +3,7 @@
     <div
         class="slide-panel transition"
         :id="getContainerId()"
-        :style="`display: none; z-index: 10000; ${backgroundColor?'background-color: '+backgroundColor + ';':''}`"
+        :style="`display: none; z-index: 1999; ${backgroundColor?'background-color: '+backgroundColor + ';':''}`"
     >
         <div style="height: 100%">
             <slot>content</slot>
@@ -45,7 +45,9 @@ export default class ModalPresentationView extends Vue {
      */
     openModal() {
         this.modal.style.right = `0`;
-        this.$emit('open', this);
+        setTimeout(() => {
+            this.$emit('open', this);
+        }, 300);
     }
 
     /**
@@ -209,20 +211,12 @@ export default class ModalPresentationView extends Vue {
 }
 </script>
 <style>
-.slide-panel {
-    /* ... */
-    touch-action: pan-left;
-}
+
 body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
     overflow-x: hidden;
-}
-
-.page-content {
-    padding: 20px;
-    background-color: #f0f0f0;
 }
 
 .slide-panel {

@@ -1,27 +1,19 @@
 import router from "@/router";
+import {Notification} from "element-ui";
 
 class PageStack {
     private stackSize: number = 0
 
     constructor() {
-        let stackSize = window.localStorage.getItem("pageStackSize")
-
-        if (stackSize === null) {
-            stackSize = '0';
-        }
-
-        this.stackSize = parseInt(stackSize);
+        this.stackSize = 0;
     }
 
     push() {
         this.stackSize++;
-        window.localStorage.setItem("pageStackSize", this.stackSize.toString());
-
     }
 
     pop() {
         this.stackSize--;
-        window.localStorage.setItem("pageStackSize", this.stackSize.toString());
     }
 
     getStackSize() {
@@ -34,7 +26,6 @@ class PageStack {
 
     clear() {
         this.stackSize = 0;
-        window.localStorage.setItem("pageStackSize", this.stackSize.toString());
     }
 
 }
@@ -42,7 +33,7 @@ class PageStack {
 let pageStack = new PageStack()
 
 function popPage() {
-    debugger
+
     // go back to the previous page
     router.go(-1)
     // stack minus 1
@@ -54,7 +45,7 @@ function popPage() {
 }
 
 function pushPage(path: string) {
-    debugger
+
     // go to the next page
     router.push(path)
     // stack plus 1
@@ -62,6 +53,13 @@ function pushPage(path: string) {
     // prevent the most basic page from scrolling
     document.body.style.overflowY = 'hidden'
 }
+
+function closeIt() {
+    pageStack.clear()
+    Notification.info("clear stack size")
+}
+
+window.onbeforeunload = closeIt;
 
 export default pageStack;
 
