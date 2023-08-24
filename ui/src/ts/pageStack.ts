@@ -13,7 +13,11 @@ class PageStack {
     }
 
     pop() {
-        this.stackSize--;
+        if(this.stackSize <= 0) {
+            this.stackSize = 0;
+        } else {
+            this.stackSize--;
+        }
     }
 
     getStackSize() {
@@ -44,6 +48,23 @@ function popPage() {
     }
 }
 
+function gotoPage(popStack: boolean, path: string, processOption: any) {
+    let option = {
+        path: path,
+    }
+    processOption(option)
+    // go back to the previous page
+    router.push(option)
+    if (popStack) {
+        // stack minus 1
+        pageStack.pop()
+        if (pageStack.isBottom()) {
+            // if the page stack is only left with one page, this page should be able to scroll
+            document.body.style.overflowY = 'auto'
+        }
+    }
+}
+
 function pushPage(path: string) {
 
     // go to the next page
@@ -63,4 +84,4 @@ window.onbeforeunload = closeIt;
 
 export default pageStack;
 
-export {popPage, pushPage};
+export {popPage, pushPage, gotoPage};

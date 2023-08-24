@@ -7,9 +7,12 @@ import com.example.app.dao.utils.base.pagination.Page
 import com.example.app.dao.utils.base.pagination.PageConfig
 import com.example.app.dao.utils.base.pagination.PageNo
 import com.example.app.dao.utils.base.pagination.PageSize
+import com.example.app.exception.ApiException
 import com.example.app.utils.getMonthRange
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import java.io.Serializable
 import java.math.BigDecimal
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -64,6 +67,15 @@ interface TransactionService {
         description: String?,
         datetime: String,
         location: Map<String, String>,
+    ): TransactionVO
+
+    fun get(transactionId: Serializable): TransactionVO?
+    fun update(
+        transactionId: Long,
+        bigDecimal: BigDecimal,
+        count: Int,
+        description: String?,
+        datetime: String?,
     ): TransactionVO
 }
 
@@ -184,5 +196,30 @@ class TransactionServiceImpl : TransactionService {
         transactionDao.save(transaction)
 
         return fillVO(transaction)
+    }
+
+    override fun get(transactionId: Serializable): TransactionVO? {
+        var transaction = transactionDao.getOneByMap("id", transactionId)
+        return transaction?.let { fillVO(it) }
+    }
+
+    override fun update(
+        transactionId: Long,
+        bigDecimal: BigDecimal,
+        count: Int,
+        description: String?,
+        datetime: String?,
+    ): TransactionVO {
+        var transaction = transactionDao.getOneByMap("id", transactionId)
+        transaction?.let {
+            transaction.amount = bigDecimal
+            transaction.count = count
+            transaction.description = description
+            transaction.datetime = datetime
+            transactionDao.updateById(transaction)
+            return fillVO(transaction)
+        } ?: run {
+            throw ApiException(HttpStatus.NOT_FOUND, "transaction not found")
+        }
     }
 }

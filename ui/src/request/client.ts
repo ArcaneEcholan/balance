@@ -80,6 +80,32 @@ class Client {
             params: { month: yearHyphenMonth },
         });
     }
+
+    static getTransaction(transactionId: number) {
+        return request({
+            url: `/transaction`,
+            method: 'get',
+            params: { transactionId },
+        });
+    }
+
+    static updateTransaction(recordId: number | string | null,
+                             amount: string,
+                             datetime: string | null,
+                             count: string,
+                             description: string | null) {
+        return request({
+            url: `/transaction`,
+            method: 'put',
+            data: {
+                transactionId: recordId,
+                amount,
+                datetime,
+                count,
+                description,
+            }
+        });
+    }
 }
 
 export default Client;

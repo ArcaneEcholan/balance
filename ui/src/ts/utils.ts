@@ -71,3 +71,27 @@ export function convertToShortDateTime(timeString: string) {
 
     return formattedString;
 }
+
+export function
+countDecimalPlaces(number: string) {
+    if (number === '') {
+        return 0; // Not a valid float string
+    }
+
+    const parts = number.split('.');
+
+    if (parts.length === 1) {
+        return 0; // No decimal point found
+    }
+
+    return parts[1].length; // Return the length of the decimal part
+}
+export function
+isFloat(number: number) {
+    return Number(number) === number && !Number.isInteger(number) || Number.isInteger(number);
+}
+
+export function
+isPositiveInteger(number: number): boolean {
+    return Number.isInteger(number) && number > 0;
+}

@@ -7,7 +7,6 @@
         </router-view>
 
 
-
         <div>
             <van-cell title="Show Popup" is-link @click="showPopup"/>
             <van-popup v-model:show="show" position="right"
@@ -28,7 +27,7 @@
 
             <div class="mgb20"></div>
 
-            <div style="z-index: 10000000">{{stackSize}}</div>
+            <div style="z-index: 10000000">{{ stackSize }}</div>
 
             <!--region: input area-->
             <div class="mgb8"><span class="bold fs22">Record</span></div>
@@ -98,7 +97,7 @@
                 <template v-for="(form, index) in transactionList">
                     <!--list item-->
                     <div class="flex pd10"
-                         @click="edit"
+                         @click="edit(form.id)"
                          :style="
                      `border-bottom: 1px solid #f5f5f5;
                      ${index === transactionList.length - 1 ? 'border-bottom: none; border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;' : ''};
@@ -154,6 +153,8 @@ import request from '@/request';
 import {convertToShortDateTime} from "@/ts/utils";
 import PageStack, {pushPage} from "@/ts/pageStack";
 import pageStack from "@/ts/pageStack";
+import {Route} from "vue-router";
+import eventBus from "@/ts/EventBus";
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -180,7 +181,10 @@ Component.registerHooks([
 
 @Component({
     filters: {
-        formatTimeForRecordItem: function (timeString: string) {
+        formatTimeForRecordItem: function (timeString: string | null) {
+            if(!timeString) {
+                return 'unknown datetime'
+            }
             return convertToShortDateTime(timeString);
         }
     }
@@ -189,6 +193,7 @@ export default class IndexView extends Vue {
     get stackSize() {
         return pageStack.getStackSize()
     }
+
     showMain = true
     show = false
     transactionList: any[] = [];
@@ -202,9 +207,23 @@ export default class IndexView extends Vue {
         formattedName: null
     };
 
-    edit() {
-        this.present('/index/edit')
+    updateTransasction(newTransaction: any) {
+        let found = this.transactionList.find((item) => {
+            return item.id === newTransaction.id
+        })
+        if (found) {
+            found.amount = newTransaction.amount
+            found.count = newTransaction.count
+            found.datetime = newTransaction.datetime
+            found.description = newTransaction.description
+        }
     }
+
+    edit(recordId: string | number) {
+        this.present(`/index/edit?recordId=${recordId}`)
+    }
+
+
 
     present(path: string) {
         pushPage(path)
@@ -469,6 +488,9 @@ export default class IndexView extends Vue {
     }
 
     created() {
+        eventBus.$on('afterTransactionChanged', (newTransaction: any) => {
+            this.updateTransasction(newTransaction)
+        });
         this.transactionList = [{
             id: 1,
             categoryValue: "food",

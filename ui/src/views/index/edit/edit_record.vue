@@ -6,7 +6,6 @@
             ref="modal"
         >
             <template #default>
-
                 <div>
                     <el-input type="textarea" v-model="variableVisibleString">
                     </el-input>
@@ -44,7 +43,11 @@ height: 56px;">
                 <div class="pdb16 pdt16"></div>
                 <div class="pdl16 pdr16">
                     <el-button round plain type="primary" style="width: 100%"
-                    @click="submitCommit">Submit</el-button>
+                               @click="submit"
+
+                    :disabled="!submitEnable"
+                    >Submit
+                    </el-button>
                 </div>
             </template>
         </modal-presentation>
@@ -54,9 +57,19 @@ height: 56px;">
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentationView from "@/components/ModalPresentation.vue";
-import {popPage} from "@/ts/pageStack";
+import {gotoPage, popPage} from "@/ts/pageStack";
 import pageStack from "@/ts/pageStack";
 import {Notify} from "vant";
+import Client from "@/request/client";
+import {countDecimalPlaces, isFloat, isPositiveInteger} from '@/ts/utils';
+import eventBus from "@/ts/EventBus";
+
+class FormItem {
+    categoryValue: string | null = null;
+    amount: number | null = null;
+    count: number | null = null;
+    description: string | null = null;
+}
 
 // Register the router hooks with their names
 // Component.registerHooks([
@@ -74,15 +87,85 @@ export default class EditRecordView extends Vue {
         return pageStack.getStackSize()
     }
 
-
     varTable: any = {}
 
-     visibleVariable(varName:string, varValue: any) {
+    visibleVariable(varName: string, varValue: any) {
         this.varTable[varName] = varValue
         this.renderToString()
     }
 
-     renderToString() {
+    submit() {
+        this.submitEnable = false
+
+        let error = false;
+
+        let datetime = this.datetime
+
+        if(datetime != null) {
+            datetime = datetime.trim()
+            const datetimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+
+            if (!datetimeRegex.test(datetime)) {
+                Notify({
+                    type: "danger",
+                    message: "Information format invalid"
+                })
+                this.submitEnable = true
+                return
+            }
+        }
+        let description = this.description
+
+        let amount = this.amount
+        let count = this.count
+
+        // ensure no null
+        if (amount == null || count == null) {
+            Notify({
+                type: "danger",
+                message: "Information incomplete"
+            })
+            this.submitEnable = true
+            return
+        }
+
+
+
+        let countValid = isPositiveInteger(Number(count));
+        let amountValid = isFloat(Number(amount));
+        let amountDecimalPlaces = countDecimalPlaces(amount);
+        if (amountDecimalPlaces > 2) {
+            amountValid = false
+        }
+
+        if (!countValid || !amountValid) {
+            Notify({
+                type: "danger",
+                message: "Information format invalid"
+            })
+            this.submitEnable = true
+            return
+        }
+
+
+        // format check pass
+        Client.updateTransaction(this.recordId,
+            amount, datetime, count, description)
+            .then((resp:any) => {
+                let newTrans = resp.data
+                eventBus.$emit("afterTransactionChanged", newTrans)
+                Notify({
+                    type: "success",
+                    message: "Update success"
+                })
+                this.submitEnable = true
+            })
+            .catch((err: any) => {
+                this.submitEnable = true
+            })
+    }
+
+    renderToString() {
         let keys = Object.keys(this.varTable)
         let result = ""
         for (let i = 0; i < keys.length; i++) {
@@ -93,6 +176,10 @@ export default class EditRecordView extends Vue {
         this.variableVisibleString = result
     }
 
+
+    recordId: number | string | null = null
+
+    submitEnable: boolean = true
     variableVisibleString: string | null = null
 
     amount: string | null = null
@@ -104,10 +191,6 @@ export default class EditRecordView extends Vue {
     modal!: ModalPresentationView
 
     created() {
-
-
-
-
     }
 
     mounted() {
@@ -117,10 +200,16 @@ export default class EditRecordView extends Vue {
         }, 1)
 
         setTimeout(() => {
-            let recordId = this.$route.query.recordId
+            let recordId: string | number | null = this.$route.query.recordId as number | string | null
+            this.recordId = recordId
             this.visibleVariable("recordId", recordId)
-            if(recordId != null) {
-
+            if (recordId != null) {
+                Client.getTransaction(recordId as number).then(resp => {
+                    this.amount = resp.data.amount
+                    this.datetime = resp.data.datetime
+                    this.count = resp.data.count
+                    this.description = resp.data.description
+                })
                 return
             }
 
@@ -129,12 +218,20 @@ export default class EditRecordView extends Vue {
                 Notify.clear()
                 this.$router.push("/")
             }, 1000)
-        }, 300)
+        }, 500)
 
     }
 
     closed() {
-        popPage()
+        gotoPage(true, "/", (routeOpiton: any) => {
+            routeOpiton.params =  {
+                transactionId: this.recordId,
+                amount: this.amount,
+                datetime: this.datetime,
+                count: this.count,
+                description: this.description
+            }
+        })
     }
 }
 </script>
