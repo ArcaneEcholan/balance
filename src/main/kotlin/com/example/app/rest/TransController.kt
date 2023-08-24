@@ -2,10 +2,12 @@ package com.example.app.rest
 
 import cn.hutool.core.date.DateTime
 import com.example.app.dao.TransactionCategoryDao
+import com.example.app.exception.ApiException
 import com.example.app.service.TransactionService
 import com.example.app.service.TransactionVO
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -24,6 +26,7 @@ class SaveTranDTO {
     @Pattern(regexp = "^[-+]?[0-9]*\\.?[0-9]+$", message = "amount must be double")
     var amount: String? = null
 
+    @NotNull
     @Positive(message = "count must be positive")
     var count: Int? = null
 
@@ -76,8 +79,53 @@ class TransController {
     }
 
     @GetMapping("/transactions")
-    fun getTransactions(@Valid @NotNull month:String): ResponseEntity<List<TransactionVO>> {
+    fun getTransactions(@Valid @NotNull month: String): ResponseEntity<List<TransactionVO>> {
         return ResponseEntity.ok(transactionService.list(month));
     }
 
+
+    @GetMapping("/transaction")
+    fun getTransaction(@Valid @NotNull transactionId: Long): ResponseEntity<TransactionVO> {
+        val get = transactionService.get(transactionId)
+        get?.let {
+            return ResponseEntity.ok(it);
+        } ?: run {
+            throw ApiException(HttpStatus.NOT_FOUND, "transaction not found")
+        }
+    }
+
+    @PutMapping("/transaction")
+    fun updateTransaction(
+        @RequestBody
+        updateTransactionDTO: @NotNull UpdateTransactionDTO,
+    ) : ResponseEntity<TransactionVO> {
+       var updated =  transactionService.update(
+            updateTransactionDTO.transactionId!!,
+            BigDecimal(updateTransactionDTO.amount!!),
+            updateTransactionDTO.count!!,
+            updateTransactionDTO.description,
+            updateTransactionDTO.datetime
+        )
+
+        return ResponseEntity.ok(updated);
+    }
+}
+
+
+class UpdateTransactionDTO {
+    @NotNull
+    var transactionId: Long? = null
+
+    @NotNull
+    @Pattern(regexp = "^[-+]?[0-9]*\\.?[0-9]+$", message = "amount must be double")
+    var amount: String? = null
+
+    @NotNull
+    @Positive(message = "count must be positive")
+    var count: Int? = null
+
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\$", message = "datetime format error")
+    var datetime: String? = null
+
+    var description: String? = null
 }

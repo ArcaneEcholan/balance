@@ -33,7 +33,7 @@ export default class ModalPresentationView extends Vue {
         this.modal.style.right = `${-this.modalWidth}px`;
         setTimeout(() => {
             this.$emit('close', this);
-        }, 300);
+        }, 500);
     }
 
     getContainerId() {
@@ -47,7 +47,7 @@ export default class ModalPresentationView extends Vue {
         this.modal.style.right = `0`;
         setTimeout(() => {
             this.$emit('open', this);
-        }, 300);
+        }, 500);
     }
 
     /**
@@ -227,6 +227,6 @@ body {
 }
 
 .slide-panel.transition {
-    transition: right 0.3s ease-in-out;
+    transition: right 0.5s cubic-bezier(0, 1, 0, 1);
 }
 </style>

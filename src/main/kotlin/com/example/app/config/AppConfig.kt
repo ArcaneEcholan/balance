@@ -38,6 +38,11 @@ class RequestCorsFilter {
             listOf(
                 "http://localhost:[*]",
                 "https://*.wenchao.fit:[*]",
+
+
+                // for debug
+                "https://49.232.155.160:[*]",
+                "http://49.232.155.160:[*]",
             )
         );
         config.allowedHeaders = Arrays.asList("Origin", "Content-Type", "Accept", "responseType", "Authorization")
