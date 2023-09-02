@@ -7,41 +7,64 @@
 
         <div>
             <!--region: amap-->
-            <div class="mgb8"><span class="bold fs22">Location</span></div>
-            <div id="amap" style="width: 100%; height: auto"></div>
-            <div class="flex">
-                <span style="font-size: 16px">(lat, lng)=({{ geoLocation.latitude }},{{ geoLocation.longitude }})</span>
+
+
+            <div class="record-header">Amap</div>
+
+            <div class=" bg-white br8 shadow  overflow-hidden">
+                <div id="amap" style="width: 100%; height: auto"></div>
             </div>
+
+
+            <div class="mgb20"></div>
+
+            <van-cell-group class="shadow overflow-hidden br8 " title="Location information">
+                <van-cell title="Coordinate (lat, lng)"
+                          :value="`(${geoLocation.latitude}, ${geoLocation.longitude})`"/>
+                <van-cell title="Overview" :value="`${geoLocation.formattedName}`"/>
+            </van-cell-group>
+
+            <div class="mgb20"></div>
+            <!--<van-list-->
+            <!--    v-model:loading="loading"-->
+            <!--    :finished="finished"-->
+            <!--    finished-text="Finished"-->
+            <!--    @load="onload"-->
+            <!--&gt;-->
+            <!--    <van-cell v-for="item in list" :key="item" :title="item" />-->
+            <!--</van-list>-->
             <!--endregion-->
 
             <div class="mgb20"></div>
 
-            <div style="z-index: 10000000">{{ stackSize }}</div>
+            <!--<div style="z-index: 10000000">{{ stackSize }}</div>-->
 
             <!--region: input area-->
-            <div class="mgb8"><span class="bold fs22">Record</span></div>
+            <div class="record-header">Add Some Record</div>
 
             <!--Input-->
-            <el-input
+            <van-field
                 @input="onParseRawString"
-                type="textarea"
-                :autosize="{ minRows: 2 }"
                 v-model="rawFormatString"
-            ></el-input>
+                label="Records (per / Line)"
+                type="textarea"
+                placeholder="Message"
+                rows="2"
+                autosize
+            />
 
             <div class="mgb8"></div>
 
             <!--region: Preview-->
-            <div style="" class="shadow br5">
-                <div class="record-header" v-show="parsedForms.length > 0">Preview</div>
+            <div class="record-header" v-show="parsedForms.length > 0">Preview</div>
+            <div style="" class="shadow br8 overflow-hidden">
                 <template v-for="(form, index) in parsedForms">
                     <div class="flex pd10"
                          :style="
-                     `border-bottom: 1px solid #f5f5f5;
-                     ${index === parsedForms.length - 1 ? 'border-bottom: none; border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;' : ''};
-                     background-color: white;
-                     `
-                ">
+                                 `border-bottom: 1px solid #f5f5f5;
+                                 ${index === parsedForms.length - 1 ? 'border-bottom: none; border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;' : ''};
+                                 background-color: white;
+                                 `">
                         <div class="flexg5">
                             <div>
                                 <span>{{ form.categoryValue ? form.categoryValue.value : "" }}</span>
@@ -66,30 +89,33 @@
 
             <!--endregion-->
 
-            <div @click="onSaveTrans" style="
-        background-color: white;
-        text-align: center;
-"
-                 class="br5 pdt10 pdb10"
-            >
+            <el-button @click="onSaveTrans" round plain type="primary" style="width: 100%">
                 <i class="el-icon-plus"></i>
-            </div>
+            </el-button>
+            <!--            <div @click="onSaveTrans" style="-->
+            <!--        background-color: white;-->
+            <!--        text-align: center;-->
+            <!--"-->
+            <!--                 class="br5 pdt10 pdb10"-->
+            <!--            >-->
+            <!--                <i class="el-icon-plus"></i>-->
+            <!--            </div>-->
 
 
             <div class="mgb8"></div>
 
+            <!--header-->
+            <div class="record-header" v-show="transactionList.length > 0">This month</div>
+
             <!--region: this month-->
-            <div style="" class="shadow br5">
-                <!--header-->
-                <div class="record-header" v-show="transactionList.length > 0">This month</div>
+            <div style="" class="shadow br8 overflow-hidden">
                 <!--list-->
                 <template v-for="(form, index) in transactionList">
                     <!--list item-->
-                    <div class="flex pd10"
+                    <div class="flex pdt10 pdb10 pdl16 pdr16"
                          @click="edit(form.id)"
                          :style="
                      `border-bottom: 1px solid #f5f5f5;
-                     ${index === transactionList.length - 1 ? 'border-bottom: none; border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;' : ''};
                      background-color: white;
                      `
                 ">
@@ -116,19 +142,7 @@
             </div>
             <!--endregion-->
 
-            <!--<el-table :data="transactionList">-->
-            <!--    <el-table-column prop="id" label="id"></el-table-column>-->
-            <!--    <el-table-column prop="amount" label="amount"></el-table-column>-->
-            <!--    <el-table-column-->
-            <!--        prop="categoryId"-->
-            <!--        label="categoryId"-->
-            <!--    ></el-table-column>-->
-            <!--    <el-table-column-->
-            <!--        prop="description"-->
-            <!--        label="description"-->
-            <!--    ></el-table-column>-->
-            <!--    <el-table-column prop="location" label="location"></el-table-column>-->
-            <!--</el-table>-->
+
         </div>
     </div>
 </template>
@@ -144,6 +158,8 @@ import PageStack, {pushPage} from "@/ts/pageStack";
 import pageStack from "@/ts/pageStack";
 import {Route} from "vue-router";
 import eventBus from "@/ts/EventBus";
+import {Notify} from "vant";
+import {getCurrentMonth, getCurrentYear} from '@/ts/time';
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -196,6 +212,10 @@ export default class IndexView extends Vue {
         formattedName: null
     };
 
+    nowadays(): string {
+        return `${getCurrentYear()}-${getCurrentMonth()}`
+    }
+
     updateTransasction(newTransaction: any) {
         let found = this.transactionList.find((item) => {
             return item.id === newTransaction.id
@@ -217,9 +237,6 @@ export default class IndexView extends Vue {
         pushPage(path)
     }
 
-    showPopup() {
-        this.show = true
-    }
 
     mounted() {
         let amapElem: HTMLElement = document.getElementById("amap")!
@@ -227,7 +244,59 @@ export default class IndexView extends Vue {
         amapElem.style.height = amapWidth + 'px'
     }
 
-    getDetailLocation(lat: string, long: string) {
+    getOneInformationEntry(entry: any): string {
+        // this is the format of the response entry of amap api,
+        // an empty array means a not existing entry value( the same meaning as null )
+
+        if (Array.isArray(entry) && entry.length === 0) {
+            return "";
+        }
+        return entry;
+    }
+
+    getInfomationFromGetLocationDetail(detail: any): any {
+        let usefullocationInfos: any = {}
+
+        usefullocationInfos.formattedName =
+            this.getOneInformationEntry(detail.regeocode.formatted_address);
+
+        if (usefullocationInfos.formattedName === "") {
+            Notify(
+                {
+                    type: "danger",
+                    message: "Your location is out of the service of amap "
+                }
+            )
+            this.geoLocation.formattedName = 'out of service'
+            return;
+        }
+
+        let addressDetail = detail.regeocode.addressComponent;
+        usefullocationInfos.adcode = this.getOneInformationEntry(addressDetail.adcode);
+        usefullocationInfos.province = this.getOneInformationEntry(addressDetail.province);
+
+        // if the city is empty, it means the city is a direct-controlled municipality(beijing, shanghai...)
+        let city =
+            this.getOneInformationEntry(addressDetail.city) == "" ? usefullocationInfos.province : this.getOneInformationEntry(addressDetail.city);
+        usefullocationInfos.city = city;
+        usefullocationInfos.district = this.getOneInformationEntry(addressDetail.district);
+        usefullocationInfos.citycode = this.getOneInformationEntry(addressDetail.citycode);
+
+        usefullocationInfos.township = this.getOneInformationEntry(addressDetail.township);
+        usefullocationInfos.towncode = this.getOneInformationEntry(addressDetail.towncode);
+        usefullocationInfos.streetName = this.getOneInformationEntry(addressDetail.streetNumber.street);
+        usefullocationInfos.streetNumber = this.getOneInformationEntry(addressDetail.streetNumber.number)
+        ;
+        usefullocationInfos.streetLocation = this.getOneInformationEntry(
+            addressDetail.streetNumber.location)
+        usefullocationInfos.streetDirection = this.getOneInformationEntry(
+            addressDetail.streetNumber.direction)
+        usefullocationInfos.streetDistance = this.getOneInformationEntry(
+            addressDetail.streetNumber.distance)
+        return usefullocationInfos
+    }
+
+    getDetailLocation(lat: string, long: string, successCb: (location: any) => void, failCb: (respBodyOrError: any) => void) {
         request({
             url: '//restapi.amap.com/v3/geocode/regeo',
             method: 'get',
@@ -243,33 +312,13 @@ export default class IndexView extends Vue {
             let code = responseData.infocode;
 
             if (code == '10000') {
-                this.geoLocation.formattedName =
-                    responseData.regeocode.formatted_address;
-
-                let addressDetail = responseData.regeocode.addressComponent;
-                this.geoLocation.adcode = addressDetail.adcode;
-                this.geoLocation.province = addressDetail.province;
-
-                let city =
-                    addressDetail.city.length == 0 ? '' : addressDetail.city[0];
-                this.geoLocation.city = city;
-                this.geoLocation.district = addressDetail.district;
-                this.geoLocation.citycode = addressDetail.citycode;
-
-                this.geoLocation.township = addressDetail.township;
-                this.geoLocation.towncode = addressDetail.towncode;
-                this.geoLocation.streetName = addressDetail.streetNumber.street;
-                this.geoLocation.streetNumber =
-                    addressDetail.streetNumber.number;
-                this.geoLocation.streetLocation =
-                    addressDetail.streetNumber.location;
-                this.geoLocation.streetDirection =
-                    addressDetail.streetNumber.direction;
-                this.geoLocation.streetDistance =
-                    addressDetail.streetNumber.distance;
-                console.log(this.geoLocation);
+                successCb(responseData)
+            } else {
+                failCb(responseData)
             }
-        });
+        }).catch((err) => {
+            failCb(err)
+        })
     }
 
     onSaveTrans() {
@@ -343,26 +392,10 @@ export default class IndexView extends Vue {
 
         Client.saveTransactions(request).then((resp) => {
             Notification.success("save successfully")
-            return Client.getTransactionList("2023-8")
+            return Client.getTransactionList(this.nowadays())
         }).then(resp => {
             this.transactionList = resp.data
         });
-    }
-
-    checkCategory(form: any) {
-        // form?.categoryValue?.isValid = true;
-    }
-
-    checkAmount(form: any) {
-        // form.amount.isValid = true;
-    }
-
-    checkCount(form: any) {
-        // form.count.isValid = true;
-    }
-
-    checkDescription(form: any) {
-        // form.description.isValid = true;
     }
 
     countDecimalPlaces(number: string) {
@@ -430,43 +463,6 @@ export default class IndexView extends Vue {
         }
     }
 
-    onClickRefreshLocation() {
-        this.doGetGeoLocation()
-    }
-
-    doGetGeoLocation() {
-        this.getGeolocation(
-            (status: any, result: any) => {
-                console.log(status);
-                console.log(result);
-
-                if (status === 'complete') {
-                    let position = result.position;
-                    this.geoLocation.latitude = position.lat;
-                    this.geoLocation.longitude = position.lng;
-                    console.log(position);
-
-                    Notification.success(
-                        `'(lat, lng) = (${position.lat}, ${position.lng})`,
-                    );
-
-                    // this.getDetailLocation(
-                    //     position.lat,
-                    //     position.lng,
-                    // );
-                } else {
-                    console.log(result);
-                    Notification.error('定位失败');
-                }
-            },
-            (error: any) => {
-                Notification.error(
-                    `fail to get geollocation: ${error.code}-${error.message}`,
-                );
-            },
-        );
-    }
-
     getGeolocation(successCb: any, errorCb: any) {
         if (this.amapGeolocationPlugin == null) {
             Notification.error('wait location service to load');
@@ -500,7 +496,7 @@ export default class IndexView extends Vue {
                 longitude: 0,
             }
         }]
-        Client.getTransactionList("2023-8")
+        Client.getTransactionList(this.nowadays())
             .then(resp => {
                 this.transactionList = resp.data
             })
@@ -516,7 +512,56 @@ export default class IndexView extends Vue {
                     var geolocation = new AMap.Geolocation();
                     this.amap.addControl(geolocation);
                     this.amapGeolocationPlugin = geolocation;
-                    this.doGetGeoLocation();
+                    this.getGeolocation(
+                        (status: any, result: any) => {
+                            console.log(status);
+                            console.log(result);
+
+                            if (status === 'complete') {
+                                let position = result.position;
+
+                                // assign coordinate
+                                this.geoLocation.latitude = position.lat;
+                                this.geoLocation.longitude = position.lng;
+
+                                console.debug(`get coordinates: ${position}`)
+                                Notify({
+                                    message: `(lat, lng) = (${position.lat}, ${position.lng})`,
+                                    type: 'success'
+                                })
+
+                                this.getDetailLocation(position.lat, position.lng,
+                                    (locationDetail: any) => {
+                                        // get information we need from detail response
+                                        let infomationFromGetLocationDetail = this.getInfomationFromGetLocationDetail(locationDetail);
+                                        // assign details
+                                        this.geoLocation = Object.assign(this.geoLocation, infomationFromGetLocationDetail);
+                                        console.debug(`get location detail: `, this.geoLocation)
+                                    },
+                                    (respBodyOrError: any) => {
+                                        console.error(`fail to get location detail: `, respBodyOrError)
+                                        Notify({
+                                            message: 'Fail to get location detail',
+                                            type: 'warning'
+                                        })
+                                    }
+                                )
+                            } else {
+                                console.error(`fail to get geolocation, status: `, status, `result: `, result);
+                                Notify({
+                                    message: 'Fail to locate your position',
+                                    type: 'danger'
+                                })
+                            }
+                        },
+                        (error: any) => {
+                            Notify({
+                                message: `fail to get geollocation: ${error.code}-${error.message}`,
+                                type: 'danger'
+                            })
+                            console.error(`fail to get geollocation: ${error.code}-${error.message}`);
+                        },
+                    );
                 });
             })
             .catch((e) => {
@@ -565,14 +610,20 @@ export default class IndexView extends Vue {
 @import "~@/style/common-style.scss";
 
 .page {
-    background-color: $google-gray-300;
-    padding: 5px;
+    padding: 8px;
+    background-color: #f7f8fa;
 }
 
+
 .record-header {
-    background-color: $google-gray-100;
-    padding: 10px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+    padding: 16px 16px 8px;
+    color: #969799;
+    font-size: 14px;
+    line-height: 16px;
+
+    //background-color: $google-gray-100;
+    //padding: 10px;
+    //border-top-left-radius: 5px;
+    //border-top-right-radius: 5px;
 }
 </style>

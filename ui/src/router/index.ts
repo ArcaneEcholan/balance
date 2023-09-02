@@ -1,11 +1,7 @@
 import Vue from 'vue';
 import VueRouter, {RouteConfig} from 'vue-router';
-import HelloWorld from '@/views/HelloWorld.vue';
-import About from '@/views/About.vue';
-import TestView from "@/views/index/index/index.vue";
-import EditRecordView from "@/views/index/edit/edit_record.vue";
 import IndexView from "@/views/index/index/index.vue";
-import IndexIndexView from "@/views/index/index.vue";
+import EditRecordView from "@/views/index/edit/edit_record.vue";
 
 Vue.use(VueRouter);
 
