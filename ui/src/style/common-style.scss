@@ -166,6 +166,10 @@ $google-gray-400: #bdbdbd;
     background-color: $google-blue;
 }
 
+.bg-white {
+    background-color: white;
+}
+
 // =========================================================== 背景色 =============================================================
 // =========================================================== 边框色 =============================================================
 
@@ -524,6 +528,26 @@ $google-gray-400: #bdbdbd;
     border-radius: 5px;
 }
 
+.br8 {
+    border-radius: 8px;
+}
+
+.brtl8 {
+    border-top-left-radius: 8px;
+}
+
+.brtr8 {
+    border-top-right-radius: 8px;
+}
+
+.brbl8 {
+    border-bottom-left-radius: 8px;
+}
+
+.brbr8 {
+    border-bottom-right-radius: 8px;
+}
+
 .br10 {
     border-radius: 10px;
 }
@@ -552,10 +576,6 @@ $google-gray-400: #bdbdbd;
 
 .no-border {
     border: 0;
-}
-
-.br100 {
-    border-radius: 100px;
 }
 
 .google-gray-100 {
@@ -617,4 +637,13 @@ $google-gray-400: #bdbdbd;
 
 .enable-scroll-y {
     overflow-y: auto !important;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+
+:export {
+    color_googleGray200: $google-gray-200;
 }

@@ -18,7 +18,7 @@ import {Button} from 'vant';
 import {Notify} from 'vant';
 import { NavBar } from 'vant';
 import {Icon} from "vant";
-
+import { List } from 'vant';
 
 Vue.use(Notify);
 Vue.use(Button);
@@ -28,6 +28,8 @@ Vue.use(Field);
 Vue.use(CellGroup);
 Vue.use(NavBar);
 Vue.use(Icon);
+Vue.use(List);
+
 
 new Vue({
     router,

@@ -1,7 +1,7 @@
 <template>
     <div>
         <modal-presentation
-            :background-color="'#f7f8fa'"
+            class="page"
             @close="closed"
             ref="modal"
         >
@@ -60,7 +60,6 @@ import {Notify} from "vant";
 import Client from "@/request/client";
 import {countDecimalPlaces, isFloat, isPositiveInteger} from '@/ts/utils';
 import eventBus from "@/ts/EventBus";
-
 class FormItem {
     categoryValue: string | null = null;
     amount: number | null = null;
@@ -220,7 +219,8 @@ export default class EditRecordView extends Vue {
 <style lang='scss' scoped>
 @import "~@/style/common-style.scss";
 
-.page-background {
-    background-color: $google-gray-400;
+.page {
+    padding: 8px;
+    background-color: #f7f8fa;
 }
 </style>
