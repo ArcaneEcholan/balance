@@ -1,5 +1,6 @@
 import router from '@/router/index'
 import pageStack from "@/ts/pageStack";
+import pageConfig from "@/ts/pageConfig";
 
 
 let count = 0;
@@ -9,6 +10,13 @@ function isThisTheFirstNav() {
 }
 
 router.beforeEach(async (to, from, next) => {
+    let title = to.meta?.title
+    if (title) {
+        pageConfig.setTitle(title)
+    } else {
+        pageConfig.setTitle("title")
+    }
+    console.log(pageConfig)
     // first nav means user refresh the page, which represent user closing the app
     if (isThisTheFirstNav()) {
         // ok, it's the first time the app starts up

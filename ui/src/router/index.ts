@@ -17,12 +17,18 @@ const routes: Array<RouteConfig> = [
     {
         path: '/index',
         component: IndexView,
+        meta: {
+            title: "Balance"
+        },
         children: [
             // {
             //     path: '',
             //     component: IndexView,
             // },
             {
+                meta: {
+                    title: "Edit"
+                },
                 path: 'edit',
                 component: EditRecordView,
             },
