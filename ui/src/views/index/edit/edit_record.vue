@@ -6,22 +6,19 @@
             ref="modal"
         >
             <template #default>
-                <div>
-                    <el-input type="textarea" v-model="variableVisibleString">
-                    </el-input>
-                </div>
-                <div class="header">
-                    <div style="z-index: 10000000">{{ stackSize }}</div>
-                    <div class="flex flex-center" style="background-color: #fff;
-height: 56px;">
-                        <div class="fs20 bold"
-                             style="
-                         text-transform: capitalize;">
-                            Edit Record
-                        </div>
-                    </div>
-                </div>
+<!--                <div class="header">-->
+<!--                    -->
+<!--                    <div class="flex flex-center" style="background-color: #fff;-->
+<!--height: 56px;">-->
+<!--                        <div class="fs20 bold"-->
+<!--                             style="-->
+<!--                         text-transform: capitalize;">-->
+<!--                            Edit Record-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
                 <div class="pdl16 pdr16">
+                    <div style="z-index: 10000000">{{ stackSize }}</div>
                     <div class="google-gray-400 capitalize">
                         <!--test-->
                     </div>
@@ -89,10 +86,7 @@ export default class EditRecordView extends Vue {
 
     varTable: any = {}
 
-    visibleVariable(varName: string, varValue: any) {
-        this.varTable[varName] = varValue
-        this.renderToString()
-    }
+
 
     submit() {
         this.submitEnable = false
@@ -165,22 +159,11 @@ export default class EditRecordView extends Vue {
             })
     }
 
-    renderToString() {
-        let keys = Object.keys(this.varTable)
-        let result = ""
-        for (let i = 0; i < keys.length; i++) {
-            let key = keys[i]
-            let value = this.varTable[key]
-            result += `${key} = ${value}\n`
-        }
-        this.variableVisibleString = result
-    }
 
 
     recordId: number | string | null = null
 
     submitEnable: boolean = true
-    variableVisibleString: string | null = null
 
     amount: string | null = null
     datetime: string | null = null
@@ -202,7 +185,6 @@ export default class EditRecordView extends Vue {
         setTimeout(() => {
             let recordId: string | number | null = this.$route.query.recordId as number | string | null
             this.recordId = recordId
-            this.visibleVariable("recordId", recordId)
             if (recordId != null) {
                 Client.getTransaction(recordId as number).then(resp => {
                     this.amount = resp.data.amount

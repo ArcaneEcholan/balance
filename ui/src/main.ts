@@ -16,6 +16,8 @@ import {Cell, Field, CellGroup} from 'vant';
 import {Popup} from 'vant';
 import {Button} from 'vant';
 import {Notify} from 'vant';
+import { NavBar } from 'vant';
+import {Icon} from "vant";
 
 
 Vue.use(Notify);
@@ -24,6 +26,8 @@ Vue.use(Popup);
 Vue.use(Cell);
 Vue.use(Field);
 Vue.use(CellGroup);
+Vue.use(NavBar);
+Vue.use(Icon);
 
 new Vue({
     router,

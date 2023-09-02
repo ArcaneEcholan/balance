@@ -1,22 +1,11 @@
 <template>
     <div class="page">
 
-
         <!--edit stack-->
         <router-view>
         </router-view>
 
-
         <div>
-            <van-cell title="Show Popup" is-link @click="showPopup"/>
-            <van-popup v-model:show="show" position="right"
-                       :style="{ width: '100%', height: '100%'}">
-                <div class="pd10">
-                    Content
-                </div>
-            </van-popup>
-
-
             <!--region: amap-->
             <div class="mgb8"><span class="bold fs22">Location</span></div>
             <div id="amap" style="width: 100%; height: auto"></div>
@@ -182,7 +171,7 @@ Component.registerHooks([
 @Component({
     filters: {
         formatTimeForRecordItem: function (timeString: string | null) {
-            if(!timeString) {
+            if (!timeString) {
                 return 'unknown datetime'
             }
             return convertToShortDateTime(timeString);
@@ -222,7 +211,6 @@ export default class IndexView extends Vue {
     edit(recordId: string | number) {
         this.present(`/index/edit?recordId=${recordId}`)
     }
-
 
 
     present(path: string) {
