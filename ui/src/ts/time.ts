@@ -3,6 +3,6 @@ export function getCurrentYear() {
 }
 
 export function getCurrentMonth() {
-    return new Date().getMonth();
+    return new Date().getMonth() + 1;
 }
 
