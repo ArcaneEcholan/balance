@@ -95,3 +95,44 @@ export function
 isPositiveInteger(number: number): boolean {
     return Number.isInteger(number) && number > 0;
 }
+
+export
+function remove(target: string, start: number, end: number): string {
+    if (start < 0) start = 0;
+    if (end > target.length) end = target.length;
+    return target.slice(0, start) + target.slice(end);
+}
+export
+function insert(target: string, pos: number, str: string): string {
+    if (pos < 0) pos = 0;
+    if (pos > target.length) pos = target.length;
+    return target.slice(0, pos) + str + target.slice(pos);
+}
+export
+function replace(target: string, start: number, end: number, replacement: string): string {
+    const removed = remove(target, start, end);
+    return insert(removed, start, replacement);
+}
+export
+function findWordInLine(target: string, lineNumber: number, count: number): { start: number, end: number } | null {
+    const lines = target.split('\n');
+    if (lineNumber < 0 || lineNumber >= lines.length) {
+        return null; // Line number out of range
+    }
+
+    const line = lines[lineNumber].trim(); // Trim leading and trailing whitespace
+    const words = line.split(/\s+/); // Split the trimmed line into words using whitespace as the delimiter
+    if (count <= 0 || count > words.length) {
+        return null; // Word count out of range
+    }
+
+    // Calculate the absolute position of the word
+    let start = 0;
+    for (let i = 0; i < count - 1; i++) {
+        start += words[i].length + 1; // Add 1 for the space character
+    }
+
+    const end = start + words[count - 1].length; // End position is the start position plus the word length
+    return { start, end };
+}
+
