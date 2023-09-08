@@ -39,9 +39,10 @@
 
             <!--<div style="z-index: 10000000">{{ stackSize }}</div>-->
 
-
-            <template v-for="type in types">
-                <van-tag type="primary" round class="mgr8 mgb8 pdr8 pdl8" style="line-height: 24px">{{ type }}</van-tag>
+            <template v-for="type in transactionCategories">
+                <van-tag type="primary" @click="replaceFirstWord(type.value)" round class="mgr8 mgb8 pdr8 pdl8"
+                         style="line-height: 24px">{{ type.value }}
+                </van-tag>
             </template>
 
             <!--region: input area-->
@@ -50,6 +51,7 @@
             <!--Input-->
             <van-field
                 ref="recordInput"
+                @click="getCursorPosition0"
                 @input="onParseRawString"
                 v-model="rawFormatString"
                 label="Records (per / Line)"
@@ -159,7 +161,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {Notification} from 'element-ui';
 import Client from '@/request/client';
 import request from '@/request';
-import {convertToShortDateTime} from "@/ts/utils";
+import {convertToShortDateTime, findWordInLine, replace} from "@/ts/utils";
 import PageStack, {pushPage} from "@/ts/pageStack";
 import pageStack from "@/ts/pageStack";
 import {Route} from "vue-router";
@@ -203,6 +205,31 @@ Component.registerHooks([
 export default class IndexView extends Vue {
     get stackSize() {
         return pageStack.getStackSize()
+    }
+
+    replaceFirstWord(type: string) {
+        let str = this.rawFormatString
+        if (str == null || str == "") {
+            str = type
+        }
+
+        let row = this.cursorPosition.cursorRow
+        let range = findWordInLine(str, row, 1)
+
+        if (range == null) {
+            return;
+        }
+
+        str = replace(str, range.start, range.end, type)
+        this.rawFormatString = str
+        this.onParseRawString()
+
+        let vantinput = (this.$refs.recordInput as any).$el
+        let input = vantinput.querySelector('textarea')
+
+        let start = range.start
+        input.selectionStart = start
+        this.getCursorPosition0()
     }
 
     showMain = true
@@ -481,20 +508,30 @@ export default class IndexView extends Vue {
 
 
     getCursorPosition0() {
-        let vantinput = this.$refs.recordInput.$el
+        let vantinput = (this.$refs.recordInput as any).$el
         let inputElement = vantinput.querySelector('textarea') as HTMLTextAreaElement;
+        let result = {}
         if (this.rawFormatString == null) {
-            return {
+            result = {
                 absoluteCursorPosition: 0,
-                cursorRow: 0,
+                cursosrRow: 0,
                 cursorColumn: 0
             }
+        } else {
+            result = this.getCursorPosition(this.rawFormatString!, inputElement)
         }
-        return this.getCursorPosition(this.rawFormatString!, inputElement)
+
+
+        this.cursorPosition = result
+        console.log(this.cursorPosition)
+    }
+
+    recordInput() {
+        this.getCursorPosition0()
+        this.onParseRawString()
     }
 
     onParseRawString() {
-        this.cursorPosition = this.getCursorPosition0()
         console.log(this.cursorPosition)
         if (this.rawFormatString !== null) {
             let objs = this.rawFormatStringToObject(this.rawFormatString);
@@ -521,6 +558,8 @@ export default class IndexView extends Vue {
         this.amapGeolocationPlugin.getCurrentPosition(successCb, errorCb);
     }
 
+    transactionCategories: any[] = []
+
     created() {
         eventBus.$on('afterTransactionChanged', (newTransaction: any) => {
             this.updateTransasction(newTransaction)
@@ -546,10 +585,14 @@ export default class IndexView extends Vue {
                 longitude: 0,
             }
         }]
-        Client.getTransactionList(this.nowadays())
-            .then(resp => {
-                this.transactionList = resp.data
-            })
+
+        Client.getTransactionCategories().then(resp => {
+            this.transactionCategories = resp.data
+        })
+        Client.getTransactionList(this.nowadays()).then(resp => {
+            this.transactionList = resp.data
+        })
+
         AMapLoader.load({
             key: '8375fa99f0a19ba66b137bddcb2fceac', // 申请好的Web端开发者Key，首次调用 load 时必填
             version: '2.0', // 指定要加载的 JS API 的版本，缺省时默认为 1.4.15

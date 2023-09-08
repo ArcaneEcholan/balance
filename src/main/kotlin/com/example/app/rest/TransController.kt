@@ -3,6 +3,8 @@ package com.example.app.rest
 import cn.hutool.core.date.DateTime
 import com.example.app.dao.TransactionCategoryDao
 import com.example.app.exception.ApiException
+import com.example.app.service.TransactionCategoryService
+import com.example.app.service.TransactionCategoryVO
 import com.example.app.service.TransactionService
 import com.example.app.service.TransactionVO
 import mu.KotlinLogging
@@ -98,8 +100,8 @@ class TransController {
     fun updateTransaction(
         @RequestBody
         updateTransactionDTO: @NotNull UpdateTransactionDTO,
-    ) : ResponseEntity<TransactionVO> {
-       var updated =  transactionService.update(
+    ): ResponseEntity<TransactionVO> {
+        var updated = transactionService.update(
             updateTransactionDTO.transactionId!!,
             BigDecimal(updateTransactionDTO.amount!!),
             updateTransactionDTO.count!!,
@@ -109,6 +111,15 @@ class TransController {
 
         return ResponseEntity.ok(updated);
     }
+
+    @Autowired
+    lateinit var transactionCategoryService: TransactionCategoryService
+
+    @GetMapping("/transaction/category")
+    fun getTransactionCategories(): List<TransactionCategoryVO> {
+        return transactionCategoryService.getAll()
+    }
+
 }
 
 

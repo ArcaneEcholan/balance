@@ -86,6 +86,7 @@ countDecimalPlaces(number: string) {
 
     return parts[1].length; // Return the length of the decimal part
 }
+
 export function
 isFloat(number: number) {
     return Number(number) === number && !Number.isInteger(number) || Number.isInteger(number);
@@ -96,25 +97,24 @@ isPositiveInteger(number: number): boolean {
     return Number.isInteger(number) && number > 0;
 }
 
-export
-function remove(target: string, start: number, end: number): string {
+export function remove(target: string, start: number, end: number): string {
     if (start < 0) start = 0;
     if (end > target.length) end = target.length;
     return target.slice(0, start) + target.slice(end);
 }
-export
-function insert(target: string, pos: number, str: string): string {
+
+export function insert(target: string, pos: number, str: string): string {
     if (pos < 0) pos = 0;
     if (pos > target.length) pos = target.length;
     return target.slice(0, pos) + str + target.slice(pos);
 }
-export
-function replace(target: string, start: number, end: number, replacement: string): string {
+
+export function replace(target: string, start: number, end: number, replacement: string): string {
     const removed = remove(target, start, end);
     return insert(removed, start, replacement);
 }
-export
-function findWordInLine(target: string, lineNumber: number, count: number): { start: number, end: number } | null {
+
+export function findWordInLine(target: string, lineNumber: number, count: number): { start: number, end: number } | null {
     const lines = target.split('\n');
     if (lineNumber < 0 || lineNumber >= lines.length) {
         return null; // Line number out of range
@@ -126,8 +126,11 @@ function findWordInLine(target: string, lineNumber: number, count: number): { st
         return null; // Word count out of range
     }
 
-    // Calculate the absolute position of the word
+    // Calculate the absolute position of the word within the entire input string
     let start = 0;
+    for (let i = 0; i < lineNumber; i++) {
+        start += lines[i].length + 1; // Add 1 for the newline character
+    }
     for (let i = 0; i < count - 1; i++) {
         start += words[i].length + 1; // Add 1 for the space character
     }
@@ -135,4 +138,3 @@ function findWordInLine(target: string, lineNumber: number, count: number): { st
     const end = start + words[count - 1].length; // End position is the start position plus the word length
     return { start, end };
 }
-

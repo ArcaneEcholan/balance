@@ -106,6 +106,14 @@ class Client {
             }
         });
     }
+
+
+    static getTransactionCategories() {
+        return request({
+            url: `/transaction/category`,
+            method: 'get',
+        });
+    }
 }
 
 export default Client;
