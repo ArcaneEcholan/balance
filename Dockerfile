@@ -1,5 +1,5 @@
 # Use a base image, like AdoptOpenJDK or OpenJDK, depending on your project's requirements
-FROM adoptopenjdk:11-jre-hotspot
+FROM eclipse-temurin:11-alpine
 
 # Set the working directory in the container
 WORKDIR /app
@@ -12,11 +12,5 @@ COPY appconfig/application.yml /app/application.yml
 # Copy the application.yml file from the docker folder into the container's /app folder
 #COPY docker/application.yml /app/
 
-# Copy the start.sh script from the docker folder into the container's /app folder
-COPY docker/start.sh /app/
-
-# Give execute permissions to the start.sh script
-RUN chmod a+x /app/start.sh
-
 # Set the command to run when the container starts
-CMD ["/app/start.sh"]
+CMD ["java", "-jar", "-D'file.encoding=UTF-8'", "/app/server.jar"]
