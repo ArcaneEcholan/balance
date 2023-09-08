@@ -13,7 +13,7 @@ npm install --force
 
 rm -rf dist
 
-npm run build
+npm run build-production
 
 cd ../
 pwd
@@ -27,5 +27,5 @@ rm -rf $FRONT_DEPLOY_END_PATH/*
 
 cp -r $FRONT_END_CODE_PATH/dist/* $FRONT_DEPLOY_END_PATH
 
-
+mvn clean
 mvn package -Dmaven.test.skip=true

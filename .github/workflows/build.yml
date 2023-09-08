@@ -116,7 +116,7 @@ jobs:
         working-directory: ui # Path to the Vue.js project directory
 
       - name: Build Vue.js project
-        run: npm run build
+        run: npm run build-production
         working-directory: ui # Path to the Vue.js project directory
 
       - name: Copy Vue.js build to Java resources
