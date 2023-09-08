@@ -19,6 +19,7 @@ import {Notify} from 'vant';
 import { NavBar } from 'vant';
 import {Icon} from "vant";
 import { List } from 'vant';
+import { Tag } from 'vant';
 
 Vue.use(Notify);
 Vue.use(Button);
@@ -29,6 +30,7 @@ Vue.use(CellGroup);
 Vue.use(NavBar);
 Vue.use(Icon);
 Vue.use(List);
+Vue.use(Tag);
 
 
 new Vue({

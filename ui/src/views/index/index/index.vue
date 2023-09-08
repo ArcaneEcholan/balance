@@ -39,11 +39,17 @@
 
             <!--<div style="z-index: 10000000">{{ stackSize }}</div>-->
 
+
+            <template v-for="type in types">
+                <van-tag type="primary" round class="mgr8 mgb8 pdr8 pdl8" style="line-height: 24px">{{ type }}</van-tag>
+            </template>
+
             <!--region: input area-->
             <div class="record-header">Add Some Record</div>
 
             <!--Input-->
             <van-field
+                ref="recordInput"
                 @input="onParseRawString"
                 v-model="rawFormatString"
                 label="Records (per / Line)"
@@ -211,6 +217,11 @@ export default class IndexView extends Vue {
         longitude: null,
         formattedName: null
     };
+
+    types: any[] = [
+        "daily", "food", "fruit", "drinks", "alcohol", "transportation", "entertainment", "others"
+    ]
+
 
     nowadays(): string {
         return `${getCurrentYear()}-${getCurrentMonth()}`
@@ -445,7 +456,46 @@ export default class IndexView extends Vue {
         return objs;
     }
 
+
+    cursorPosition: any = {
+        absoluteCursorPosition: 0,
+        cursorRow: 0,
+        cursorColumn: 0
+    }
+
+    getCursorPosition(raw: string, inputElement: HTMLTextAreaElement): any {
+        console.log(inputElement.selectionStart)
+        console.log(inputElement.selectionStart)
+        let absoluteCursorPosition = inputElement.selectionStart;
+
+        let before = raw.substring(0, absoluteCursorPosition!);
+        let row = before.split('\n').length - 1;
+        let col = absoluteCursorPosition! - before.lastIndexOf('\n') - 1;
+
+        return {
+            absoluteCursorPosition,
+            cursorRow: row,
+            cursorColumn: col,
+        };
+    }
+
+
+    getCursorPosition0() {
+        let vantinput = this.$refs.recordInput.$el
+        let inputElement = vantinput.querySelector('textarea') as HTMLTextAreaElement;
+        if (this.rawFormatString == null) {
+            return {
+                absoluteCursorPosition: 0,
+                cursorRow: 0,
+                cursorColumn: 0
+            }
+        }
+        return this.getCursorPosition(this.rawFormatString!, inputElement)
+    }
+
     onParseRawString() {
+        this.cursorPosition = this.getCursorPosition0()
+        console.log(this.cursorPosition)
         if (this.rawFormatString !== null) {
             let objs = this.rawFormatStringToObject(this.rawFormatString);
             this.parsedForms = objs.map((obj: any) => {
