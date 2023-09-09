@@ -48,11 +48,13 @@
             <!--region: input area-->
             <div class="record-header">Add Some Record</div>
 
+
+            row: {{ cursorPosition.cursorRow }}, col: {{ cursorPosition.cursorColumn }}
             <!--Input-->
             <van-field
                 ref="recordInput"
                 @click="getCursorPosition0"
-                @input="onParseRawString"
+                @input="recordInput"
                 v-model="rawFormatString"
                 label="Records (per / Line)"
                 type="textarea"
