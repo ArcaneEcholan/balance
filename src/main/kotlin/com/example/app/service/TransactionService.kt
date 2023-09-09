@@ -72,6 +72,7 @@ interface TransactionService {
     fun get(transactionId: Serializable): TransactionVO?
     fun update(
         transactionId: Long,
+        categoryValue: String?,
         bigDecimal: BigDecimal,
         count: Int,
         description: String?,
@@ -205,14 +206,18 @@ class TransactionServiceImpl : TransactionService {
 
     override fun update(
         transactionId: Long,
+        categoryValue: String?,
         bigDecimal: BigDecimal,
         count: Int,
         description: String?,
         datetime: String?,
     ): TransactionVO {
+        var cateId = categoryDao.getOneByMap("value",categoryValue)?.id
+
         var transaction = transactionDao.getOneByMap("id", transactionId)
         transaction?.let {
             transaction.amount = bigDecimal
+            it.categoryId = cateId ?: 0
             transaction.count = count
             transaction.description = description
             transaction.datetime = datetime

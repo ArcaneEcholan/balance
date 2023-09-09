@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import javax.validation.Valid
+import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Positive
@@ -103,6 +104,7 @@ class TransController {
     ): ResponseEntity<TransactionVO> {
         var updated = transactionService.update(
             updateTransactionDTO.transactionId!!,
+            updateTransactionDTO.categoryValue!!,
             BigDecimal(updateTransactionDTO.amount!!),
             updateTransactionDTO.count!!,
             updateTransactionDTO.description,
@@ -126,6 +128,9 @@ class TransController {
 class UpdateTransactionDTO {
     @NotNull
     var transactionId: Long? = null
+
+    @NotEmpty
+    var categoryValue: String? = null
 
     @NotNull
     @Pattern(regexp = "^[-+]?[0-9]*\\.?[0-9]+$", message = "amount must be double")

@@ -90,6 +90,7 @@ class Client {
     }
 
     static updateTransaction(recordId: number | string | null,
+                                categoryValue: string,
                              amount: string,
                              datetime: string | null,
                              count: string,
@@ -99,6 +100,7 @@ class Client {
             method: 'put',
             data: {
                 transactionId: recordId,
+                categoryValue,
                 amount,
                 datetime,
                 count,

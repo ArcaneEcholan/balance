@@ -6,17 +6,17 @@
             ref="modal"
         >
             <template #default>
-<!--                <div class="header">-->
-<!--                    -->
-<!--                    <div class="flex flex-center" style="background-color: #fff;-->
-<!--height: 56px;">-->
-<!--                        <div class="fs20 bold"-->
-<!--                             style="-->
-<!--                         text-transform: capitalize;">-->
-<!--                            Edit Record-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                <div class="header">-->
+                <!--                    -->
+                <!--                    <div class="flex flex-center" style="background-color: #fff;-->
+                <!--height: 56px;">-->
+                <!--                        <div class="fs20 bold"-->
+                <!--                             style="-->
+                <!--                         text-transform: capitalize;">-->
+                <!--                            Edit Record-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                </div>-->
                 <div class="pdl16 pdr16">
                     <div style="z-index: 10000000">{{ stackSize }}</div>
                     <div class="google-gray-400 capitalize">
@@ -32,6 +32,7 @@
                 {{ description }}
 
                 <van-cell-group inset>
+                    <van-field v-model="categoryValue" type="string" label="category"/>
                     <van-field v-model="amount" type="number" label="amount"/>
                     <van-field v-model="datetime" type="text" label="datetime"/>
                     <van-field v-model="count" type="digit" label="count"/>
@@ -42,7 +43,7 @@
                     <el-button round plain type="primary" style="width: 100%"
                                @click="submit"
 
-                    :disabled="!submitEnable"
+                               :disabled="!submitEnable"
                     >Submit
                     </el-button>
                 </div>
@@ -60,6 +61,7 @@ import {Notify} from "vant";
 import Client from "@/request/client";
 import {countDecimalPlaces, isFloat, isPositiveInteger} from '@/ts/utils';
 import eventBus from "@/ts/EventBus";
+
 class FormItem {
     categoryValue: string | null = null;
     amount: number | null = null;
@@ -85,7 +87,7 @@ export default class EditRecordView extends Vue {
 
     varTable: any = {}
 
-
+    categoryValue: string | null = null
 
     submit() {
         this.submitEnable = false
@@ -94,7 +96,7 @@ export default class EditRecordView extends Vue {
 
         let datetime = this.datetime
 
-        if(datetime != null) {
+        if (datetime != null) {
             datetime = datetime.trim()
             const datetimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
@@ -123,6 +125,11 @@ export default class EditRecordView extends Vue {
         }
 
 
+        let categoryValid = true
+        let categoryValue = this.categoryValue
+        if (categoryValue == null || categoryValue.trim() == "") {
+            categoryValid = false
+        }
 
         let countValid = isPositiveInteger(Number(count));
         let amountValid = isFloat(Number(amount));
@@ -131,7 +138,9 @@ export default class EditRecordView extends Vue {
             amountValid = false
         }
 
-        if (!countValid || !amountValid) {
+
+        if (!countValid || !amountValid ||
+            !categoryValid) {
             Notify({
                 type: "danger",
                 message: "Information format invalid"
@@ -143,9 +152,15 @@ export default class EditRecordView extends Vue {
 
         // format check pass
         Client.updateTransaction(this.recordId,
+            categoryValue!,
             amount, datetime, count, description)
-            .then((resp:any) => {
+            .then((resp: any) => {
                 let newTrans = resp.data
+                this.categoryValue = newTrans.categoryValue
+                this.amount = newTrans.amount
+                this.datetime = newTrans.datetime
+                this.count = newTrans.count
+                this.description = newTrans.description
                 eventBus.$emit("afterTransactionChanged", newTrans)
                 Notify({
                     type: "success",
@@ -157,7 +172,6 @@ export default class EditRecordView extends Vue {
                 this.submitEnable = true
             })
     }
-
 
 
     recordId: number | string | null = null
@@ -189,6 +203,7 @@ export default class EditRecordView extends Vue {
                     this.amount = resp.data.amount
                     this.datetime = resp.data.datetime
                     this.count = resp.data.count
+                    this.categoryValue = resp.data.categoryValue
                     this.description = resp.data.description
                 })
                 return
@@ -205,7 +220,7 @@ export default class EditRecordView extends Vue {
 
     closed() {
         gotoPage(true, "/", (routeOpiton: any) => {
-            routeOpiton.params =  {
+            routeOpiton.params = {
                 transactionId: this.recordId,
                 amount: this.amount,
                 datetime: this.datetime,

@@ -260,6 +260,7 @@ export default class IndexView extends Vue {
         })
         if (found) {
             found.amount = newTransaction.amount
+            found.categoryValue = newTransaction.categoryValue
             found.count = newTransaction.count
             found.datetime = newTransaction.datetime
             found.description = newTransaction.description
