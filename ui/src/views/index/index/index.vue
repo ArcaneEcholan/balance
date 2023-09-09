@@ -11,8 +11,10 @@
 
             <div class="record-header">Amap</div>
 
-            <div class=" bg-white br8 shadow  overflow-hidden">
-                <div id="amap" style="width: 100%; height: auto"></div>
+            <div style="position: relative" class="bg-white br8 shadow  overflow-hidden">
+                <div id="amap" style="width: 100%; height: auto">
+                </div>
+                <div class="fake-marker"></div>
             </div>
 
 
@@ -49,7 +51,7 @@
             <div class="record-header">Add Some Record</div>
 
 
-            row: {{ cursorPosition.cursorRow }}, col: {{ cursorPosition.cursorColumn }}
+            <!--row: {{ cursorPosition.cursorRow }}, col: {{ cursorPosition.cursorColumn }}-->
             <!--Input-->
             <van-field
                 ref="recordInput"
@@ -156,7 +158,7 @@
         </div>
     </div>
 </template>
-
+<script src="https://webapi.amap.com/loader.js"></script>
 <script lang="ts">
 import AMapLoader from '@amap/amap-jsapi-loader';
 import {Component, Vue} from 'vue-property-decorator';
@@ -166,7 +168,6 @@ import request from '@/request';
 import {convertToShortDateTime, findWordInLine, replace} from "@/ts/utils";
 import PageStack, {pushPage} from "@/ts/pageStack";
 import pageStack from "@/ts/pageStack";
-import {Route} from "vue-router";
 import eventBus from "@/ts/EventBus";
 import {Notify} from "vant";
 import {getCurrentMonth, getCurrentYear} from '@/ts/time';
@@ -250,6 +251,28 @@ export default class IndexView extends Vue {
     types: any[] = [
         "daily", "food", "fruit", "drinks", "alcohol", "transportation", "entertainment", "others"
     ]
+
+    mapTouchend() {
+
+        let {lat, lng} = this.amap.getCenter()
+        console.log(lat, lng)
+        this.getDetailLocation(lat, lng,
+            (locationDetail: any) => {
+                // get information we need from detail response
+                let infomationFromGetLocationDetail = this.getInfomationFromGetLocationDetail(locationDetail);
+                // assign details
+                this.geoLocation = Object.assign(this.geoLocation, infomationFromGetLocationDetail);
+                console.debug(`get location detail: `, this.geoLocation)
+            },
+            (respBodyOrError: any) => {
+                console.error(`fail to get location detail: `, respBodyOrError)
+                Notify({
+                    message: 'Fail to get location detail',
+                    type: 'warning'
+                })
+            }
+        )
+    }
 
 
     nowadays(): string {
@@ -337,7 +360,7 @@ export default class IndexView extends Vue {
         return usefullocationInfos
     }
 
-    getDetailLocation(lat: string, long: string, successCb: (location: any) => void, failCb: (respBodyOrError: any) => void) {
+    getDetailLocation(lat: number, long: number, successCb: (location: any) => void, failCb: (respBodyOrError: any) => void) {
         request({
             url: '//restapi.amap.com/v3/geocode/regeo',
             method: 'get',
@@ -553,15 +576,30 @@ export default class IndexView extends Vue {
         }
     }
 
-    getGeolocation(successCb: any, errorCb: any) {
-        if (this.amapGeolocationPlugin == null) {
-            Notification.error('wait location service to load');
-            return;
-        }
-        this.amapGeolocationPlugin.getCurrentPosition(successCb, errorCb);
+    transactionCategories: any[] = []
+
+    updateDetailLocationData(lat: number, lng: number) {
+
+        this.getDetailLocation(lat, lng,
+            (locationDetail: any) => {
+                // get information we need from detail response
+                let infomationFromGetLocationDetail = this.getInfomationFromGetLocationDetail(locationDetail);
+                // assign details
+                this.geoLocation = Object.assign(this.geoLocation, infomationFromGetLocationDetail);
+                console.debug(`get location detail: `, this.geoLocation)
+            },
+            (respBodyOrError: any) => {
+                console.error(`fail to get location detail: `, respBodyOrError)
+                Notify({
+                    message: 'Fail to get location detail',
+                    type: 'warning'
+                })
+            }
+        )
     }
 
-    transactionCategories: any[] = []
+    marker: any = null
+    apiInvokingTimesSaver: any = null
 
     created() {
         eventBus.$on('afterTransactionChanged', (newTransaction: any) => {
@@ -602,14 +640,33 @@ export default class IndexView extends Vue {
             plugins: [], // 需要使用的的插件列表，如比例尺'AMap.Scale'等
         })
             .then((AMap) => {
-                this.amap = new AMap.Map('amap');
+
+                let map = new AMap.Map('amap', {
+                    zoom: 16,
+                });
+                this.amap = map
+                // let {lat, lng} = map.getCenter()
+                // let marker = new AMap.Marker({
+                //     position: map.getCenter()
+                // })
+                map.on('mapmove', () => {
+                    let {lat, lng} = this.amap.getCenter()
+                    this.geoLocation.longitude = lng
+                    this.geoLocation.latitude = lat
+                    console.log(lat, lng)
+                    clearTimeout(this.apiInvokingTimesSaver)
+                    this.apiInvokingTimesSaver = setTimeout(() => {
+                        this.updateDetailLocationData(lat, lng)
+                    }, 500)
+                    // this.updateDetailLocationData(lat, lng)
+                })
+
                 AMap.plugin('AMap.Geolocation', () => {
                     // 异步加载插件
                     var geolocation = new AMap.Geolocation();
                     this.amap.addControl(geolocation);
                     this.amapGeolocationPlugin = geolocation;
-                    this.getGeolocation(
-                        (status: any, result: any) => {
+                    this.amapGeolocationPlugin.getCurrentPosition((status: any, result: any) => {
                             console.log(status);
                             console.log(result);
 
@@ -626,22 +683,7 @@ export default class IndexView extends Vue {
                                     type: 'success'
                                 })
 
-                                this.getDetailLocation(position.lat, position.lng,
-                                    (locationDetail: any) => {
-                                        // get information we need from detail response
-                                        let infomationFromGetLocationDetail = this.getInfomationFromGetLocationDetail(locationDetail);
-                                        // assign details
-                                        this.geoLocation = Object.assign(this.geoLocation, infomationFromGetLocationDetail);
-                                        console.debug(`get location detail: `, this.geoLocation)
-                                    },
-                                    (respBodyOrError: any) => {
-                                        console.error(`fail to get location detail: `, respBodyOrError)
-                                        Notify({
-                                            message: 'Fail to get location detail',
-                                            type: 'warning'
-                                        })
-                                    }
-                                )
+                                this.updateDetailLocationData(position.lat, position.lng)
                             } else {
                                 console.error(`fail to get geolocation, status: `, status, `result: `, result);
                                 Notify({
@@ -656,8 +698,9 @@ export default class IndexView extends Vue {
                                 type: 'danger'
                             })
                             console.error(`fail to get geollocation: ${error.code}-${error.message}`);
-                        },
-                    );
+                        }
+                    )
+
                 });
             })
             .catch((e) => {
@@ -704,6 +747,21 @@ export default class IndexView extends Vue {
 </script>
 <style lang="scss" scoped>
 @import "~@/style/common-style.scss";
+
+.fake-marker {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    object-fit: cover;
+    width: 20px;
+    height: 33px;
+    z-index: auto;
+    transform: translate(-50%, -100%);
+    background: url("~@/assets/mark_bs.png");
+    background-size: cover;
+}
+
 
 .page {
     padding: 8px;
