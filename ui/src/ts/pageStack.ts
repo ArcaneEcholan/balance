@@ -1,12 +1,43 @@
 import router from "@/router";
 import {Notification} from "element-ui";
 
+class StackItem {
+    name: string | null = null;
+    params: any;
+}
+
 class PageStack {
     private stackSize: number = 0
+
+    private stack: StackItem[] = []
 
     constructor() {
         this.stackSize = 0;
     }
+
+    pushPage(name: string, params: any) {
+        this.stack.push({name, params})
+    }
+
+    popPage() {
+        if (this.stack.length <= 0) {
+            this.stack = [];
+        } else {
+            this.stack.pop();
+        }
+    }
+
+    size() {
+        return this.stack.length
+    }
+
+    empty() {
+        return this.size() === 0
+    }
+
+
+
+
 
     push() {
         this.stackSize++;
@@ -30,14 +61,14 @@ class PageStack {
 
     clear() {
         this.stackSize = 0;
+        this.stack = []
     }
 
 }
 
 let pageStack = new PageStack()
 
-export
-function gotoPageWithName(popStack: boolean, name: string, processOption: any) {
+export function gotoPageWithName(popStack: boolean, name: string, processOption: any) {
     let option = {
         name: name,
     }
@@ -46,8 +77,8 @@ function gotoPageWithName(popStack: boolean, name: string, processOption: any) {
     router.push(option)
     if (popStack) {
         // stack minus 1
-        pageStack.pop()
-        if (pageStack.isBottom()) {
+        pageStack.popPage()
+        if (pageStack.empty()) {
             // if the page stack is only left with one page, this page should be able to scroll
             document.body.style.overflowY = 'auto'
         }
@@ -58,7 +89,7 @@ export function pushPageWithName(name: string, params: any) {
     // go to the next page
     router.push({name, params})
     // stack plus 1
-    pageStack.push()
+    pageStack.pushPage(name, params)
     // prevent the most basic page from scrolling
     document.body.style.overflowY = 'hidden'
 }

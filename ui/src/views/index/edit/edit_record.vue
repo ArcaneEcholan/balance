@@ -21,7 +21,7 @@
                     <!--                    </div>-->
                     <!--                </div>-->
                     <div class=" ">
-                        <div style="z-index: 10000000">{{ stackSize }}</div>
+                        <!--<div style="z-index: 10000000">{{ stackSize }}</div>-->
                         <div class="google-gray-400 capitalize">
                             <!--test-->
                         </div>
@@ -89,10 +89,6 @@ class FormItem {
     }
 })
 export default class EditRecordView extends Vue {
-    get stackSize() {
-        return pageStack.getStackSize()
-    }
-
     varTable: any = {}
 
     categoryValue: string | null = null

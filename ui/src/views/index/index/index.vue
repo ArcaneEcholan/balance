@@ -204,9 +204,6 @@ Component.registerHooks([
     }
 })
 export default class IndexView extends Vue {
-    get stackSize() {
-        return pageStack.getStackSize()
-    }
 
     replaceFirstWord(type: string) {
         let str = this.rawFormatString
