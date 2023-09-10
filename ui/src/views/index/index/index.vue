@@ -11,11 +11,12 @@
 
             <div class="record-header">Amap</div>
 
-            <div style="position: relative" class="bg-white br8 shadow  overflow-hidden">
+            <div style="position: relative" class="bg-white br8 shadow overflow-hidden">
                 <div id="amap" style="width: 100%; height: auto">
                 </div>
                 <div class="fake-marker"></div>
             </div>
+            <!--endregion-->
 
 
             <div class="mgb20"></div>
@@ -25,8 +26,6 @@
                           :value="`(${geoLocation.latitude}, ${geoLocation.longitude})`"/>
                 <van-cell title="Overview" :value="`${geoLocation.formattedName}`"/>
             </van-cell-group>
-
-            <div class="mgb20"></div>
             <!--<van-list-->
             <!--    v-model:loading="loading"-->
             <!--    :finished="finished"-->
@@ -35,7 +34,6 @@
             <!--&gt;-->
             <!--    <van-cell v-for="item in list" :key="item" :title="item" />-->
             <!--</van-list>-->
-            <!--endregion-->
 
             <div class="mgb20"></div>
 
@@ -166,7 +164,7 @@ import {Notification} from 'element-ui';
 import Client from '@/request/client';
 import request from '@/request';
 import {convertToShortDateTime, findWordInLine, replace} from "@/ts/utils";
-import PageStack, {pushPage} from "@/ts/pageStack";
+import {pushPageWithName} from "@/ts/pageStack";
 import pageStack from "@/ts/pageStack";
 import eventBus from "@/ts/EventBus";
 import {Notify} from "vant";
@@ -293,12 +291,28 @@ export default class IndexView extends Vue {
     }
 
     edit(recordId: string | number) {
-        this.present(`/index/edit?recordId=${recordId}`)
+        // find the record
+        let found = this.transactionList.find((item) => {
+            return item.id === recordId
+        })
+
+        if (!found) {
+            return
+        }
+        // this.present(`/index/edit?recordId=${recordId}`)
+        this.present(`edit_transaction`, {
+            id: found.id,
+            amount: found.amount,
+            datetime: found.datetime,
+            count: found.count,
+            categoryValue: found.categoryValue,
+            description: found.description
+        })
     }
 
 
-    present(path: string) {
-        pushPage(path)
+    present(viewName: string, data: any) {
+        pushPageWithName(viewName, data)
     }
 
 

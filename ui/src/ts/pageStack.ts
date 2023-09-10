@@ -13,7 +13,7 @@ class PageStack {
     }
 
     pop() {
-        if(this.stackSize <= 0) {
+        if (this.stackSize <= 0) {
             this.stackSize = 0;
         } else {
             this.stackSize--;
@@ -36,21 +36,10 @@ class PageStack {
 
 let pageStack = new PageStack()
 
-function popPage() {
-
-    // go back to the previous page
-    router.go(-1)
-    // stack minus 1
-    pageStack.pop()
-    if (pageStack.isBottom()) {
-        // if the page stack is only left with one page, this page should be able to scroll
-        document.body.style.overflowY = 'auto'
-    }
-}
-
-function gotoPage(popStack: boolean, path: string, processOption: any) {
+export
+function gotoPageWithName(popStack: boolean, name: string, processOption: any) {
     let option = {
-        path: path,
+        name: name,
     }
     processOption(option)
     // go back to the previous page
@@ -65,10 +54,9 @@ function gotoPage(popStack: boolean, path: string, processOption: any) {
     }
 }
 
-function pushPage(path: string) {
-
+export function pushPageWithName(name: string, params: any) {
     // go to the next page
-    router.push(path)
+    router.push({name, params})
     // stack plus 1
     pageStack.push()
     // prevent the most basic page from scrolling
@@ -83,5 +71,3 @@ function closeIt() {
 window.onbeforeunload = closeIt;
 
 export default pageStack;
-
-export {popPage, pushPage, gotoPage};

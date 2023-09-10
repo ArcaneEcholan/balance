@@ -8,6 +8,7 @@ Vue.use(VueRouter);
 const routes: Array<RouteConfig> = [
     {
         path: '/',
+        name: 'home',
         redirect: '/index',
     },
     {
@@ -25,6 +26,7 @@ const routes: Array<RouteConfig> = [
                 meta: {
                     title: "Edit"
                 },
+                name: 'edit_transaction',
                 path: 'edit',
                 component: EditRecordView,
             },
