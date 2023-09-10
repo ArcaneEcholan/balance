@@ -15,7 +15,6 @@ const routes: Array<RouteConfig> = [
         path: '/index',
         component: IndexView,
         meta: {
-            title: "Balance"
         },
         children: [
             // {
@@ -24,7 +23,6 @@ const routes: Array<RouteConfig> = [
             // },
             {
                 meta: {
-                    title: "Edit"
                 },
                 name: 'edit_transaction',
                 path: 'edit',
