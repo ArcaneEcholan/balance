@@ -36,7 +36,7 @@ export default class AppView extends Vue {
             // this is where the user's finger is, in this case, represents the swipe start point
             const touchClientX = touch.clientX;
             // is not near edge of view, exit
-            if (touchClientX <= 8 || touchClientX >= window.innerWidth - 8) {
+            if (touchClientX <= 20 || touchClientX >= window.innerWidth - 20) {
                 console.debug("prevent default swipe gesture")
                 e.preventDefault();
             }
