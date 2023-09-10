@@ -2,7 +2,9 @@
     <div>
         <modal-presentation
             style="background-color: #f7f8fa"
-            @close="closed"
+            @closed="closed"
+            @close-100="close100"
+            @on-close="onclose"
             ref="modal"
         >
             <template #default>
@@ -66,6 +68,7 @@ import {Notify} from "vant";
 import Client from "@/request/client";
 import {countDecimalPlaces, isFloat, isPositiveInteger} from '@/ts/utils';
 import eventBus from "@/ts/EventBus";
+import pageConfig from "@/ts/pageConfig";
 
 class FormItem {
     categoryValue: string | null = null;
@@ -229,6 +232,9 @@ export default class EditRecordView extends Vue {
     }
 
     closed() {
+
+    }
+    close100() {
         gotoPageWithName(true, "home", (routeOpiton: any) => {
             // routeOpiton.params = {
             //     transactionId: this.recordId,
@@ -238,6 +244,16 @@ export default class EditRecordView extends Vue {
             //     description: this.description
             // }
         })
+    }
+    close200() {
+
+    }
+    close300() {
+
+    }
+
+    onclose() {
+        pageConfig.setTitle("Balance")
     }
 }
 </script>

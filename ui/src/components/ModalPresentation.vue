@@ -31,8 +31,18 @@ export default class ModalPresentationView extends Vue {
      */
     closeModal() {
         this.modal.style.right = `${-this.modalWidth}px`;
+        this.$emit('on-close', this);
         setTimeout(() => {
-            this.$emit('close', this);
+            this.$emit('close-300', this);
+        }, 300);
+        setTimeout(() => {
+            this.$emit('close-200', this);
+        }, 200);
+        setTimeout(() => {
+            this.$emit('close-100', this);
+        }, 100);
+        setTimeout(() => {
+            this.$emit('closed', this);
         }, 500);
     }
 
