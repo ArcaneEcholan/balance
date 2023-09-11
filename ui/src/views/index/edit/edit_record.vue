@@ -9,17 +9,6 @@
         >
             <template #default>
                 <div class="page">
-                    <!--                <div class="header">-->
-                    <!--                    -->
-                    <!--                    <div class="flex flex-center" style="background-color: #fff;-->
-                    <!--height: 56px;">-->
-                    <!--                        <div class="fs20 bold"-->
-                    <!--                             style="-->
-                    <!--                         text-transform: capitalize;">-->
-                    <!--                            Edit Record-->
-                    <!--                        </div>-->
-                    <!--                    </div>-->
-                    <!--                </div>-->
                     <div class=" ">
                         <!--<div style="z-index: 10000000">{{ stackSize }}</div>-->
                         <div class="google-gray-400 capitalize">
@@ -27,12 +16,6 @@
                         </div>
                     </div>
                     <div class="pdb16 pdt16"></div>
-                    <!--{{-->
-                    <!--    amount-->
-                    <!--}}-->
-                    <!--{{ datetime }}-->
-                    <!--{{ count }}-->
-                    <!--{{ description }}-->
 
                     <div class="record-header">Edit Fields</div>
 

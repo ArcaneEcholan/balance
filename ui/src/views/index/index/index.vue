@@ -156,7 +156,6 @@
         </div>
     </div>
 </template>
-<script src="https://webapi.amap.com/loader.js"></script>
 <script lang="ts">
 import AMapLoader from '@amap/amap-jsapi-loader';
 import {Component, Vue} from 'vue-property-decorator';
@@ -247,29 +246,6 @@ export default class IndexView extends Vue {
         "daily", "food", "fruit", "drinks", "alcohol", "transportation", "entertainment", "others"
     ]
 
-    mapTouchend() {
-
-        let {lat, lng} = this.amap.getCenter()
-        console.log(lat, lng)
-        this.getDetailLocation(lat, lng,
-            (locationDetail: any) => {
-                // get information we need from detail response
-                let infomationFromGetLocationDetail = this.getInfomationFromGetLocationDetail(locationDetail);
-                // assign details
-                this.geoLocation = Object.assign(this.geoLocation, infomationFromGetLocationDetail);
-                console.debug(`get location detail: `, this.geoLocation)
-            },
-            (respBodyOrError: any) => {
-                console.error(`fail to get location detail: `, respBodyOrError)
-                Notify({
-                    message: 'Fail to get location detail',
-                    type: 'warning'
-                })
-            }
-        )
-    }
-
-
     nowadays(): string {
         return `${getCurrentYear()}-${getCurrentMonth()}`
     }
@@ -307,11 +283,9 @@ export default class IndexView extends Vue {
         })
     }
 
-
     present(viewName: string, data: any) {
         pushPageWithName(viewName, data)
     }
-
 
     mounted() {
         let amapElem: HTMLElement = document.getElementById("amap")!
