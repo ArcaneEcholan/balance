@@ -5,25 +5,24 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.app.dao.utils.base.pagination.*;
+import com.example.app.exception.ApiException;
 import com.example.app.utils.MyBatisUtilsKt;
 import com.example.app.utils.VarCaseConvertUtils;
-import com.example.app.exception.ApiException;
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-@Slf4j
 public class BaseDao<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> implements IBaseDao<T> {
 
+    @NotNull
+    private final Logger log = Objects.requireNonNull(LoggerFactory.getLogger(BaseDao.class));
     @Override
     public T existsByPrimaryKey(T entity) {
         Class<?> entityClass = entity.getClass();

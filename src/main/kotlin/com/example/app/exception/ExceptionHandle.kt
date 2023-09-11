@@ -1,9 +1,10 @@
 package com.example.app.exception
 
 import RespCode
-import com.alibaba.fastjson2.JSONObject
 import com.example.app.utils.ClassUtils
+import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -91,7 +92,7 @@ class GlobalExceptionHandler {
     private val log = KotlinLogging.logger {}
 
     class ParameterCheckResult {
-        var paramCheckMap: JSONObject = JSONObject()
+        var paramCheckMap = mutableMapOf<String, Any?>()
         fun putResult(field: String, message: String?) {
             paramCheckMap.put(field, message)
         }
@@ -108,12 +109,15 @@ class GlobalExceptionHandler {
         return turnBackendExceptionIntoJsonResult(req, ex)
     }
 
+    @Autowired
+    lateinit var objectMapper: ObjectMapper
+
     /**
      * @param ex the exception
      * @return the json result
      */
     private fun turnBackendExceptionIntoJsonResult(req: HttpServletResponse, ex: ApiException): ResponseEntity<*> {
-        return ResponseEntity(com.alibaba.fastjson.JSONObject.toJSONString(ex.msg), ex.httpStatus)
+        return ResponseEntity(objectMapper.writeValueAsString(ex.msg), ex.httpStatus)
     }
 
     // endregion
