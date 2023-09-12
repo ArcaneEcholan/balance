@@ -35,8 +35,13 @@ class PageStack {
         return this.size() === 0
     }
 
-
-
+    peek() {
+        if (this.stack.length <= 0) {
+            return null
+        } else {
+            return this.stack[this.stack.length - 1]
+        }
+    }
 
 
     push() {
@@ -68,30 +73,60 @@ class PageStack {
 
 let pageStack = new PageStack()
 
-export function gotoPageWithName(popStack: boolean, name: string, processOption: any) {
-    let option = {
-        name: name,
+export function gotoPage(popStack: boolean, name: string, params: any) {
+    // null params breaks the router.push and router.replace
+    if (params == null) {
+        params = {}
     }
-    processOption(option)
-    // go back to the previous page
-    router.push(option)
     if (popStack) {
         // stack minus 1
         pageStack.popPage()
-        if (pageStack.empty()) {
-            // if the page stack is only left with one page, this page should be able to scroll
-            document.body.style.overflowY = 'auto'
-        }
-    }
-}
 
-export function pushPageWithName(name: string, params: any) {
-    // go to the next page
-    router.push({name, params})
-    // stack plus 1
-    pageStack.pushPage(name, params)
-    // prevent the most basic page from scrolling
-    document.body.style.overflowY = 'hidden'
+        let top = pageStack.peek()
+        if (top == null) {
+            return;
+        }
+
+        let pageName = top.name as string
+        let params = top.params
+        let option = {
+            name: pageName,
+            params: {}
+        }
+        if (params != null) {
+            option.params = params
+        }
+        // go back to the previous page
+        router.replace(option)
+    } else {
+
+        if (params != null) {
+            // go to the next page
+            router.replace({name, params})
+
+            // stack plus 1
+            pageStack.pushPage(name, params)
+        } else {
+            // go to the next page
+            router.replace({name})
+
+            // stack plus 1
+            pageStack.pushPage(name, null)
+        }
+
+    }
+
+    if (pageStack.size() <= 1) {
+        // if the page stack is only left with one page, this page should be able to scroll
+        document.body.style.overflowY = 'auto'
+    }
+
+    if (pageStack.size() >= 2) {
+        // prevent the most basic page from scrolling
+        document.body.style.overflowY = 'hidden'
+    }
+
+    console.debug(`pagestack:${pageStack.size()}`)
 }
 
 function closeIt() {

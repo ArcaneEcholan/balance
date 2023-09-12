@@ -163,7 +163,7 @@ import {Notification} from 'element-ui';
 import Client from '@/request/client';
 import request from '@/request';
 import {convertToShortDateTime, findWordInLine, replace} from "@/ts/utils";
-import {pushPageWithName} from "@/ts/pageStack";
+import {gotoPage} from "@/ts/pageStack";
 import pageStack from "@/ts/pageStack";
 import eventBus from "@/ts/EventBus";
 import {Notify} from "vant";
@@ -284,7 +284,8 @@ export default class IndexView extends Vue {
     }
 
     present(viewName: string, data: any) {
-        pushPageWithName(viewName, data)
+        gotoPage(false, viewName, data)
+        // pushPageWithName(viewName, data)
     }
 
     mounted() {
@@ -587,6 +588,7 @@ export default class IndexView extends Vue {
     apiInvokingTimesSaver: any = null
 
     created() {
+        console.log("pageStack" + pageStack.size());
         eventBus.$on('afterTransactionChanged', (newTransaction: any) => {
             this.updateTransasction(newTransaction)
         });

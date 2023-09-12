@@ -23,7 +23,7 @@ router.beforeEach(async (to, from, next) => {
         count ++
 
         // we abandon the non index nav
-        if (to.path === "/" || to.path === "/index") {
+        if (to.path === "/") {
             next()
         } else {
             // if the start up action is not index, we redirect to index
@@ -32,7 +32,7 @@ router.beforeEach(async (to, from, next) => {
         }
     } else {
         // it's not the first time the app starts up
-        if(to.path === "/" || to.path === "/index") {
+        if(to.path === "/" ) {
             pageStack.clear()
         }
         count++

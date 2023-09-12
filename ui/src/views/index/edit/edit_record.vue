@@ -45,7 +45,7 @@
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentationView from "@/components/ModalPresentation.vue";
-import {gotoPageWithName} from "@/ts/pageStack";
+import {gotoPage} from "@/ts/pageStack";
 import pageStack from "@/ts/pageStack";
 import {Notify} from "vant";
 import Client from "@/request/client";
@@ -214,15 +214,8 @@ export default class EditRecordView extends Vue {
 
     }
     close100() {
-        gotoPageWithName(true, "home", (routeOpiton: any) => {
-            // routeOpiton.params = {
-            //     transactionId: this.recordId,
-            //     amount: this.amount,
-            //     datetime: this.datetime,
-            //     count: this.count,
-            //     description: this.description
-            // }
-        })
+        gotoPage(true, "home", {})
+
     }
     close200() {
 

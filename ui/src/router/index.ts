@@ -2,17 +2,18 @@ import Vue from 'vue';
 import VueRouter, {RouteConfig} from 'vue-router';
 import IndexView from "@/views/index/index/index.vue";
 import EditRecordView from "@/views/index/edit/edit_record.vue";
+import IndexIndexView from "@/views/index/index.vue";
 
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
     {
         path: '/',
-        name: 'home',
-        redirect: '/index',
+        component: IndexIndexView,
     },
     {
         path: '/index',
+        name: 'home',
         component: IndexView,
         meta: {
         },
