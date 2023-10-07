@@ -1,9 +1,26 @@
 <template>
-    <div class="page">
+    <div class="page" v-loading="ledgerLoading">
 
         <!--edit stack-->
         <router-view>
         </router-view>
+
+
+        <van-dropdown-menu ref="menuRef">
+            <van-dropdown-item :title="currentLedger.name" ref="item">
+                <van-cell-group >
+                    <van-cell @click="onSelectLedger(ledger)" v-for="ledger in ledgerList" :title="ledger.name">
+                    </van-cell>
+                </van-cell-group>
+                <div style="padding: 5px 16px;">
+                    <el-button @click="onConfirm" round plain type="primary" style="width: 100%">
+                        <i class="el-icon-edit">manage ledger</i>
+                    </el-button>
+                </div>
+            </van-dropdown-item>
+        </van-dropdown-menu>
+
+
 
         <div>
             <!--region: amap-->
@@ -203,6 +220,54 @@ Component.registerHooks([
     }
 })
 export default class IndexView extends Vue {
+    ledgerLoading = false
+    currentLedger = {name: "default"}
+    onSelectLedger(ledger: any) {
+        console.log("onSelectLedger")
+        this.ledgerLoading = true
+        setTimeout(() => {
+            console.log(this.$refs.item);
+            (this.$refs.item as any).toggle()
+            this.currentLedger = ledger
+            this.transactionList = [{
+                id: 1,
+                categoryValue: "food",
+                amount: 44.00,
+                count: 1,
+                description: "kfc",
+                location: {
+                    latitude: 0,
+                    longitude: 0,
+                    formatedName: "test loc1",
+                }
+            }, {
+                id: 2,
+                categoryValue: "fruit",
+                amount: 33.00,
+                count: 1,
+                description: "watermalon",
+                location: {
+                    latitude: 0,
+                    longitude: 0,
+                    formatedName: "test loc2",
+                }
+            }]
+            this.ledgerLoading = false
+        }, 500)
+    }
+
+    ledgerList = [
+        {name: "default"},
+        {name: "ledger1"},
+        {name: "ledger2"},
+        {name: "ledger3"},
+    ]
+
+    onConfirm() {
+        console.log(this.$refs.item);
+        (this.$refs.item as any).toggle();
+        this.present(`manage_ledger`,{})
+    };
 
     replaceFirstWord(type: string) {
         let str = this.rawFormatString
@@ -601,6 +666,7 @@ export default class IndexView extends Vue {
             location: {
                 latitude: 0,
                 longitude: 0,
+                formatedName: "test loc1",
             }
         }, {
             id: 2,
@@ -611,6 +677,7 @@ export default class IndexView extends Vue {
             location: {
                 latitude: 0,
                 longitude: 0,
+                formatedName: "test loc2",
             }
         }]
 

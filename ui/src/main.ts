@@ -20,6 +20,8 @@ import { NavBar } from 'vant';
 import {Icon} from "vant";
 import { List } from 'vant';
 import { Tag } from 'vant';
+import { DropdownMenu, DropdownItem } from 'vant'
+import { SwipeCell } from 'vant';
 
 Vue.use(Notify);
 Vue.use(Button);
@@ -31,7 +33,10 @@ Vue.use(NavBar);
 Vue.use(Icon);
 Vue.use(List);
 Vue.use(Tag);
+Vue.use(DropdownMenu);
+Vue.use(DropdownItem);
 
+Vue.use(SwipeCell);
 
 new Vue({
     router,
