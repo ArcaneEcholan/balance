@@ -7,19 +7,40 @@
             @on-close="onclose"
             ref="modal"
         >
+
+
             <template #default>
                 <div class="page">
+
+                    <van-action-sheet v-model="show" title="Title">
+                        <div class="page">
+                            <div class="pdb16 pdt16"></div>
+                            <div class="record-header">Edit Fields</div>
+                            <van-cell-group class="shadow overflow-hidden br8 ">
+                                <van-field v-model="editLedgerName" type="text" label="name"/>
+                            </van-cell-group>
+                            <div class="pdb16 pdt16"></div>
+                            <div class=" ">
+                                <el-button round plain type="primary" style="width: 100%"
+                                           @click="submitEditLedger"
+                                           :disabled="editLedgerLoading"
+                                >Submit
+                                </el-button>
+                            </div>
+                        </div>
+
+                    </van-action-sheet>
+
                     <div class="pdb16 pdt16"></div>
-                    <div class="record-header">Edit Fields</div>
-                    <van-cell-group class="shadow overflow-hidden br8">
-                        <van-swipe-cell v-for="i in 6">
-                            <template #left>
-                                <van-button square type="primary" text="Select" />
-                            </template>
-                            <van-cell :border="false" title="Cell" value="Cell Content" />
+                    <div class="record-header">Ledgers</div>
+                    <van-cell-group v-loading="ledgersLoading" class="shadow overflow-hidden br8">
+                        <van-swipe-cell v-for="ledger in ledgers">
+                            <van-cell :border="false" :title="ledger.name"/>
                             <template #right>
-                                <van-button square type="danger" text="Delete" />
-                                <van-button square type="primary" text="Collect" />
+                                <van-button square type="primary" text="Edit"
+                                            @click="onClickEdit(ledger.id, ledger.name)"/>
+                                <van-button square type="danger" text="Delete"
+                                            @click="onClickDelete(ledger.id, ledger.name)"/>
                             </template>
                         </van-swipe-cell>
                     </van-cell-group>
@@ -34,7 +55,6 @@
 import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentationView from "@/components/ModalPresentation.vue";
 import {gotoPage} from "@/ts/pageStack";
-import pageStack from "@/ts/pageStack";
 import {Notify} from "vant";
 import Client from "@/request/client";
 import {countDecimalPlaces, isFloat, isPositiveInteger} from '@/ts/utils';
@@ -60,90 +80,40 @@ class FormItem {
     }
 })
 export default class ManageLedgerView extends Vue {
+    ledgers: any = []
     varTable: any = {}
-
+    show = false
     categoryValue: string | null = null
+    name = ""
+    editLedgerId: number | null = null
+    editLedgerName: string | null = ""
 
-    submit() {
-        this.submitEnable = false
+    onClickEdit(ledgerId: number, ledgerName: string) {
+        this.editLedgerId = ledgerId
+        this.editLedgerName = ledgerName
+        this.show = true
+    }
 
-        let datetime = this.datetime
-
-        if (datetime != null) {
-            datetime = datetime.trim()
-            const datetimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
-
-            if (!datetimeRegex.test(datetime)) {
-                Notify({
-                    type: "danger",
-                    message: "Information format invalid"
-                })
-                this.submitEnable = true
-                return
-            }
-        }
-        let description = this.description
-
-        let amount = this.amount
-        let count = this.count
-
-        // ensure no null
-        if (amount == null || count == null) {
+    onClickDelete(ledgerId: number, ledgeName: string) {
+        this.ledgers = this.ledgers.filter((item: any) => item.id != ledgerId)
+    }
+    editLedgerLoading =false
+    submitEditLedger() {
+        this.editLedgerLoading = true
+        setTimeout(() => {
+            this.editLedgerLoading = false
             Notify({
-                type: "danger",
-                message: "Information incomplete"
+                type: "success",
+                message: "Update success"
             })
-            this.submitEnable = true
-            return
-        }
 
-
-        let categoryValid = true
-        let categoryValue = this.categoryValue
-        if (categoryValue == null || categoryValue.trim() == "") {
-            categoryValid = false
-        }
-
-        let countValid = isPositiveInteger(Number(count));
-        let amountValid = isFloat(Number(amount));
-        let amountDecimalPlaces = countDecimalPlaces(amount);
-        if (amountDecimalPlaces > 2) {
-            amountValid = false
-        }
-
-
-        if (!countValid || !amountValid ||
-            !categoryValid) {
-            Notify({
-                type: "danger",
-                message: "Information format invalid"
+            this.show=false
+            this.ledgers.filter((item: any) =>  {
+                if(item.id === this.editLedgerId) {
+                    item.name = this.editLedgerName
+                }
             })
-            this.submitEnable = true
-            return
-        }
-
-
-        // format check pass
-        Client.updateTransaction(this.recordId,
-            categoryValue!,
-            amount, datetime, count, description)
-            .then((resp: any) => {
-                let newTrans = resp.data
-                this.categoryValue = newTrans.categoryValue
-                this.amount = newTrans.amount
-                this.datetime = newTrans.datetime
-                this.count = newTrans.count
-                this.description = newTrans.description
-                eventBus.$emit("afterTransactionChanged", newTrans)
-                Notify({
-                    type: "success",
-                    message: "Update success"
-                })
-                this.submitEnable = true
-            })
-            .catch((err: any) => {
-                this.submitEnable = true
-            })
+        }, 500)
     }
 
 
@@ -159,7 +129,27 @@ export default class ManageLedgerView extends Vue {
 
     modal!: ModalPresentationView
 
+    ledgersLoading = false
     created() {
+        this.ledgersLoading = true
+        setTimeout(() => {
+            this.ledgersLoading = false
+            this.ledgers = [
+                {
+                    id: 1,
+                    name: "Ledger 1"
+                }, {
+                    id: 2,
+                    name: "Ledger 2"
+                }, {
+                    id: 3,
+                    name: "Ledger 3"
+                }, {
+                    id: 4,
+                    name: "Ledger 4"
+                },
+            ]
+        }, 500)
     }
 
     mounted() {

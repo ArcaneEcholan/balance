@@ -16,9 +16,7 @@
                         </div>
                     </div>
                     <div class="pdb16 pdt16"></div>
-
                     <div class="record-header">Edit Fields</div>
-
                     <van-cell-group class="shadow overflow-hidden br8 ">
                         <van-field v-model="categoryValue" type="string" label="category"/>
                         <van-field v-model="amount" type="number" label="amount"/>

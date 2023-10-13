@@ -22,7 +22,7 @@ import { List } from 'vant';
 import { Tag } from 'vant';
 import { DropdownMenu, DropdownItem } from 'vant'
 import { SwipeCell } from 'vant';
-
+import { ActionSheet } from 'vant';
 Vue.use(Notify);
 Vue.use(Button);
 Vue.use(Popup);
@@ -35,6 +35,7 @@ Vue.use(List);
 Vue.use(Tag);
 Vue.use(DropdownMenu);
 Vue.use(DropdownItem);
+Vue.use(ActionSheet);
 
 Vue.use(SwipeCell);
 
