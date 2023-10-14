@@ -133,6 +133,16 @@ class Client {
             method: 'get',
         });
     }
+
+    static addLedger(addLedgerName: string) {
+        return request({
+            url: `/ledger`,
+            method: 'post',
+            data: {
+                name: addLedgerName,
+            }
+        });
+    }
 }
 
 export default Client;

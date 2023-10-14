@@ -84,6 +84,7 @@ import {Notify} from "vant";
 import pageConfig from "@/ts/pageConfig";
 import {getHtmlElem, getRef} from "@/ts/vueUtils";
 import eventBus from "@/ts/EventBus";
+import Client from "@/request/client";
 
 class FormItem {
     categoryValue: string | null = null;
@@ -120,8 +121,16 @@ export default class ManageLedgerView extends Vue {
     countxxx = 100;
 
     submitAddLedger() {
+        let name = this.addLedgerName
+        if (name == null || name === "") {
+            Notify({
+                type: "danger",
+                message: "name is empty"
+            })
+            return
+        }
         this.addLedgerLoading = true
-        setTimeout(() => {
+        Client.addLedger(name).then((resp) => {
             Notify({
                 type: "success",
                 message: "Add success"
@@ -129,11 +138,19 @@ export default class ManageLedgerView extends Vue {
 
             this.addLedgerShow = false
             this.ledgers.push({
-                id: this.countxxx++,
-                name: this.addLedgerName
+                id: resp.data.id,
+                name: resp.data.name,
+                ctime: resp.data.ctime
             })
             // we don't recover the loading status to prevent the user click submit button twice
-        }, 500)
+        }).catch(() => {
+            this.addLedgerLoading = false
+            Notify({
+                type: "danger",
+                message: "add failed"
+            })
+        })
+
     }
 
 
@@ -146,7 +163,9 @@ export default class ManageLedgerView extends Vue {
     onClickDelete(ledgerId: number, ledgeName: string) {
         this.ledgers = this.ledgers.filter((item: any) => item.id != ledgerId)
     }
-    editLedgerLoading =false
+
+    editLedgerLoading = false
+
     submitEditLedger() {
         this.editLedgerLoading = true
         setTimeout(() => {
@@ -156,9 +175,9 @@ export default class ManageLedgerView extends Vue {
                 message: "Update success"
             })
 
-            this.show=false
-            this.ledgers.filter((item: any) =>  {
-                if(item.id === this.editLedgerId) {
+            this.show = false
+            this.ledgers.filter((item: any) => {
+                if (item.id === this.editLedgerId) {
                     item.name = this.editLedgerName
                 }
             })
@@ -179,6 +198,7 @@ export default class ManageLedgerView extends Vue {
     modal!: ModalPresentationView
 
     ledgersLoading = false
+
     created() {
         this.recordId = this.$route.params.id
         this.amount = this.$route.params.amount
@@ -186,26 +206,18 @@ export default class ManageLedgerView extends Vue {
         this.count = this.$route.params.count
         this.categoryValue = this.$route.params.categoryValue
         this.description = this.$route.params.description
+
+
         this.ledgersLoading = true
-        setTimeout(() => {
+
+        Client.getLedgerList().then((resp) => {
             this.ledgersLoading = false
-            this.ledgers = [
-                {
-                    id: 1,
-                    name: "Ledger 1"
-                }, {
-                    id: 2,
-                    name: "Ledger 2"
-                }, {
-                    id: 3,
-                    name: "Ledger 3"
-                }, {
-                    id: 4,
-                    name: "Ledger 4"
-                },
-            ]
-            eventBus.$emit('ledges-changes',   this.ledgers)
-        }, 500)
+            this.ledgers = resp.data
+            eventBus.$emit('ledges-changes', this.ledgers)
+        }).catch(() => {
+            this.ledgersLoading = false
+        })
+
     }
 
 
