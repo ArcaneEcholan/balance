@@ -519,7 +519,6 @@ export default class IndexView extends Vue {
         getRef(this, "ledgerSelection").toggle()
     }
 
-
     toEditTransactionPage(recordId: string | number) {
         // find the record
         let foundTrans = this.transactionList.find((item) => {
@@ -670,7 +669,6 @@ export default class IndexView extends Vue {
         }
 
         this.replaceFirstWord(curStringAtInput, type)
-        this.updateCurrentCursorPosition()
     }
 
     replaceFirstWord(curStringAtInput: string, type: string) {
@@ -764,7 +762,7 @@ export default class IndexView extends Vue {
                     });
                 }, objWithViewStatus);
             });
-        return objs;
+        this.parsedForms = objs as FormItem[];
     }
 
 }
