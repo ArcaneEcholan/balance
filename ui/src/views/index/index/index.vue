@@ -7,13 +7,13 @@
 
 
         <van-dropdown-menu ref="menuRef">
-            <van-dropdown-item :title="currentLedger.name" ref="item">
-                <van-cell-group >
-                    <van-cell @click="onSelectLedger(ledger)" v-for="ledger in ledgerList" :title="ledger.name">
+            <van-dropdown-item :title="currentLedger.name" ref="ledgerSelection">
+                <van-cell-group>
+                    <van-cell @click="onClickSwitchLedger(ledger)" v-for="ledger in ledgerList" :title="ledger.name">
                     </van-cell>
                 </van-cell-group>
                 <div style="padding: 5px 16px;">
-                    <el-button @click="onConfirm" round plain type="primary" style="width: 100%">
+                    <el-button @click="onClickManageLedgerList" round plain type="primary" style="width: 100%">
                         <i class="el-icon-edit">manage ledger</i>
                     </el-button>
                 </div>
@@ -43,22 +43,18 @@
                           :value="`(${geoLocation.latitude}, ${geoLocation.longitude})`"/>
                 <van-cell title="Overview" :value="`${geoLocation.formattedName}`"/>
             </van-cell-group>
-            <!--<van-list-->
-            <!--    v-model:loading="loading"-->
-            <!--    :finished="finished"-->
-            <!--    finished-text="Finished"-->
-            <!--    @load="onload"-->
-            <!--&gt;-->
-            <!--    <van-cell v-for="item in list" :key="item" :title="item" />-->
-            <!--</van-list>-->
 
             <div class="mgb20"></div>
 
-            <!--<div style="z-index: 10000000">{{ stackSize }}</div>-->
-
             <template v-for="type in transactionCategories">
-                <van-tag type="primary" @click="replaceFirstWord(type.value)" round class="mgr8 mgb8 pdr8 pdl8"
-                         style="line-height: 24px">{{ type.value }}
+                <van-tag
+                    class="mgr8 mgb8 pdr8 pdl8"
+                    style="line-height: 24px"
+                    type="primary"
+                    round
+                    @click="onClickOneType(type.value)"
+                >
+                    {{ type.value }}
                 </van-tag>
             </template>
 
@@ -70,8 +66,8 @@
             <!--Input-->
             <van-field
                 ref="recordInput"
-                @click="getCursorPosition0"
-                @input="recordInput"
+                @click="updateCurrentCursorPosition"
+                @input="onTransactionTextAreaInput"
                 v-model="rawFormatString"
                 label="Records (per / Line)"
                 type="textarea"
@@ -116,18 +112,9 @@
 
             <!--endregion-->
 
-            <el-button @click="onSaveTrans" round plain type="primary" style="width: 100%">
+            <el-button @click="onAddTrans" round plain type="primary" style="width: 100%">
                 <i class="el-icon-plus"></i>
             </el-button>
-            <!--            <div @click="onSaveTrans" style="-->
-            <!--        background-color: white;-->
-            <!--        text-align: center;-->
-            <!--"-->
-            <!--                 class="br5 pdt10 pdb10"-->
-            <!--            >-->
-            <!--                <i class="el-icon-plus"></i>-->
-            <!--            </div>-->
-
 
             <div class="mgb8"></div>
 
@@ -140,7 +127,7 @@
                 <template v-for="(form, index) in transactionList">
                     <!--list item-->
                     <div class="flex pdt10 pdb10 pdl16 pdr16"
-                         @click="edit(form.id)"
+                         @click="toEditTransactionPage(form.id)"
                          :style="
                      `border-bottom: 1px solid #f5f5f5;
                      background-color: white;
@@ -180,10 +167,11 @@ import {Notification} from 'element-ui';
 import Client from '@/request/client';
 import request from '@/request';
 import {convertToShortDateTime, findWordInLine, replace} from "@/ts/utils";
-import pageStack, {gotoPage} from "@/ts/pageStack";
+import {gotoPage} from "@/ts/pageStack";
 import eventBus from "@/ts/EventBus";
 import {Notify} from "vant";
-import {getCurrentMonth, getCurrentYear} from '@/ts/time';
+import {getCurrentYearAndMonth} from '@/ts/time';
+import {getRef} from "@/ts/vueUtils";
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -219,79 +207,20 @@ Component.registerHooks([
     }
 })
 export default class IndexView extends Vue {
+    transactionCategories: any[] = []
+
     ledgerTransactionsLoading = false
     currentLedger = {name: "default"}
-    onSelectLedger(ledger: any) {
-        console.log("onSelectLedger")
-        this.ledgerTransactionsLoading = true
-        setTimeout(() => {
-            console.log(this.$refs.item);
-            (this.$refs.item as any).toggle()
-            this.currentLedger = ledger
-            this.transactionList = [{
-                id: 1,
-                categoryValue: "food",
-                amount: 44.00,
-                count: 1,
-                description: "kfc",
-                location: {
-                    latitude: 0,
-                    longitude: 0,
-                    formatedName: "test loc1",
-                }
-            }, {
-                id: 2,
-                categoryValue: "fruit",
-                amount: 33.00,
-                count: 1,
-                description: "watermalon",
-                location: {
-                    latitude: 0,
-                    longitude: 0,
-                    formatedName: "test loc2",
-                }
-            }]
-            this.ledgerTransactionsLoading = false
-        }, 500)
-    }
 
+    marker: any = null
+    apiInvokingTimesSaver: any = null
+    ledgersLoading = false
     ledgerList = [
         {name: "default"},
         {name: "ledger1"},
         {name: "ledger2"},
         {name: "ledger3"},
     ]
-
-    onConfirm() {
-        console.log(this.$refs.item);
-        (this.$refs.item as any).toggle();
-        this.present(`manage_ledger`,{})
-    };
-
-    replaceFirstWord(type: string) {
-        let str = this.rawFormatString
-        if (str == null || str == "") {
-            str = type
-        }
-
-        let row = this.cursorPosition.cursorRow
-        let range = findWordInLine(str, row, 1)
-
-        if (range == null) {
-            return;
-        }
-
-        str = replace(str, range.start, range.end, type)
-        this.rawFormatString = str
-        this.onParseRawString()
-
-        let vantinput = (this.$refs.recordInput as any).$el
-        let input = vantinput.querySelector('textarea')
-
-        let start = range.start
-        input.selectionStart = start
-        this.getCursorPosition0()
-    }
 
     showMain = true
     show = false
@@ -309,12 +238,36 @@ export default class IndexView extends Vue {
     types: any[] = [
         "daily", "food", "fruit", "drinks", "alcohol", "transportation", "entertainment", "others"
     ]
-
-    nowadays(): string {
-        return `${getCurrentYear()}-${getCurrentMonth()}`
+    cursorPosition: any = {
+        absoluteCursorPosition: 0,
+        cursorRow: 0,
+        cursorColumn: 0
     }
 
-    updateTransasction(newTransaction: any) {
+    created() {
+        this.registerEvents()
+
+        this.initTransactionTypes();
+
+        this.initLedgersAndTransactions();
+
+        this.loadAmap()
+    }
+
+    registerEvents() {
+        eventBus.$on('afterTransactionChanged', (newTransaction: any) => {
+            this.updateTransaction(newTransaction)
+        });
+
+        eventBus.$on('ledges-changes', (list) => {
+            this.ledgerList = list
+        })
+    }
+
+    updateTransaction(newTransaction
+                          :
+                          any
+    ) {
         let found = this.transactionList.find((item) => {
             return item.id === newTransaction.id
         })
@@ -327,87 +280,124 @@ export default class IndexView extends Vue {
         }
     }
 
-    edit(recordId: string | number) {
-        // find the record
-        let found = this.transactionList.find((item) => {
-            return item.id === recordId
-        })
-
-        if (!found) {
-            return
-        }
-        // this.present(`/index/edit?recordId=${recordId}`)
-        this.present(`edit_transaction`, {
-            id: found.id,
-            amount: found.amount,
-            datetime: found.datetime,
-            count: found.count,
-            categoryValue: found.categoryValue,
-            description: found.description
+    initTransactionTypes() {
+        Client.getTransactionCategories().then(resp => {
+            this.transactionCategories = resp.data
         })
     }
 
-    present(viewName: string, data: any) {
-        gotoPage(false, viewName, data)
-        // pushPageWithName(viewName, data)
+    initLedgersAndTransactions() {
+        this.ledgersLoading = true
+        Client.getLedgerList().then((resp: any) => {
+            this.ledgersLoading = false
+            this.ledgerList = resp.data
+            eventBus.$emit('ledges-changes', this.ledgerList)
+            return Client.getTransactionListByLedgerName(this.currentLedger.name, this.nowadays())
+        }).then(resp => {
+            this.ledgersLoading = false
+            this.transactionList = resp.data
+        }).catch((err: any) => {
+            this.ledgersLoading = false
+            console.error(err)
+        })
     }
 
-    mounted() {
-        let amapElem: HTMLElement = document.getElementById("amap")!
-        let amapWidth = amapElem.clientWidth;
-        amapElem.style.height = amapWidth + 'px'
+    loadAmap() {
+        this.doLoadAmap((AMap: any) => {
+
+            this.mountAmap(AMap)
+
+            this.registerAmapMoveEvent()
+
+            this.registerAmapGetCurrentLocationEvent(AMap)
+
+        }, (e: any) => {
+            console.log(e);
+        })
     }
 
-    getOneInformationEntry(entry: any): string {
-        // this is the format of the response entry of amap api,
-        // an empty array means a not existing entry value( the same meaning as null )
-
-        if (Array.isArray(entry) && entry.length === 0) {
-            return "";
-        }
-        return entry;
+    doLoadAmap(success: any, fail: any) {
+        AMapLoader.load({
+            key: '8375fa99f0a19ba66b137bddcb2fceac', // 申请好的Web端开发者Key，首次调用 load 时必填
+            version: '2.0', // 指定要加载的 JS API 的版本，缺省时默认为 1.4.15
+            plugins: [], // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+        })
+            .then((AMap) => {
+                success(AMap)
+            })
+            .catch((e) => {
+                fail(e)
+            });
     }
 
-    getInfomationFromGetLocationDetail(detail: any): any {
-        let usefullocationInfos: any = {}
+    mountAmap(AMap: any) {
+        this.amap = new AMap.Map('amap', {
+            zoom: 16,
+        });
 
-        usefullocationInfos.formattedName =
-            this.getOneInformationEntry(detail.regeocode.formatted_address);
+    }
 
-        if (usefullocationInfos.formattedName === "") {
-            Notify(
-                {
-                    type: "danger",
-                    message: "Your location is out of the service of amap "
-                }
+    registerAmapMoveEvent() {
+        this.amap.on('mapmove', () => {
+            let {lat, lng} = this.amap.getCenter()
+            this.updateCor(lat, lng)
+            clearTimeout(this.apiInvokingTimesSaver)
+            this.apiInvokingTimesSaver = setTimeout(() => {
+                this.getAndUpdateDetailLocationData()
+            }, 500)
+        })
+    }
+
+
+    registerAmapGetCurrentLocationEvent(AMap: any) {
+        AMap.plugin('AMap.Geolocation', () => {
+            let geolocation = new AMap.Geolocation();
+            this.amap.addControl(geolocation);
+            this.amapGeolocationPlugin = geolocation;
+            this.amapGeolocationPlugin.getCurrentPosition(
+                this.onSuccessGetCurrentPosition,
+                this.onFailedGetCurrentPosition
             )
-            this.geoLocation.formattedName = 'out of service'
-            return;
+        });
+    }
+
+    onSuccessGetCurrentPosition(status: any, result: any) {
+        if (status === 'complete') {
+            this.ifSuccessGetCurrentPosition(result)
+        } else {
+            console.error(`fail to get geolocation, status: `, status, `result: `, result);
+            Notify({
+                message: 'Fail to locate your position',
+                type: 'danger'
+            })
         }
+    }
 
-        let addressDetail = detail.regeocode.addressComponent;
-        usefullocationInfos.adcode = this.getOneInformationEntry(addressDetail.adcode);
-        usefullocationInfos.province = this.getOneInformationEntry(addressDetail.province);
+    ifSuccessGetCurrentPosition(result: any) {
+        let position = result.position;
+        this.updateCor(position.lat, position.lng)
+        this.getAndUpdateDetailLocationData()
+    }
 
-        // if the city is empty, it means the city is a direct-controlled municipality(beijing, shanghai...)
-        let city =
-            this.getOneInformationEntry(addressDetail.city) == "" ? usefullocationInfos.province : this.getOneInformationEntry(addressDetail.city);
-        usefullocationInfos.city = city;
-        usefullocationInfos.district = this.getOneInformationEntry(addressDetail.district);
-        usefullocationInfos.citycode = this.getOneInformationEntry(addressDetail.citycode);
-
-        usefullocationInfos.township = this.getOneInformationEntry(addressDetail.township);
-        usefullocationInfos.towncode = this.getOneInformationEntry(addressDetail.towncode);
-        usefullocationInfos.streetName = this.getOneInformationEntry(addressDetail.streetNumber.street);
-        usefullocationInfos.streetNumber = this.getOneInformationEntry(addressDetail.streetNumber.number)
-        ;
-        usefullocationInfos.streetLocation = this.getOneInformationEntry(
-            addressDetail.streetNumber.location)
-        usefullocationInfos.streetDirection = this.getOneInformationEntry(
-            addressDetail.streetNumber.direction)
-        usefullocationInfos.streetDistance = this.getOneInformationEntry(
-            addressDetail.streetNumber.distance)
-        return usefullocationInfos
+    getAndUpdateDetailLocationData() {
+        let lat = this.geoLocation.latitude
+        let lng = this.geoLocation.longitude
+        this.getDetailLocation(lat, lng,
+            (locationDetail: any) => {
+                // get information we need from detail response
+                let infoFromAmapLocationDetail = this.getInfoFromAmapLocationDetail(locationDetail);
+                // assign details
+                this.geoLocation = Object.assign(this.geoLocation, infoFromAmapLocationDetail);
+                console.debug(`get location detail: `, this.geoLocation)
+            },
+            (respBodyOrError: any) => {
+                console.error(`fail to get location detail: `, respBodyOrError)
+                Notify({
+                    message: 'Fail to get location detail',
+                    type: 'warning'
+                })
+            }
+        )
     }
 
     getDetailLocation(lat: number, long: number, successCb: (location: any) => void, failCb: (respBodyOrError: any) => void) {
@@ -435,17 +425,155 @@ export default class IndexView extends Vue {
         })
     }
 
-    onSaveTrans() {
-        if (this.parsedForms.length == 0) {
-            Notification.warning("No data to save");
+    getInfoFromAmapLocationDetail(amapDetailLocationResp: any): any {
+        let finalLocationInfo: any = {}
+
+        finalLocationInfo.formattedName =
+            this.returnBlankStringIfEmptyArray(amapDetailLocationResp.regeocode.formatted_address);
+
+        if (finalLocationInfo.formattedName === "") {
+            Notify(
+                {
+                    type: "danger",
+                    message: "Your location is out of the service of amap "
+                }
+            )
+            this.geoLocation.formattedName = 'out of service'
+            return;
+        }
+
+        let addressDetail = amapDetailLocationResp.regeocode.addressComponent;
+        finalLocationInfo.adcode = this.returnBlankStringIfEmptyArray(addressDetail.adcode);
+
+        finalLocationInfo.province = this.returnBlankStringIfEmptyArray(addressDetail.province);
+        finalLocationInfo.city = this.returnBlankStringIfEmptyArray(addressDetail.city) == "" ? finalLocationInfo.province : this.returnBlankStringIfEmptyArray(addressDetail.city);
+        finalLocationInfo.district = this.returnBlankStringIfEmptyArray(addressDetail.district);
+        finalLocationInfo.citycode = this.returnBlankStringIfEmptyArray(addressDetail.citycode);
+
+        finalLocationInfo.township = this.returnBlankStringIfEmptyArray(addressDetail.township);
+        finalLocationInfo.towncode = this.returnBlankStringIfEmptyArray(addressDetail.towncode);
+
+        finalLocationInfo.streetName = this.returnBlankStringIfEmptyArray(addressDetail.streetNumber.street);
+        finalLocationInfo.streetNumber = this.returnBlankStringIfEmptyArray(addressDetail.streetNumber.number)
+        finalLocationInfo.streetLocation = this.returnBlankStringIfEmptyArray(
+            addressDetail.streetNumber.location)
+        finalLocationInfo.streetDirection = this.returnBlankStringIfEmptyArray(
+            addressDetail.streetNumber.direction)
+        finalLocationInfo.streetDistance = this.returnBlankStringIfEmptyArray(
+            addressDetail.streetNumber.distance)
+
+        return finalLocationInfo
+    }
+
+    returnBlankStringIfEmptyArray(entry: any): string {
+        // this is the format of the response entry of amap api,
+        // an empty array means a not existing entry value( the same meaning as null )
+
+        if (Array.isArray(entry) && entry.length === 0) {
+            return "";
+        }
+        return entry;
+    }
+
+    onFailedGetCurrentPosition(error: any) {
+        Notify({
+            message: `fail to get geollocation: ${error.code}-${error.message}`,
+            type: 'danger'
+        })
+        console.error(`fail to get geollocation: ${error.code}-${error.message}`);
+    }
+
+    updateCor(lat: string | number, lng: string | number) {
+        this.geoLocation.latitude = lat
+        this.geoLocation.longitude = lng
+    }
+
+    mounted() {
+        this.adjustAMapSize()
+    }
+
+    adjustAMapSize() {
+        let amapElem: HTMLElement = document.getElementById("amap")!
+        let amapWidth = amapElem.clientWidth;
+        amapElem.style.height = amapWidth + 'px'
+    }
+
+    onClickSwitchLedger(ledger: any) {
+        this.ledgerTransactionsLoading = true
+        Client.getTransactionListByLedgerName(ledger.name, this.nowadays()).then((res) => {
+            this.transactionList = res.data
+            this.currentLedger = ledger
+            this.ledgerTransactionsLoading = false;
+            this.toggleLedgerSelection()
+        }).catch((err) => {
+            this.ledgerTransactionsLoading = false
+        })
+    }
+
+    onClickManageLedgerList() {
+        this.toggleLedgerSelection()
+        this.present(`manage_ledger`, {})
+    };
+
+    toggleLedgerSelection() {
+        getRef(this, "ledgerSelection").toggle()
+    }
+
+
+    toEditTransactionPage(recordId: string | number) {
+        // find the record
+        let foundTrans = this.transactionList.find((item) => {
+            return item.id === recordId
+        })
+
+        if (!foundTrans) {
             return
         }
-        let error = false
+
+        // this.present(`/index/edit?recordId=${recordId}`)
+        this.present(`edit_transaction`, {
+            id: foundTrans.id,
+            amount: foundTrans.amount,
+            datetime: foundTrans.datetime,
+            count: foundTrans.count,
+            categoryValue: foundTrans.categoryValue,
+            description: foundTrans.description
+        })
+    }
+
+    present(viewName: string, data: any) {
+        gotoPage(false, viewName, data)
+        // pushPageWithName(viewName, data)
+    }
+
+    onAddTrans() {
+        this.checkAddTransData()
+
+        this.addTransactions(this.parsedForms);
+    }
+
+    checkAddTransData() {
+        try {
+            this.doCheckAddTransData()
+        } catch (e: any) {
+            Notify({
+                message: e.message,
+                type: 'danger'
+            })
+        }
+    }
+
+    doCheckAddTransData() {
         let errorType = ""
+        if (this.parsedForms.length == 0) {
+            errorType = "No data to save"
+            throw new Error(errorType)
+        }
+        let error = false
         let parseForms = this.parsedForms
         parseForms.forEach((item: FormItem) => {
             if (error) {
-                return
+                throw new Error(errorType)
             }
             let categoryValue = item.categoryValue?.value;
             let amount = item.amount?.value;
@@ -456,7 +584,7 @@ export default class IndexView extends Vue {
             if (categoryValue == null || amount == null || count == null || description == null) {
                 error = true
                 errorType = "Information not complete"
-                return
+                throw new Error(errorType)
             }
 
             let countValid = this.isPositiveInteger(Number(count));
@@ -469,47 +597,22 @@ export default class IndexView extends Vue {
             if (!countValid || !amountValid) {
                 error = true
                 errorType = "Information format invalid"
-                return
+                throw new Error(errorType)
             }
         })
         // @ts-ignore
         if (error === true) {
             Notification.error(errorType)
-            return
+            throw new Error(errorType)
         }
-        this.saveTransactions(this.parsedForms);
     }
 
+    isPositiveInteger(number: number): boolean {
+        return Number.isInteger(number) && number > 0;
+    }
 
-    saveTransactions(trans: any[]) {
-
-
-        let request;
-        try {
-            request = trans.map((tran) => {
-                let requestTran = {
-                    categoryValue: tran.categoryValue.value,
-                    amount: tran.amount.value,
-                    count: tran.count.value,
-                    description: tran.description.value,
-                    location: this.geoLocation,
-                };
-                if (requestTran.amount == null || requestTran.count == null) {
-                    throw Error('amount or count is null');
-                }
-                return requestTran;
-            });
-        } catch (e: any) {
-            Notification.error(e.message == null ? e : e.message);
-            return;
-        }
-
-        Client.saveTransactions(request).then((resp) => {
-            Notification.success("save successfully")
-            return Client.getTransactionList(this.nowadays())
-        }).then(resp => {
-            this.transactionList = resp.data
-        });
+    isFloat(number: number) {
+        return Number(number) === number && !Number.isInteger(number) || Number.isInteger(number);
     }
 
     countDecimalPlaces(number: string) {
@@ -526,49 +629,93 @@ export default class IndexView extends Vue {
         return parts[1].length; // Return the length of the decimal part
     }
 
-    isFloat(number: number) {
-        return Number(number) === number && !Number.isInteger(number) || Number.isInteger(number);
+    addTransactions(trans: any[]) {
+        let request = this.assembleAddTransactionRequest(trans)
+
+        Client.saveTransactionsByLedgerName(this.currentLedger.name, request).then((resp) => {
+            Notify({
+                message: 'save successfully',
+                type: 'success'
+            })
+            return Client.getTransactionListByLedgerName(this.currentLedger.name, this.nowadays())
+        }).then(resp => {
+            this.transactionList = resp.data
+        });
     }
 
-    isPositiveInteger(number: number): boolean {
-        return Number.isInteger(number) && number > 0;
+    nowadays(): string {
+        return getCurrentYearAndMonth()
     }
 
-    rawFormatStringToObject(rawFormatString: string): any {
-        // food 44.00 kfc
-        // fruit 33.00 watermalon
-        let wordsOrder = ['categoryValue', 'amount', 'count', 'description'];
+    assembleAddTransactionRequest(trans: any[]): any[] {
+        let request = trans.map((tran) => {
+            let requestTran = {
+                categoryValue: tran.categoryValue.value,
+                amount: tran.amount.value,
+                count: tran.count.value,
+                description: tran.description.value,
+                location: this.geoLocation,
+            };
 
-        var lines = rawFormatString.split('\n');
-
-        let objs = lines
-            .filter((line) => !/^\s*$/.test(line))
-            .map((line) => line.trim())
-            .map((line) => {
-                let words = line.split(' ').filter((word) => word !== '');
-
-                let obj = wordsOrder.reduce(
-                    (obj, cur, index) =>
-                        Object.assign(obj, {[cur]: words[index]}),
-                    {},
-                );
-                console.log(obj);
-
-                return obj;
-            });
-        return objs;
+            return requestTran;
+        });
+        return request
     }
 
 
-    cursorPosition: any = {
-        absoluteCursorPosition: 0,
-        cursorRow: 0,
-        cursorColumn: 0
+    onClickOneType(type: string) {
+        let curStringAtInput = this.rawFormatString
+        if (curStringAtInput == null || curStringAtInput == "") {
+            return;
+        }
+
+        this.replaceFirstWord(curStringAtInput, type)
+        this.updateCurrentCursorPosition()
     }
 
-    getCursorPosition(raw: string, inputElement: HTMLTextAreaElement): any {
-        console.log(inputElement.selectionStart)
-        console.log(inputElement.selectionStart)
+    replaceFirstWord(curStringAtInput: string, type: string) {
+        let rowNumber = this.cursorPosition.cursorRow
+        let wordRange = findWordInLine(curStringAtInput, rowNumber, 1)
+
+        if (wordRange == null) {
+            return;
+        }
+
+        curStringAtInput = replace(curStringAtInput, wordRange.start, wordRange.end, type)
+        this.rawFormatString = curStringAtInput
+
+        this.onTransactionTextAreaInput()
+
+        let vantinput = (this.$refs.recordInput as any).$el
+        let input = vantinput.querySelector('textarea')
+
+        input.selectionStart = wordRange.start
+    }
+
+    onTransactionTextAreaInput() {
+        this.updateCurrentCursorPosition()
+        this.parseInputStringToObjects()
+    }
+
+    updateCurrentCursorPosition() {
+        let vantinput = (this.$refs.recordInput as any).$el
+        let inputElement = vantinput.querySelector('textarea') as HTMLTextAreaElement;
+        let result = {}
+        if (this.rawFormatString == null) {
+            result = {
+                absoluteCursorPosition: 0,
+                cursosrRow: 0,
+                cursorColumn: 0
+            }
+        } else {
+            result = this.getCurrentCursorPosition(this.rawFormatString!, inputElement)
+        }
+
+
+        this.cursorPosition = result
+    }
+
+    getCurrentCursorPosition(raw: string, inputElement: HTMLTextAreaElement): any {
         let absoluteCursorPosition = inputElement.selectionStart;
 
         let before = raw.substring(0, absoluteCursorPosition!);
@@ -582,36 +729,30 @@ export default class IndexView extends Vue {
         };
     }
 
-
-    getCursorPosition0() {
-        let vantinput = (this.$refs.recordInput as any).$el
-        let inputElement = vantinput.querySelector('textarea') as HTMLTextAreaElement;
-        let result = {}
+    parseInputStringToObjects() {
         if (this.rawFormatString == null) {
-            result = {
-                absoluteCursorPosition: 0,
-                cursosrRow: 0,
-                cursorColumn: 0
-            }
-        } else {
-            result = this.getCursorPosition(this.rawFormatString!, inputElement)
+            return;
         }
+        // food 44.00 kfc
+        // fruit 33.00 watermalon
+        let wordsOrder = ['categoryValue', 'amount', 'count', 'description'];
 
+        var lines = this.rawFormatString.split('\n');
 
-        this.cursorPosition = result
-        console.log(this.cursorPosition)
-    }
+        let objs = lines
+            .filter((line) => !/^\s*$/.test(line))
+            .map((line) => line.trim())
+            .map((line) => {
+                let words = line.split(' ').filter((word) => word !== '');
 
-    recordInput() {
-        this.getCursorPosition0()
-        this.onParseRawString()
-    }
+                let obj = wordsOrder.reduce(
+                    (obj, cur, index) =>
+                        Object.assign(obj, {[cur]: words[index]}),
+                    {},
+                );
 
-    onParseRawString() {
-        console.log(this.cursorPosition)
-        if (this.rawFormatString !== null) {
-            let objs = this.rawFormatStringToObject(this.rawFormatString);
-            this.parsedForms = objs.map((obj: any) => {
+                return obj;
+            }).map((obj: any) => {
                 let objWithViewStatus = {};
                 const keys = Object.keys(obj);
                 return keys.reduce((objWithViewStatus, key) => {
@@ -623,172 +764,9 @@ export default class IndexView extends Vue {
                     });
                 }, objWithViewStatus);
             });
-        }
+        return objs;
     }
 
-    transactionCategories: any[] = []
-
-    updateDetailLocationData(lat: number, lng: number) {
-
-        this.getDetailLocation(lat, lng,
-            (locationDetail: any) => {
-                // get information we need from detail response
-                let infomationFromGetLocationDetail = this.getInfomationFromGetLocationDetail(locationDetail);
-                // assign details
-                this.geoLocation = Object.assign(this.geoLocation, infomationFromGetLocationDetail);
-                console.debug(`get location detail: `, this.geoLocation)
-            },
-            (respBodyOrError: any) => {
-                console.error(`fail to get location detail: `, respBodyOrError)
-                Notify({
-                    message: 'Fail to get location detail',
-                    type: 'warning'
-                })
-            }
-        )
-    }
-
-    marker: any = null
-    apiInvokingTimesSaver: any = null
-    ledgersLoading = false
-    created() {
-        console.log("pageStack" + pageStack.size());
-        eventBus.$on('afterTransactionChanged', (newTransaction: any) => {
-            this.updateTransasction(newTransaction)
-        });
-
-
-        eventBus.$on('ledges-changes', (list) => {
-            this.ledgerList = list
-        })
-
-        Client.getTransactionCategories().then(resp => {
-            this.transactionCategories = resp.data
-        })
-
-        this.ledgersLoading = true
-        Client.getLedgerList().then((resp: any) => {
-            this.ledgersLoading = false
-            this.ledgerList = resp.data
-            eventBus.$emit('ledges-changes', this.ledgerList)
-        }).catch((err:any) => {
-            this.ledgersLoading = false
-            console.error(err)
-        })
-
-        Client.getTransactionList(this.nowadays()).then(resp => {
-            this.transactionList = resp.data
-        })
-
-        AMapLoader.load({
-            key: '8375fa99f0a19ba66b137bddcb2fceac', // 申请好的Web端开发者Key，首次调用 load 时必填
-            version: '2.0', // 指定要加载的 JS API 的版本，缺省时默认为 1.4.15
-            plugins: [], // 需要使用的的插件列表，如比例尺'AMap.Scale'等
-        })
-            .then((AMap) => {
-
-                let map = new AMap.Map('amap', {
-                    zoom: 16,
-                });
-                this.amap = map
-                // let {lat, lng} = map.getCenter()
-                // let marker = new AMap.Marker({
-                //     position: map.getCenter()
-                // })
-                map.on('mapmove', () => {
-                    let {lat, lng} = this.amap.getCenter()
-                    this.geoLocation.longitude = lng
-                    this.geoLocation.latitude = lat
-                    console.log(lat, lng)
-                    clearTimeout(this.apiInvokingTimesSaver)
-                    this.apiInvokingTimesSaver = setTimeout(() => {
-                        this.updateDetailLocationData(lat, lng)
-                    }, 500)
-                    // this.updateDetailLocationData(lat, lng)
-                })
-
-                AMap.plugin('AMap.Geolocation', () => {
-                    // 异步加载插件
-                    var geolocation = new AMap.Geolocation();
-                    this.amap.addControl(geolocation);
-                    this.amapGeolocationPlugin = geolocation;
-                    this.amapGeolocationPlugin.getCurrentPosition((status: any, result: any) => {
-                            console.log(status);
-                            console.log(result);
-
-                            if (status === 'complete') {
-                                let position = result.position;
-
-                                // assign coordinate
-                                this.geoLocation.latitude = position.lat;
-                                this.geoLocation.longitude = position.lng;
-
-                                console.debug(`get coordinates: ${position}`)
-                                Notify({
-                                    message: `(lat, lng) = (${position.lat}, ${position.lng})`,
-                                    type: 'success'
-                                })
-
-                                this.updateDetailLocationData(position.lat, position.lng)
-                            } else {
-                                console.error(`fail to get geolocation, status: `, status, `result: `, result);
-                                Notify({
-                                    message: 'Fail to locate your position',
-                                    type: 'danger'
-                                })
-                            }
-                        },
-                        (error: any) => {
-                            Notify({
-                                message: `fail to get geollocation: ${error.code}-${error.message}`,
-                                type: 'danger'
-                            })
-                            console.error(`fail to get geollocation: ${error.code}-${error.message}`);
-                        }
-                    )
-
-                });
-            })
-            .catch((e) => {
-                console.log(e);
-            });
-    }
-
-    location() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (loc) => {
-                    console.log(loc);
-                    Notification.success({
-                        title: 'Success',
-                        message:
-                            'Location: ' +
-                            loc.coords.latitude +
-                            ', ' +
-                            loc.coords.longitude,
-                    });
-                },
-                (positionError) => {
-                    Notification.warning({
-                        title: 'Warning',
-                        message:
-                            'Error getting location: ' + positionError.message,
-                    });
-                    console.log(positionError);
-                },
-                {
-                    enableHighAccuracy: true,
-                    maximumAge: 30000,
-                    timeout: 27000,
-                },
-            );
-        } else {
-            Notification.warning({
-                title: 'Warning',
-                message: 'Geolocation is not supported by this browser.',
-            });
-        }
-    }
 }
 </script>
 <style lang="scss" scoped>
@@ -820,10 +798,5 @@ export default class IndexView extends Vue {
     color: #969799;
     font-size: 14px;
     line-height: 16px;
-
-    //background-color: $google-gray-100;
-    //padding: 10px;
-    //border-top-left-radius: 5px;
-    //border-top-right-radius: 5px;
 }
 </style>

@@ -12,6 +12,16 @@ class Client {
         });
     }
 
+    static saveTransactionsByLedgerName(ledgerName: string, trans: any[]) {
+        return request({
+            url: `/transactions/${ledgerName}`,
+            method: 'post',
+            data: {
+                transactionList: trans,
+            },
+        });
+    }
+
     // region: Playground Project Template
     static createPlaygroundProjectTemplateFromDirectory(
         path: string,
@@ -76,6 +86,14 @@ class Client {
     static getTransactionList(yearHyphenMonth: string) {
         return request({
             url: `/transactions`,
+            method: 'get',
+            params: { month: yearHyphenMonth },
+        });
+    }
+
+    static getTransactionListByLedgerName(ledgerName: string, yearHyphenMonth: string) {
+        return request({
+            url: `/transactions/${ledgerName}`,
             method: 'get',
             params: { month: yearHyphenMonth },
         });
