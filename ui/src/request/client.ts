@@ -1,5 +1,5 @@
 import request from '@/request';
-import { AxiosPromise } from 'axios';
+import {AxiosPromise} from 'axios';
 
 class Client {
     static saveTransactions(trans: any[]) {
@@ -81,14 +81,6 @@ class Client {
         });
     }
 
-    static getTransaction(transactionId: number) {
-        return request({
-            url: `/transaction`,
-            method: 'get',
-            params: { transactionId },
-        });
-    }
-
     static updateTransaction(recordId: number | string | null,
                                 categoryValue: string,
                              amount: string,
@@ -113,6 +105,13 @@ class Client {
     static getTransactionCategories() {
         return request({
             url: `/transaction/category`,
+            method: 'get',
+        });
+    }
+
+    static getLedgerList() {
+        return request({
+            url: `/ledgers`,
             method: 'get',
         });
     }

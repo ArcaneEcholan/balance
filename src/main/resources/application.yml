@@ -19,30 +19,30 @@ spring:
 logging:
   level:
     root: debug
-    reactor:
-      netty: info
-    javax.management.remote.rmi: info
-    _org.springframework.web.servlet.HandlerMapping.Mappings: off
-    net.sf.ehcache: info
-    io.netty: info
-    io.netty.handler.logging.LoggingHandler: debug
-    org.apache: info
-    org.hibernate: info
-    com.alibaba.druid.pool.PreparedStatementPool: info
-    org.springframework.orm.jpa.JpaTransactionManager: info
-    com.zaxxer.hikari: info
-    sun.rmi: info
-    org:
-      mybatis:
-        spring:
-          mapper:
-            ClassPathMapperScanner: info
-      hibernate:
-        validator:
-          internal:
-            engine: info
-      springframework: info
-      springframework.context.support.PostProcessorRegistrationDelegate: warn
+#    reactor:
+#      netty: info
+#    javax.management.remote.rmi: info
+#    _org.springframework.web.servlet.HandlerMapping.Mappings: off
+#    net.sf.ehcache: info
+#    io.netty: info
+#    io.netty.handler.logging.LoggingHandler: debug
+#    org.apache: info
+#    org.hibernate: info
+#    com.alibaba.druid.pool.PreparedStatementPool: info
+#    org.springframework.orm.jpa.JpaTransactionManager: info
+#    com.zaxxer.hikari: info
+#    sun.rmi: info
+#    org:
+#      mybatis:
+#        spring:
+#          mapper:
+#            ClassPathMapperScanner: info
+#      hibernate:
+#        validator:
+#          internal:
+#            engine: info
+#      springframework: info
+#      springframework.context.support.PostProcessorRegistrationDelegate: warn
 
 mybatis-plus:
   global-config:
@@ -52,3 +52,41 @@ mybatis-plus:
 server:
   port: 8094
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+
+components:
+  schemas:
+    CreateLedgerDTO:
+      type: object
+      properties:
+        name:
+          type: string
+    EditLedgerDTO:
+      type: object
+      properties:
+        name:
+          type: string
+    TransactionVO:
+      type: object
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+        orderNo:
+          type: string
+        categoryId:
+          type: integer
+        description:
+          type: string
+        locationId:
+          type: integer
+        datetime:
+          type: string
+        count:
+          type: integer
+        categoryValue:
+          type: string
+        location:
+          type: object

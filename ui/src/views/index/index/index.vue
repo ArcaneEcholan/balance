@@ -1,5 +1,5 @@
 <template>
-    <div class="page" v-loading="ledgerLoading">
+    <div class="page" v-loading="ledgerTransactionsLoading">
 
         <!--edit stack-->
         <router-view>
@@ -180,8 +180,7 @@ import {Notification} from 'element-ui';
 import Client from '@/request/client';
 import request from '@/request';
 import {convertToShortDateTime, findWordInLine, replace} from "@/ts/utils";
-import {gotoPage} from "@/ts/pageStack";
-import pageStack from "@/ts/pageStack";
+import pageStack, {gotoPage} from "@/ts/pageStack";
 import eventBus from "@/ts/EventBus";
 import {Notify} from "vant";
 import {getCurrentMonth, getCurrentYear} from '@/ts/time';
@@ -220,11 +219,11 @@ Component.registerHooks([
     }
 })
 export default class IndexView extends Vue {
-    ledgerLoading = false
+    ledgerTransactionsLoading = false
     currentLedger = {name: "default"}
     onSelectLedger(ledger: any) {
         console.log("onSelectLedger")
-        this.ledgerLoading = true
+        this.ledgerTransactionsLoading = true
         setTimeout(() => {
             console.log(this.$refs.item);
             (this.$refs.item as any).toggle()
@@ -252,7 +251,7 @@ export default class IndexView extends Vue {
                     formatedName: "test loc2",
                 }
             }]
-            this.ledgerLoading = false
+            this.ledgerTransactionsLoading = false
         }, 500)
     }
 
@@ -651,7 +650,7 @@ export default class IndexView extends Vue {
 
     marker: any = null
     apiInvokingTimesSaver: any = null
-
+    ledgersLoading = false
     created() {
         console.log("pageStack" + pageStack.size());
         eventBus.$on('afterTransactionChanged', (newTransaction: any) => {
@@ -662,19 +661,21 @@ export default class IndexView extends Vue {
         eventBus.$on('ledges-changes', (list) => {
             this.ledgerList = list
         })
-        setTimeout(() => {
-            this.ledgerList = [
-                {name: "default"},
-                {name: "ledger1"},
-                {name: "ledger2"},
-                {name: "ledger3"},
-            ]
-            eventBus.$emit('ledges-changes', this.ledgerList)
-        }, 500)
 
         Client.getTransactionCategories().then(resp => {
             this.transactionCategories = resp.data
         })
+
+        this.ledgersLoading = true
+        Client.getLedgerList().then((resp: any) => {
+            this.ledgersLoading = false
+            this.ledgerList = resp.data
+            eventBus.$emit('ledges-changes', this.ledgerList)
+        }).catch((err:any) => {
+            this.ledgersLoading = false
+            console.error(err)
+        })
+
         Client.getTransactionList(this.nowadays()).then(resp => {
             this.transactionList = resp.data
         })

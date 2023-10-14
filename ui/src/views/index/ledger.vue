@@ -77,8 +77,7 @@
 </template>
 
 <script lang='ts'>
-import {Component} from 'vue-property-decorator';
-import {Vue} from '@/ttt'
+import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentationView from "@/components/ModalPresentation.vue";
 import {gotoPage} from "@/ts/pageStack";
 import {Notify} from "vant";

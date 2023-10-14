@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.app.dao.mapper.LedgerTransactionMapper">
+
+    <resultMap id="transactionMap" type="com.example.app.service.TransactionVO">
+        <id property="id" column="id" />
+        <result property="amount" column="amount" />
+        <result property="orderNo" column="order_no" />
+        <result property="categoryId" column="category_id" />
+        <result property="description" column="description" />
+        <result property="locationId" column="location_id" />
+        <result property="datetime" column="datetime" />
+        <result property="count" column="count" />
+        <result property="categoryValue" column="category_value" />
+        <result property="location" column="location" />
+    </resultMap>
+
+    <select id="selectTransactionsOfSpecificLedger" resultMap="transactionMap">
+        select t.id,
+               t.amount,
+               t.order_no,
+               t.category_id,
+               t.description,
+               t.location_id,
+               t.datetime,
+               t.count,
+               c.value as category_value,
+               loc.formatted_name as location
+        from transaction t
+                 left join ledger_transaction lt on t.id = lt.transaction_id
+                 left join ledger l on lt.ledger_id = l.id
+                 left join transaction_category c on t.category_id = c.id
+                 left join location loc on t.location_id = loc.id
+        WHERE l.id = #{ledgerId}
+          AND t.datetime >= #{startDate}
+        <![CDATA[AND t.datetime < #{endDate}]]>
+        ORDER BY t.datetime DESC
+    </select>
+</mapper>

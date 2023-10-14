@@ -39,6 +39,12 @@ class RequestCorsFilter {
                 "http://localhost:[*]",
                 "https://*.wenchao.fit:[*]",
 
+                "http://127.0.0.1:[*]",
+                "https://127.0.0.1:[*]",
+                "https://editor.swagger.io",
+
+                "http://[*]:[*]",
+                "https://[*]:[*]",
 
                 // for debug
                 "https://49.232.155.160:[*]",

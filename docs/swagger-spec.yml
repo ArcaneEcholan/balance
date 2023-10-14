@@ -1,0 +1,256 @@
+openapi: 3.0.3
+info:
+  title: Balance
+  version: 1.0.0
+servers:
+  - url: http://localhost:8094/api
+tags:
+  - name: ledger
+  - name: transaction
+
+
+
+paths:
+
+
+  /ledger:
+    post:
+      tags:
+        - ledger
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/CreateLedgerDTO"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  name:
+                    type: string
+                  ctime:
+                    type: string
+  /ledger/{id}:
+    delete:
+      tags:
+        - ledger
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                example: success
+    put:
+      tags:
+        - ledger
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/EditLedgerDTO"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                example: success
+  /ledgers:
+    get:
+      tags:
+        - ledger
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    name:
+                      type: string
+                    ctime:
+                      type: string
+
+  /transactions/{ledger_name}:
+    get:
+      tags:
+        - transaction
+      parameters:
+        - name: ledger_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionVO'
+    post:
+      tags:
+        - transaction
+      parameters:
+        - name: ledger_name
+          in: path
+          required: true
+          schema:
+            type: string
+
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/SaveTransDTO"
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  name:
+                    type: string
+                  ctime:
+                    type: string
+
+  /transactions:
+    get:
+      tags:
+        - transaction
+      parameters:
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionVO'
+
+
+    post:
+      tags:
+        - transaction
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/SaveTransDTO"
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  name:
+                    type: string
+                  ctime:
+                    type: string
+
+
+components:
+  schemas:
+    CreateLedgerDTO:
+      type: object
+      properties:
+        name:
+          type: string
+    EditLedgerDTO:
+      type: object
+      properties:
+        name:
+          type: string
+    TransactionVO:
+      type: object
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+        orderNo:
+          type: string
+        categoryId:
+          type: integer
+        description:
+          type: string
+        locationId:
+          type: integer
+        datetime:
+          type: string
+        count:
+          type: integer
+        categoryValue:
+          type: string
+        location:
+          type: object
+    SaveTransDTO:
+      type: object
+      properties:
+        transactionList:
+          type: array
+          items:
+            $ref: "#/components/schemas/SaveTranDTO"
+
+    SaveTranDTO:
+      type: object
+      properties:
+        categoryValue:
+          type: string
+        amount:
+          type: string
+        count:
+          type: integer
+        description:
+          type: string
+        location:
+          type: object
