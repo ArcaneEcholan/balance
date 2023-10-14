@@ -657,29 +657,20 @@ export default class IndexView extends Vue {
         eventBus.$on('afterTransactionChanged', (newTransaction: any) => {
             this.updateTransasction(newTransaction)
         });
-        this.transactionList = [{
-            id: 1,
-            categoryValue: "food",
-            amount: 44.00,
-            count: 1,
-            description: "kfc",
-            location: {
-                latitude: 0,
-                longitude: 0,
-                formatedName: "test loc1",
-            }
-        }, {
-            id: 2,
-            categoryValue: "fruit",
-            amount: 33.00,
-            count: 1,
-            description: "watermalon",
-            location: {
-                latitude: 0,
-                longitude: 0,
-                formatedName: "test loc2",
-            }
-        }]
+
+
+        eventBus.$on('ledges-changes', (list) => {
+            this.ledgerList = list
+        })
+        setTimeout(() => {
+            this.ledgerList = [
+                {name: "default"},
+                {name: "ledger1"},
+                {name: "ledger2"},
+                {name: "ledger3"},
+            ]
+            eventBus.$emit('ledges-changes', this.ledgerList)
+        }, 500)
 
         Client.getTransactionCategories().then(resp => {
             this.transactionCategories = resp.data

@@ -7,59 +7,84 @@
             @on-close="onclose"
             ref="modal"
         >
-
-
             <template #default>
-                <div class="page">
+                <div ref="page-main-frame" style="position: relative; height: 100%;">
 
-                    <van-action-sheet v-model="show" title="Title">
-                        <div class="page">
-                            <div class="pdb16 pdt16"></div>
-                            <div class="record-header">Edit Fields</div>
-                            <van-cell-group class="shadow overflow-hidden br8 ">
-                                <van-field v-model="editLedgerName" type="text" label="name"/>
-                            </van-cell-group>
-                            <div class="pdb16 pdt16"></div>
-                            <div class=" ">
-                                <el-button round plain type="primary" style="width: 100%"
-                                           @click="submitEditLedger"
-                                           :disabled="editLedgerLoading"
-                                >Submit
-                                </el-button>
+                    <div class="page" style="overflow-y: scroll;" ref="page-main-area">
+                        <van-action-sheet v-model="show" title="Title">
+                            <div class="page">
+                                <div class="pdb16 pdt16"></div>
+                                <div class="record-header">Edit Fields</div>
+                                <van-cell-group class="shadow overflow-hidden br8 ">
+                                    <van-field v-model="editLedgerName" type="text" label="name"/>
+                                </van-cell-group>
+                                <div class="pdb16 pdt16"></div>
+                                <div class="">
+                                    <el-button round plain type="primary" style="width: 100%"
+                                               @click="submitEditLedger"
+                                               :disabled="editLedgerLoading"
+                                    >Submit
+                                    </el-button>
+                                </div>
                             </div>
-                        </div>
+                        </van-action-sheet>
 
-                    </van-action-sheet>
+                        <van-action-sheet v-model="addLedgerShow" title="Title">
+                            <div class="page">
+                                <div class="pdb16 pdt16"></div>
+                                <div class="record-header">Add Fields</div>
+                                <van-cell-group class="shadow overflow-hidden br8 ">
+                                    <van-field v-model="addLedgerName" type="text" label="name"/>
+                                </van-cell-group>
+                                <div class="pdb16 pdt16"></div>
+                                <div class="">
+                                    <el-button round plain type="primary" style="width: 100%"
+                                               @click="submitAddLedger"
+                                               :disabled="addLedgerLoading"
+                                    >Submit
+                                    </el-button>
+                                </div>
+                            </div>
+                        </van-action-sheet>
 
-                    <div class="pdb16 pdt16"></div>
-                    <div class="record-header">Ledgers</div>
-                    <van-cell-group v-loading="ledgersLoading" class="shadow overflow-hidden br8">
-                        <van-swipe-cell v-for="ledger in ledgers">
-                            <van-cell :border="false" :title="ledger.name"/>
-                            <template #right>
-                                <van-button square type="primary" text="Edit"
-                                            @click="onClickEdit(ledger.id, ledger.name)"/>
-                                <van-button square type="danger" text="Delete"
-                                            @click="onClickDelete(ledger.id, ledger.name)"/>
-                            </template>
-                        </van-swipe-cell>
-                    </van-cell-group>
+                        <div class="pdb16 pdt16"></div>
+                        <div class="record-header">Ledgers</div>
+                        <van-cell-group v-loading="ledgersLoading" class="shadow overflow-hidden br8">
+                            <van-swipe-cell v-for="ledger in ledgers">
+                                <van-cell :border="false" :title="ledger.name"/>
+                                <template #right>
+                                    <van-button square type="primary" text="Edit"
+                                                @click="onClickEdit(ledger.id, ledger.name)"/>
+                                    <van-button square type="danger" text="Delete"
+                                                @click="onClickDelete(ledger.id, ledger.name)"/>
+                                </template>
+                            </van-swipe-cell>
+                        </van-cell-group>
+
+                    </div>
+
+
+                    <div
+                        ref="bottom-tool-bar"
+                        style="position: absolute; bottom: 0;left: 0; right: 0; background-color: white; border-top: 1px solid #ebedf0; width: 100%">
+                        <el-button type="primary" ref="add-ledger-btn" size="mini"><i class="el-icon-plus"></i>
+                        </el-button>
+                    </div>
                 </div>
-
             </template>
         </modal-presentation>
     </div>
 </template>
 
 <script lang='ts'>
-import {Component, Vue} from 'vue-property-decorator';
+import {Component} from 'vue-property-decorator';
+import {Vue} from '@/ttt'
 import ModalPresentationView from "@/components/ModalPresentation.vue";
 import {gotoPage} from "@/ts/pageStack";
 import {Notify} from "vant";
-import Client from "@/request/client";
-import {countDecimalPlaces, isFloat, isPositiveInteger} from '@/ts/utils';
-import eventBus from "@/ts/EventBus";
 import pageConfig from "@/ts/pageConfig";
+import {getHtmlElem, getRef} from "@/ts/vueUtils";
+import eventBus from "@/ts/EventBus";
 
 class FormItem {
     categoryValue: string | null = null;
@@ -83,10 +108,35 @@ export default class ManageLedgerView extends Vue {
     ledgers: any = []
     varTable: any = {}
     show = false
+
     categoryValue: string | null = null
     name = ""
     editLedgerId: number | null = null
     editLedgerName: string | null = ""
+
+
+    addLedgerLoading = false
+    addLedgerShow = false
+    addLedgerName: string | null = ""
+    countxxx = 100;
+
+    submitAddLedger() {
+        this.addLedgerLoading = true
+        setTimeout(() => {
+            Notify({
+                type: "success",
+                message: "Add success"
+            })
+
+            this.addLedgerShow = false
+            this.ledgers.push({
+                id: this.countxxx++,
+                name: this.addLedgerName
+            })
+            // we don't recover the loading status to prevent the user click submit button twice
+        }, 500)
+    }
+
 
     onClickEdit(ledgerId: number, ledgerName: string) {
         this.editLedgerId = ledgerId
@@ -131,6 +181,12 @@ export default class ManageLedgerView extends Vue {
 
     ledgersLoading = false
     created() {
+        this.recordId = this.$route.params.id
+        this.amount = this.$route.params.amount
+        this.datetime = this.$route.params.datetime
+        this.count = this.$route.params.count
+        this.categoryValue = this.$route.params.categoryValue
+        this.description = this.$route.params.description
         this.ledgersLoading = true
         setTimeout(() => {
             this.ledgersLoading = false
@@ -149,56 +205,72 @@ export default class ManageLedgerView extends Vue {
                     name: "Ledger 4"
                 },
             ]
+            eventBus.$emit('ledges-changes',   this.ledgers)
         }, 500)
     }
 
+
+    pageRatio = 95
+
     mounted() {
-        this.modal = this.$refs.modal as ModalPresentationView;
+        this.modal = getRef(this, "modal") as ModalPresentationView;
         setTimeout(() => {
             this.modal.openModal()
         }, 1)
 
-        this.recordId = this.$route.params.id
-        this.amount = this.$route.params.amount
-        this.datetime = this.$route.params.datetime
-        this.count = this.$route.params.count
-        this.categoryValue = this.$route.params.categoryValue
-        this.description = this.$route.params.description
-        //
-        // setTimeout(() => {
-        //     let recordId: string | number | null = this.$route.query.recordId as number | string | null
-        //     this.recordId = recordId
-        //     if (recordId != null) {
-        //         Client.getTransaction(recordId as number).then(resp => {
-        //             this.amount = resp.data.amount
-        //             this.datetime = resp.data.datetime
-        //             this.count = resp.data.count
-        //             this.categoryValue = resp.data.categoryValue
-        //             this.description = resp.data.description
-        //         })
-        //         return
-        //     }
-        //
-        //     Notify("page status invalid")
-        //     setTimeout(() => {
-        //         Notify.clear()
-        //         this.$router.push("/")
-        //     }, 1000)
-        // }, 500)
-
+        this.adjustPageHeight()
     }
+
+    adjustPageHeight() {
+        let mainframe = getHtmlElem(this, "page-main-frame")
+
+        let pageMainArea = getHtmlElem(this, "page-main-area")
+        let bottomToolBar = getHtmlElem(this, "bottom-tool-bar")
+
+        let mainframeHeight = mainframe.clientHeight;
+        let pageMainAreaHeight = mainframeHeight * this.pageRatio / 100
+        let bottomToolBarHeight = mainframeHeight - pageMainAreaHeight
+
+        pageMainArea.style.height = pageMainAreaHeight + "px"
+        bottomToolBar.style.height = bottomToolBarHeight + "px"
+
+
+        let a = getHtmlElem(this, "add-ledger-btn")
+        console.log(a.$el)
+        console.log(a.$el.style)
+
+
+        let e = a.$el as HTMLElement
+
+        e.style.padding = `${5}px`
+        e.style.borderRadius = `${8}px`
+        e.style.position = "relative"
+
+        console.log(e.offsetHeight)
+
+        // center the e to the  bottomToolBar
+        let bottomToolBarHeight2 = bottomToolBar.offsetHeight
+        let eHeight = e.offsetHeight
+        let eTop = (bottomToolBarHeight2 - eHeight) / 2
+
+        e.style.top = `${eTop}px`
+
+        bottomToolBar.style.paddingLeft = `${8}px`
+
+        e.onclick = () => {
+            this.addLedgerName = ""
+            this.addLedgerLoading = false;
+            this.addLedgerShow = true
+        }
+    }
+
 
     closed() {
 
     }
+
     close100() {
         gotoPage(true, "home", {})
-
-    }
-    close200() {
-
-    }
-    close300() {
 
     }
 
@@ -211,8 +283,9 @@ export default class ManageLedgerView extends Vue {
 @import "~@/style/common-style.scss";
 
 .page {
-    padding: 8px;
+    padding: 0 8px 0 8px;
     background-color: #f7f8fa;
+
 }
 
 .record-header {

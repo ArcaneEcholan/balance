@@ -39,6 +39,11 @@ Vue.use(ActionSheet);
 
 Vue.use(SwipeCell);
 
+// Vue.prototype.$customFuncs = {
+//     getRef,
+//     getHtmlElem
+// }
+
 new Vue({
     router,
     store,
