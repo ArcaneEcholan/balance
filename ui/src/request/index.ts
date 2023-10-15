@@ -14,6 +14,7 @@ import { Notification } from 'element-ui';
 import globalHandledRespCodes, {
     SUCCESS,
 } from '@/ts/GlobalHandledResponseCode';
+import {Notify} from "vant";
 
 // create an axios instance
 const service = axios.create({
@@ -81,13 +82,18 @@ service.interceptors.response.use(
         return Promise.reject(res);
     },
     (error) => {
-        // 统一处理网络错误
-        Message({
-            message: `无法连接服务器(${error.message})`,
-            type: 'error',
-            duration: 2 * 1000,
-        });
-        return Promise.reject();
+        let response = error.response;
+
+        if (response == null) {
+            Notification.error('Server unreachable');
+            return Promise.reject();
+        }
+        let status = response.status;
+        let data = response.data;
+        Notify(
+            { type: 'danger', message: `${status}: ${data}` }
+        )
+        return Promise.reject(error);
     },
 );
 
