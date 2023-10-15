@@ -23,21 +23,23 @@
 
         <div>
             <!--region: amap-->
+            <!--<div class="record-header">Amap</div>-->
 
-
-            <div class="record-header">Amap</div>
-
-            <div style="position: relative" class="bg-white br8 shadow overflow-hidden">
-                <div id="amap" style="width: 100%; height: auto">
-                </div>
-                <div class="fake-marker"></div>
-            </div>
+            <!--<div style="position: relative" class="bg-white br8 shadow overflow-hidden">-->
+            <!--    <div id="amap" style="width: 100%; height: auto">-->
+            <!--    </div>-->
+            <!--    <div class="fake-marker"></div>-->
+            <!--</div>-->
             <!--endregion-->
 
 
             <div class="mgb20"></div>
-
-            <van-cell-group class="shadow overflow-hidden br8 " title="Location information">
+            <div class="record-header">Location information
+                <el-button ref="refresh-btn" @click="onClickRefreshLocationData">
+                    <van-icon name="replay"/>
+                </el-button>
+            </div>
+            <van-cell-group v-loading="locationLoading" class="shadow overflow-hidden br8 ">
                 <van-cell title="Coordinate (lat, lng)"
                           :value="`(${geoLocation.latitude}, ${geoLocation.longitude})`"/>
                 <van-cell title="Overview" :value="`${geoLocation.formattedName}`"/>
@@ -167,7 +169,7 @@ import {gotoPage} from "@/ts/pageStack";
 import eventBus from "@/ts/EventBus";
 import {Notify} from "vant";
 import {getCurrentYearAndMonth} from '@/ts/time';
-import {getRef} from "@/ts/vueUtils";
+import {getRef, getVueEl} from "@/ts/vueUtils";
 import VanCursorEditor from "@/views/components/VanCursorEditor.vue";
 import VanCursorEditorComponent from "@/views/components/VanCursorEditor.vue";
 
@@ -226,6 +228,9 @@ export default class IndexView extends Vue {
         formattedName: null
     };
 
+    onClickRefreshLocationData() {
+        this.getCurrentLocation(this.amap)
+    }
 
     created() {
         this.registerEvents()
@@ -302,11 +307,11 @@ export default class IndexView extends Vue {
     loadAmap() {
         this.doLoadAmap((AMap: any) => {
 
-            this.mountAmap(AMap)
+            // this.mountAmap(AMap)
+            //
+            // this.registerAmapMoveEvent()
 
-            this.registerAmapMoveEvent()
-
-            this.registerAmapGetCurrentLocationEvent(AMap)
+            this.getCurrentLocation(AMap)
 
         }, (e: any) => {
             console.log(e);
@@ -331,7 +336,6 @@ export default class IndexView extends Vue {
         this.amap = new AMap.Map('amap', {
             zoom: 16,
         });
-
     }
 
     registerAmapMoveEvent() {
@@ -346,19 +350,36 @@ export default class IndexView extends Vue {
     }
 
 
-    registerAmapGetCurrentLocationEvent(AMap: any) {
+    locationLoading = false
+
+    getCurrentLocation(AMap: any) {
+        if (this.amapGeolocationPlugin == null) {
+            this.loadAmapGeolocationPlugin(AMap, () => {
+                this.doGetCurrentLocation()
+            })
+        } else {
+            this.doGetCurrentLocation()
+        }
+    }
+
+    loadAmapGeolocationPlugin(AMap: any, cb: any) {
         AMap.plugin('AMap.Geolocation', () => {
             let geolocation = new AMap.Geolocation();
-            this.amap.addControl(geolocation);
             this.amapGeolocationPlugin = geolocation;
-            this.amapGeolocationPlugin.getCurrentPosition(
-                this.onSuccessGetCurrentPosition,
-                this.onFailedGetCurrentPosition
-            )
+            cb()
         });
     }
 
+    doGetCurrentLocation() {
+        this.locationLoading = true
+        this.amapGeolocationPlugin.getCurrentPosition(
+            this.onSuccessGetCurrentPosition,
+            this.onFailedGetCurrentPosition
+        )
+    }
+
     onSuccessGetCurrentPosition(status: any, result: any) {
+        this.locationLoading = false
         if (status === 'complete') {
             this.ifSuccessGetCurrentPosition(result)
         } else {
@@ -371,6 +392,7 @@ export default class IndexView extends Vue {
     }
 
     ifSuccessGetCurrentPosition(result: any) {
+        this.locationLoading = false
         let position = result.position;
         this.updateCor(position.lat, position.lng)
         this.getAndUpdateDetailLocationData()
@@ -382,10 +404,7 @@ export default class IndexView extends Vue {
         this.getDetailLocation(lat, lng,
             (locationDetail: any) => {
                 // get information we need from detail response
-                let infoFromAmapLocationDetail = this.getInfoFromAmapLocationDetail(locationDetail);
-                // assign details
-                this.geoLocation = Object.assign(this.geoLocation, infoFromAmapLocationDetail);
-                console.debug(`get location detail: `, this.geoLocation)
+                this.getInfoFromAmapLocationDetail(locationDetail);
             },
             (respBodyOrError: any) => {
                 console.error(`fail to get location detail: `, respBodyOrError)
@@ -423,10 +442,16 @@ export default class IndexView extends Vue {
     }
 
     getInfoFromAmapLocationDetail(amapDetailLocationResp: any): any {
-        let finalLocationInfo: any = {}
+        let finalLocationInfo = this.getFormattedNameFromLocationDetail(amapDetailLocationResp)
+        // assign details
+        this.geoLocation = Object.assign(this.geoLocation, finalLocationInfo);
+        console.debug(`get location detail: `, this.geoLocation)
+    }
 
-        finalLocationInfo.formattedName =
-            this.returnBlankStringIfEmptyArray(amapDetailLocationResp.regeocode.formatted_address);
+
+    getFormattedNameFromLocationDetail(amapDetailLocationResp: any) {
+        let finalLocationInfo: any = {}
+        finalLocationInfo.formattedName = this.returnBlankStringIfEmptyArray(amapDetailLocationResp.regeocode.formatted_address);
 
         if (finalLocationInfo.formattedName === "") {
             Notify(
@@ -435,30 +460,8 @@ export default class IndexView extends Vue {
                     message: "Your location is out of the service of amap "
                 }
             )
-            this.geoLocation.formattedName = 'out of service'
-            return;
+            finalLocationInfo.formattedName = 'out of service'
         }
-
-        let addressDetail = amapDetailLocationResp.regeocode.addressComponent;
-        finalLocationInfo.adcode = this.returnBlankStringIfEmptyArray(addressDetail.adcode);
-
-        finalLocationInfo.province = this.returnBlankStringIfEmptyArray(addressDetail.province);
-        finalLocationInfo.city = this.returnBlankStringIfEmptyArray(addressDetail.city) == "" ? finalLocationInfo.province : this.returnBlankStringIfEmptyArray(addressDetail.city);
-        finalLocationInfo.district = this.returnBlankStringIfEmptyArray(addressDetail.district);
-        finalLocationInfo.citycode = this.returnBlankStringIfEmptyArray(addressDetail.citycode);
-
-        finalLocationInfo.township = this.returnBlankStringIfEmptyArray(addressDetail.township);
-        finalLocationInfo.towncode = this.returnBlankStringIfEmptyArray(addressDetail.towncode);
-
-        finalLocationInfo.streetName = this.returnBlankStringIfEmptyArray(addressDetail.streetNumber.street);
-        finalLocationInfo.streetNumber = this.returnBlankStringIfEmptyArray(addressDetail.streetNumber.number)
-        finalLocationInfo.streetLocation = this.returnBlankStringIfEmptyArray(
-            addressDetail.streetNumber.location)
-        finalLocationInfo.streetDirection = this.returnBlankStringIfEmptyArray(
-            addressDetail.streetNumber.direction)
-        finalLocationInfo.streetDistance = this.returnBlankStringIfEmptyArray(
-            addressDetail.streetNumber.distance)
-
         return finalLocationInfo
     }
 
@@ -486,6 +489,9 @@ export default class IndexView extends Vue {
     }
 
     mounted() {
+
+        let a = getVueEl(this, "refresh-btn")
+        a.style.padding = "4px";
         this.adjustAMapSize()
     }
 
