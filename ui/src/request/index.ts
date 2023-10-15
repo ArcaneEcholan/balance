@@ -40,7 +40,9 @@ service.interceptors.response.use(
         let response = error.response;
 
         if (response == null) {
-            Notification.error('Server unreachable');
+            Notify(
+                {type: 'danger', message: `server unreachable`}
+            )
             return Promise.reject();
         }
         let status = response.status;

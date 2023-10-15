@@ -14,7 +14,7 @@ class Client {
 
     static saveTransactionsByLedgerName(ledgerName: string, trans: any[]) {
         return request({
-            url: `/transactions/${ledgerName}`,
+            url: `/transactions/${encodeURIComponent(ledgerName)}`,
             method: 'post',
             data: {
                 transactionList: trans,
@@ -93,7 +93,7 @@ class Client {
 
     static getTransactionListByLedgerName(ledgerName: string, yearHyphenMonth: string) {
         return request({
-            url: `/transactions/${ledgerName}`,
+            url: `/transactions/${encodeURIComponent(ledgerName)}`,
             method: 'get',
             params: { month: yearHyphenMonth },
         });
