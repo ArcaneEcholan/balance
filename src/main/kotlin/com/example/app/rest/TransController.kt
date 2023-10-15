@@ -54,6 +54,7 @@ class SaveTranDTO {
 //           type: object
 class SaveTransDTO {
     @NotNull
+    @Valid
     var transactionList: List<SaveTranDTO>? = null
 }
 
