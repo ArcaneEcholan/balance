@@ -12,21 +12,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
 import java.util.*
 
-
-class AppConfig {
-}
-
-// @Configuration
-// class CorsConfig : WebMvcConfigurer {
-//     override fun addCorsMappings(registry: CorsRegistry) {
-//         registry.addMapping("/**")
-//             .allowedOrigins("*")
-//             .allowedMethods("GET", "POST", "PUT", "DELETE")
-//             .allowedHeaders("*")
-//             .allowCredentials(true)
-//     }
-// }
-
 @Configuration
 class RequestCorsFilter {
     @Bean
@@ -34,23 +19,7 @@ class RequestCorsFilter {
         val source = UrlBasedCorsConfigurationSource()
         val config = CorsConfiguration()
         config.allowCredentials = true
-        config.setAllowedOriginPatterns(
-            listOf(
-                "http://localhost:[*]",
-                "https://*.wenchao.fit:[*]",
-
-                "http://127.0.0.1:[*]",
-                "https://127.0.0.1:[*]",
-                "https://editor.swagger.io",
-
-                "http://[*]:[*]",
-                "https://[*]:[*]",
-
-                // for debug
-                "https://49.232.155.160:[*]",
-                "http://49.232.155.160:[*]",
-            )
-        );
+        config.addAllowedOriginPattern("*")
         config.allowedHeaders = Arrays.asList("Origin", "Content-Type", "Accept", "responseType", "Authorization")
         config.allowedMethods = Arrays.asList("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH")
         source.registerCorsConfiguration("/**", config)
