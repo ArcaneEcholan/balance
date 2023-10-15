@@ -82,7 +82,7 @@ import ModalPresentationView from "@/components/ModalPresentation.vue";
 import {gotoPage} from "@/ts/pageStack";
 import {Notify} from "vant";
 import pageConfig from "@/ts/pageConfig";
-import {getHtmlElem, getRef} from "@/ts/vueUtils";
+import {getHtmlElem, getRef, getVueEl} from "@/ts/vueUtils";
 import eventBus from "@/ts/EventBus";
 import Client from "@/request/client";
 
@@ -256,13 +256,7 @@ export default class ManageLedgerView extends Vue {
         pageMainArea.style.height = pageMainAreaHeight + "px"
         bottomToolBar.style.height = bottomToolBarHeight + "px"
 
-
-        let a = getHtmlElem(this, "add-ledger-btn")
-        console.log(a.$el)
-        console.log(a.$el.style)
-
-
-        let e = a.$el as HTMLElement
+        let e = getVueEl(this, "add-ledger-btn")
 
         e.style.padding = `${5}px`
         e.style.borderRadius = `${8}px`
