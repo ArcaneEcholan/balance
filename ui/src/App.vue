@@ -3,9 +3,7 @@
         <!--<nav>-->
         <!--    &lt;!&ndash;<router-link to="/test">Test</router-link>&ndash;&gt;-->
         <!--</nav>-->
-
-
-        <div class="fixed-header">
+        <div id="header-area" class="fixed-header">
             <van-nav-bar :title="title" left-text="Back" left-arrow>
                 <template #right>
                     <van-icon name="search"/>
@@ -13,9 +11,11 @@
             </van-nav-bar>
         </div>
 
-        <div style="margin-top: 46px"></div>
+        <div id="padding-area"></div>
 
-        <router-view/>
+        <div id="main-app-area">
+            <router-view/>
+        </div>
     </div>
 </template>
 
@@ -36,6 +36,18 @@ export default class AppView extends Vue {
     }
     mounted() {
         this.registerListenersForHandlingEdgeSwipe()
+
+        // let b = document
+        let h = document.getElementById("header-area")!
+        let p = document.getElementById("padding-area")!
+        let m = document.getElementById("main-app-area")!
+
+        let vh = window.innerHeight
+
+        let headerHeight = h.clientHeight
+        p.style.height = headerHeight + "px"
+        m.style.position  = "relative"
+        m.style.height = (vh - headerHeight) + "px"
     }
 
     registerListenersForHandlingEdgeSwipe() {
@@ -108,6 +120,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
     //text-align: center;
     color: #2c3e50;
+    height: 660px;
 }
 
 nav {
