@@ -1,11 +1,10 @@
 package com.example.app.exception
 
-import RespCode
 import com.example.app.utils.ClassUtil
-import com.example.app.utils.ClassUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -20,8 +19,8 @@ import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.multipart.MaxUploadSizeExceededException
 import org.springframework.web.multipart.support.MissingServletRequestPartException
 import javax.servlet.http.HttpServletResponse
+import javax.validation.ConstraintViolation
 import javax.validation.ConstraintViolationException
-import javax.validation.Path
 
 enum class ErrorCode {
     UNKNOWN,
@@ -32,30 +31,6 @@ enum class ErrorCode {
     KEY_NOT_EXISTS
 }
 
-
-class BackendException : RuntimeException {
-    var data: Any?
-    var code: String
-    var msg: String
-
-    constructor(data: Any?, msg: String, code: String) {
-        this.data = data
-        this.code = code
-        this.msg = msg
-    }
-
-    constructor(data: Any?, respCode: RespCode) {
-        this.data = data
-        this.code = respCode.getCode()
-        msg = respCode.msg
-    }
-
-    constructor(cause: Throwable?, data: Any?, respCode: RespCode) : super(cause) {
-        this.data = data
-        this.code = respCode.getCode()
-        msg = respCode.msg
-    }
-}
 
 class ApiException : RuntimeException {
     var httpStatus: HttpStatus
@@ -92,37 +67,12 @@ class GlobalExceptionHandler {
 
     private val log = KotlinLogging.logger {}
 
-    class ParameterCheckResult {
-        var paramCheckMap = mutableMapOf<String, Any?>()
-        fun putResult(field: String, message: String?) {
-            paramCheckMap.put(field, message)
-        }
-    }
-
-    // @Value("\${spring.servlet.multipart.max-file-size}")
+    @Value("\${spring.servlet.multipart.max-file-size}")
     var uploadLimit: String? = null
-
-    // region: error code handler
-    @ExceptionHandler(ApiException::class)
-    @ResponseBody
-    fun errorCodeException(req: HttpServletResponse, ex: ApiException): ResponseEntity<*> {
-        log.error("[{}] {}", ex.httpStatus, ex.msg)
-        return turnBackendExceptionIntoJsonResult(req, ex)
-    }
 
     @Autowired
     lateinit var objectMapper: ObjectMapper
 
-    /**
-     * @param ex the exception
-     * @return the json result
-     */
-    private fun turnBackendExceptionIntoJsonResult(req: HttpServletResponse, ex: ApiException): ResponseEntity<*> {
-        return ResponseEntity(objectMapper.writeValueAsString(ex.msg), ex.httpStatus)
-    }
-
-    // endregion
-    // region: validation error
     @ExceptionHandler(
         BindException::class,
         MethodArgumentNotValidException::class
@@ -130,81 +80,107 @@ class GlobalExceptionHandler {
     fun paramValidateException(ex: Exception?): ResponseEntity<*> {
         return try {
             val bindingResult: BindingResult = ClassUtil.getFieldValue(ex!!, "bindingResult", BindingResult::class.java)
-            val parameterCheckResult = extractValidationErrorEntries(bindingResult)
-            log.error("Request parameter error:{}", parameterCheckResult)
-            ResponseEntity(parameterCheckResult, HttpStatus.BAD_REQUEST)
+            var a = getResponseBody(bindingResult)
+            ResponseEntity(a, HttpStatus.BAD_REQUEST)
         } catch (e: NoSuchFieldException) {
             ResponseEntity(Any(), HttpStatus.BAD_REQUEST)
         }
     }
 
+    fun getResponseBody(bindingResult: BindingResult): Any? {
+        var a = mutableListOf<Map<String, Any?>>()
+        for (objectError in bindingResult.allErrors) {
+            val fieldError = objectError as FieldError
+            a.add(mapOf("field" to fieldError.field, "message" to fieldError.defaultMessage))
+        }
+        return a;
+    }
+
     @ExceptionHandler(ConstraintViolationException::class)
     fun constraintViolationException(ex: ConstraintViolationException): ResponseEntity<*> {
         val constraintViolations = ex.constraintViolations
-        val parameterCheckResult = ParameterCheckResult()
+        var a = getResponseBoddddy(constraintViolations)
+        return ResponseEntity<Any?>(a, HttpStatus.BAD_REQUEST)
+    }
+
+    fun getResponseBoddddy(constraintViolations: MutableSet<ConstraintViolation<*>>): Any? {
+        var a = mutableListOf<Map<String, Any?>>()
         for (constraintViolation in constraintViolations) {
-            parameterCheckResult.putResult(
-                getLastPathNode(constraintViolation.propertyPath),
-                constraintViolation.message
-            )
+            a.add(mapOf("field" to constraintViolation.propertyPath, "message" to constraintViolation.message))
         }
-        return ResponseEntity<Any?>(parameterCheckResult, HttpStatus.BAD_REQUEST)
+        return a;
     }
 
-    private fun extractValidationErrorEntries(bindingResult: BindingResult): ParameterCheckResult {
-        val parameterCheckResult = ParameterCheckResult()
-        for (objectError in bindingResult.allErrors) {
-            val fieldError = objectError as FieldError
-            parameterCheckResult.putResult(fieldError.field, fieldError.defaultMessage)
-        }
-        return parameterCheckResult
-    }
 
-    // endregion
-    // region: other exception
     @ExceptionHandler(Exception::class)
     fun otherException(req: HttpServletResponse, ex: Exception): ResponseEntity<*> {
-        log.error(
-            "Server Exception-Name:{}，Server Exception-Msg:{}",
-            ex.javaClass.typeName,
-            ex.message
-        )
+        if(ex is ApiException) {
+            return logExAndAssembleResponse(ex)
+        }
         if (ex is HttpMessageNotReadableException) {
-            return turnBackendExceptionIntoJsonResult(
-                req,
+            return logExAndAssembleResponse(
                 ApiException(HttpStatus.BAD_REQUEST, "Request paramater is invalid")
             )
         }
         if (ex is MissingServletRequestParameterException) {
-            return turnBackendExceptionIntoJsonResult(
-                req,
+            return logExAndAssembleResponse(
                 ApiException(HttpStatus.BAD_REQUEST, "Required request body is missing")
             )
         }
         if (ex is MaxUploadSizeExceededException) {
-            return turnBackendExceptionIntoJsonResult(
-                req, ApiException(
+            return logExAndAssembleResponse(
+                ApiException(
                     HttpStatus.PAYLOAD_TOO_LARGE,
                     "Limitation: $uploadLimit"
                 )
             )
         }
         if (ex is MissingServletRequestPartException) {
-            return turnBackendExceptionIntoJsonResult(req, ApiException(HttpStatus.BAD_REQUEST, ex.message))
+            return logExAndAssembleResponse(ApiException(HttpStatus.BAD_REQUEST, ex.message))
         }
-        ex.printStackTrace()
-        return turnBackendExceptionIntoJsonResult(req, ApiException(HttpStatus.INTERNAL_SERVER_ERROR, ex.message))
+
+        return logExAndAssembleResponse(ApiException(HttpStatus.INTERNAL_SERVER_ERROR, ex.message))
     } // endregion
 
-    companion object {
-        private fun getLastPathNode(path: Path): String {
-            val wholePath = path.toString()
-            val i = wholePath.lastIndexOf(".")
-            return if (i != -1) {
-                wholePath.substring(i + 1)
-            } else wholePath
+    fun logExAndAssembleResponse(ex: ApiException): ResponseEntity<*> {
+        log(ex)
+
+        return ResponseEntity(objectMapper.writeValueAsString(ex.msg), ex.httpStatus)
+    }
+
+    fun log(ex: ApiException) {
+        log.error { "restful server exception caught" }
+
+        log.error(
+            "cause: {} - {}",
+            ex.javaClass.typeName,
+            ex.message
+        )
+
+        var r = getRootCause(ex)
+        if (r != null) {
+            log.error(
+                "rootcause: {} - {}",
+                r.javaClass.typeName,
+                r.message
+            )
+        } else {
+            log.error(
+                "rootcause: {} - {}",
+                ex.javaClass.typeName,
+                ex.message
+            )
         }
     }
+
+    fun getRootCause(throwable: Throwable): Throwable? {
+        var rootCause: Throwable? = throwable.cause
+        while (rootCause != null) {
+            rootCause = rootCause.cause
+        }
+        return rootCause
+    }
+
 }
 
 

@@ -16,6 +16,10 @@ spring:
       schema-locations: classpath:sql/schema.sql
       mode: always
 
+  servlet:
+    multipart:
+      max-file-size: 100
+
 logging:
   level:
     root: debug
@@ -52,41 +56,3 @@ mybatis-plus:
 server:
   port: 8094
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
-
-
-components:
-  schemas:
-    CreateLedgerDTO:
-      type: object
-      properties:
-        name:
-          type: string
-    EditLedgerDTO:
-      type: object
-      properties:
-        name:
-          type: string
-    TransactionVO:
-      type: object
-      properties:
-        id:
-          type: integer
-        amount:
-          type: number
-        orderNo:
-          type: string
-        categoryId:
-          type: integer
-        description:
-          type: string
-        locationId:
-          type: integer
-        datetime:
-          type: string
-        count:
-          type: integer
-        categoryValue:
-          type: string
-        location:
-          type: object
