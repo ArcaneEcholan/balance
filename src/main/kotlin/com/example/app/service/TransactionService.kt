@@ -2,6 +2,10 @@ package com.example.app.service
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.example.app.dao.*
+import com.example.app.dao.mapper.LedgerMapper
+import com.example.app.dao.mapper.LedgerTransactionMapper
+import com.example.app.dao.po.LedgerPO
+import com.example.app.dao.po.LedgerTransactionPO
 import com.example.app.dao.utils.base.pagination.Page
 import com.example.app.dao.utils.base.pagination.PageConfig
 import com.example.app.dao.utils.base.pagination.PageNo
@@ -24,25 +28,7 @@ import java.util.*
 //     var description: String ?,
 //     var locationId: Long ?,
 //     var datetime: String ?
-class TransactionVO {
-    var id: Long? = null
-    var amount: BigDecimal? = null
-    var orderNo: String? = null
-    var categoryId: Long? = null
-    var description: String? = null
-    var locationId: Long? = null
-    var datetime: String? = null
 
-    var count: Int? = null
-
-    var categoryValue: String? = null
-    var location: Any? = null
-
-    override fun toString(): String {
-        return "TransactionVO(id=$id, amount=$amount, orderNo=$orderNo, categoryId=$categoryId, description=$description, locationId=$locationId, datetime=$datetime, categoryValue=$categoryValue, location=$location)"
-    }
-
-}
 
 interface TransactionService {
 
@@ -50,8 +36,8 @@ interface TransactionService {
 
     fun list(pageNo: Long, pageSize: Long): List<TransactionVO>
 
-
     fun list(mouth: String): List<TransactionVO>
+    fun list(ledgerId: Long, mouth: String): List<TransactionVO>
 
     // var id: Long?,
     //     var amount: BigDecimal?,
@@ -61,6 +47,16 @@ interface TransactionService {
     //     var locationId: Long?,
     //     var datetime: String?,
     fun insert(
+        amount: BigDecimal,
+        categoryId: Long,
+        count: Int,
+        description: String?,
+        datetime: String,
+        location: Map<String, String>,
+    ): TransactionVO
+
+    fun insert(
+        ledgerName: String,
         amount: BigDecimal,
         categoryId: Long,
         count: Int,
@@ -136,6 +132,16 @@ class TransactionServiceImpl : TransactionService {
         }.toList().apply { return this }
     }
 
+    @Autowired
+    lateinit var ledgerMapper: LedgerMapper
+
+    @Autowired
+    lateinit var ledgerTransactionMapper: LedgerTransactionMapper
+
+    @Autowired
+    lateinit var transactionMapper: TransactionMapper
+
+
     override fun list(mouth: String): List<TransactionVO> {
         val monthRange = getMonthRange(mouth)
         val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
@@ -149,6 +155,19 @@ class TransactionServiceImpl : TransactionService {
 
         transactionDao.list(queryWrapper).map(::fillVO).toList()
             .apply { return this }
+    }
+
+    override fun list(ledgerId: Long, mouth: String): List<TransactionVO> {
+
+        val monthRange = getMonthRange(mouth)
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val startDateTimeStr = monthRange.startDateTime.format(outputFormatter)
+        val endDateTimeStr = monthRange.endDateTime.format(outputFormatter)
+        ledgerTransactionMapper.selectTransactionsOfSpecificLedger(
+            ledgerId,
+            startDateTimeStr,
+            endDateTimeStr
+        ).apply { return this }
     }
 
     override fun insert(
@@ -195,6 +214,89 @@ class TransactionServiceImpl : TransactionService {
         )
 
         transactionDao.save(transaction)
+
+
+        // save relation between transaction and ledger(whose name is default ledger)
+        var defaultLedger = ledgerMapper.selectOne(
+            QueryWrapper<LedgerPO>().eq("name", "default")
+        )
+        if (defaultLedger == null) {
+            throw RuntimeException("default ledger not found")
+        }
+
+        var ledgerTransaction = LedgerTransactionPO(
+            null,
+            ledgerId = defaultLedger.id,
+            transactionId = transaction.id
+        )
+
+        ledgerTransactionMapper.insert(ledgerTransaction)
+
+        return fillVO(transaction)
+    }
+
+    override fun insert(
+        ledgerName: String,
+        amount: BigDecimal,
+        categoryId: Long,
+        count: Int,
+        description: String?,
+        datetime: String,
+        location: Map<String, String>,
+    ): TransactionVO {
+        var location = LocationPO(
+            formattedName = location?.get("formattedName"),
+            latitude = location?.get("latitude"),
+            longitude = location?.get("longitude"),
+            province = location?.get("province"),
+            city = location?.get("city"),
+            district = location?.get("district"),
+            adcode = location?.get("adcode"),
+            citycode = location?.get("citycode"),
+
+            streetName = location?.get("streetName"),
+            streetNumber = location?.get("streetNumber"),
+            streetDirection = location?.get("streetDirection"),
+            streetDistance = location?.get("streetDistance"),
+            streetLocation = location?.get("streetLocation"),
+
+            towncode = location?.get("towncode"),
+            township = location?.get("township"),
+        )
+
+        if (!location.allNull()) {
+            locationDao.save(location)
+        }
+
+        var transaction = TransactionPO(
+            amount = amount,
+            count = count,
+            categoryId = categoryId,
+            description = description,
+            datetime = DateTime.now().toString(),
+            locationId = location.id,
+            orderNo = UUID.randomUUID().toString()
+        )
+
+        transactionDao.save(transaction)
+
+        // check ledger exist
+        var ledger = ledgerMapper.selectOne(
+            QueryWrapper<LedgerPO>().eq("name", ledgerName)
+        )
+
+        if (ledger == null) {
+            throw ApiException(HttpStatus.NOT_FOUND, "ledger not found")
+        }
+
+        // save relation between transaction and ledger(whose name is default ledger)
+        var ledgerTransaction = LedgerTransactionPO(
+            null,
+            ledgerId = ledger.id,
+            transactionId = transaction.id
+        )
+
+        ledgerTransactionMapper.insert(ledgerTransaction)
 
         return fillVO(transaction)
     }

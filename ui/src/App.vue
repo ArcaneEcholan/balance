@@ -20,27 +20,61 @@
 </template>
 
 
-<script type="ts">
+<script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import pageConfig from "@/ts/pageConfig";
-import {PageConfig} from "@/ts/pageConfig";
-
+let that:any
 @Component
 export default class AppView extends Vue {
+
+
+    touchStartPositionX = 0
+    fingerPositionX = 0
+
+    created() {
+        that = this;
+    }
     mounted() {
-        let app = document.getElementById("app")
+        this.registerListenersForHandlingEdgeSwipe()
+    }
+
+    registerListenersForHandlingEdgeSwipe() {
+
+        let app = document.getElementById("app")!
 
         app.addEventListener('touchstart', (e) => {
-            // debugger
-            const touch = e.changedTouches[0];
-            // this is where the user's finger is, in this case, represents the swipe start point
-            const touchClientX = touch.clientX;
-            // is not near edge of view, exit
-            if (touchClientX <= 30 || touchClientX >= window.innerWidth - 30) {
+            this.touchStartPositionX = e.changedTouches[0].clientX
+
+            // don't prevent default here, this will prevent the click event from being triggered
+            // more information should be collected as the user move finger
+            app.removeEventListener('touchmove', this.touchMoveListener);
+            app.addEventListener('touchmove', this.touchMoveListener);
+        });
+    }
+
+    // this listener should be put here instead of in the touchstart listener
+    // to avoid the listener being created every time touchstart is triggered
+    touchMoveListener = (e: any) => {
+        // use that instead of this, because "this" is not the vue instance,
+        // but an object of class AppView
+        that.fingerPositionX = e.changedTouches[0].clientX;
+        that.handleEdgeSwipe(e)
+    }
+
+    handleEdgeSwipe(e: any) {
+        if (this.touchStartPositionX <= 30) {
+            if (this.fingerPositionX - this.touchStartPositionX > 0) {
                 console.debug("prevent default swipe gesture")
                 e.preventDefault();
             }
-        });
+        }
+
+        if (this.touchStartPositionX >= window.innerWidth - 30) {
+            if (this.fingerPositionX - this.touchStartPositionX < 0) {
+                console.debug("prevent default swipe gesture")
+                e.preventDefault();
+            }
+        }
     }
 
     // make sure pageConfig is in vue reactive system, so the change of it

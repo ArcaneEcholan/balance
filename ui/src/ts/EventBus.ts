@@ -10,6 +10,13 @@ class EventBus {
         this.callbacks[name].push(fn);
     }
 
+    $onIfNotExists(name: string, fn: (args: any) => void) {
+        this.callbacks[name] = this.callbacks[name] || [];
+        if (this.callbacks[name].length <= 0) {
+            this.callbacks[name].push(fn);
+        }
+    }
+
     $emit(name: string, args: any) {
         if (this.callbacks[name]) {
             this.callbacks[name].forEach((cb) => cb(args));

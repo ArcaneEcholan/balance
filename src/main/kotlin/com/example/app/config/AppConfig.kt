@@ -1,5 +1,11 @@
 package com.example.app.config
 
+import com.example.app.dao.mapper.LedgerMapper
+import com.example.app.dao.po.LedgerPO
+import com.example.app.utils.DateTime
+import com.example.app.utils.DateUtils
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.web.server.ErrorPage
 import org.springframework.boot.web.server.ErrorPageRegistrar
 import org.springframework.boot.web.server.ErrorPageRegistry
@@ -12,20 +18,22 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
 import java.util.*
 
+@Component
+class Test : InitializingBean{
+    @Autowired
+    lateinit var ledgerMapper: LedgerMapper
+    override fun afterPropertiesSet() {
+        val selectByMap = ledgerMapper.selectByMap(mapOf("name" to "default"))
+        if(selectByMap.isEmpty()) {
+            ledgerMapper.insert(LedgerPO(null, "default", DateTime.now().toString()))
+        } else if (selectByMap.size > 1) {
+            throw RuntimeException("ledger name default should be only one")
+        }
+    }
 
-class AppConfig {
+
 }
 
-// @Configuration
-// class CorsConfig : WebMvcConfigurer {
-//     override fun addCorsMappings(registry: CorsRegistry) {
-//         registry.addMapping("/**")
-//             .allowedOrigins("*")
-//             .allowedMethods("GET", "POST", "PUT", "DELETE")
-//             .allowedHeaders("*")
-//             .allowCredentials(true)
-//     }
-// }
 
 @Configuration
 class RequestCorsFilter {
@@ -34,17 +42,7 @@ class RequestCorsFilter {
         val source = UrlBasedCorsConfigurationSource()
         val config = CorsConfiguration()
         config.allowCredentials = true
-        config.setAllowedOriginPatterns(
-            listOf(
-                "http://localhost:[*]",
-                "https://*.wenchao.fit:[*]",
-
-
-                // for debug
-                "https://49.232.155.160:[*]",
-                "http://49.232.155.160:[*]",
-            )
-        );
+        config.addAllowedOriginPattern("*")
         config.allowedHeaders = Arrays.asList("Origin", "Content-Type", "Accept", "responseType", "Authorization")
         config.allowedMethods = Arrays.asList("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH")
         source.registerCorsConfiguration("/**", config)

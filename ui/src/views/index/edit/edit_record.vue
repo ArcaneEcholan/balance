@@ -9,17 +9,6 @@
         >
             <template #default>
                 <div class="page">
-                    <!--                <div class="header">-->
-                    <!--                    -->
-                    <!--                    <div class="flex flex-center" style="background-color: #fff;-->
-                    <!--height: 56px;">-->
-                    <!--                        <div class="fs20 bold"-->
-                    <!--                             style="-->
-                    <!--                         text-transform: capitalize;">-->
-                    <!--                            Edit Record-->
-                    <!--                        </div>-->
-                    <!--                    </div>-->
-                    <!--                </div>-->
                     <div class=" ">
                         <!--<div style="z-index: 10000000">{{ stackSize }}</div>-->
                         <div class="google-gray-400 capitalize">
@@ -27,15 +16,7 @@
                         </div>
                     </div>
                     <div class="pdb16 pdt16"></div>
-                    <!--{{-->
-                    <!--    amount-->
-                    <!--}}-->
-                    <!--{{ datetime }}-->
-                    <!--{{ count }}-->
-                    <!--{{ description }}-->
-
                     <div class="record-header">Edit Fields</div>
-
                     <van-cell-group class="shadow overflow-hidden br8 ">
                         <van-field v-model="categoryValue" type="string" label="category"/>
                         <van-field v-model="amount" type="number" label="amount"/>
@@ -62,7 +43,7 @@
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentationView from "@/components/ModalPresentation.vue";
-import {gotoPageWithName} from "@/ts/pageStack";
+import {gotoPage} from "@/ts/pageStack";
 import pageStack from "@/ts/pageStack";
 import {Notify} from "vant";
 import Client from "@/request/client";
@@ -231,15 +212,8 @@ export default class EditRecordView extends Vue {
 
     }
     close100() {
-        gotoPageWithName(true, "home", (routeOpiton: any) => {
-            // routeOpiton.params = {
-            //     transactionId: this.recordId,
-            //     amount: this.amount,
-            //     datetime: this.datetime,
-            //     count: this.count,
-            //     description: this.description
-            // }
-        })
+        gotoPage(true, "home", {})
+
     }
     close200() {
 

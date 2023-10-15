@@ -1,10 +1,20 @@
 import request from '@/request';
-import { AxiosPromise } from 'axios';
+import {AxiosPromise} from 'axios';
 
 class Client {
     static saveTransactions(trans: any[]) {
         return request({
             url: `/transactions`,
+            method: 'post',
+            data: {
+                transactionList: trans,
+            },
+        });
+    }
+
+    static saveTransactionsByLedgerName(ledgerName: string, trans: any[]) {
+        return request({
+            url: `/transactions/${ledgerName}`,
             method: 'post',
             data: {
                 transactionList: trans,
@@ -81,11 +91,11 @@ class Client {
         });
     }
 
-    static getTransaction(transactionId: number) {
+    static getTransactionListByLedgerName(ledgerName: string, yearHyphenMonth: string) {
         return request({
-            url: `/transaction`,
+            url: `/transactions/${ledgerName}`,
             method: 'get',
-            params: { transactionId },
+            params: { month: yearHyphenMonth },
         });
     }
 
@@ -114,6 +124,30 @@ class Client {
         return request({
             url: `/transaction/category`,
             method: 'get',
+        });
+    }
+
+    static getLedgerList() {
+        return request({
+            url: `/ledgers`,
+            method: 'get',
+        });
+    }
+
+    static addLedger(addLedgerName: string) {
+        return request({
+            url: `/ledger`,
+            method: 'post',
+            data: {
+                name: addLedgerName,
+            }
+        });
+    }
+
+    static deleteLedger(ledgerId: number) {
+        return request({
+            url: `/ledger/${ledgerId}`,
+            method: 'delete',
         });
     }
 }
