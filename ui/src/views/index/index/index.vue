@@ -1,12 +1,20 @@
 <template>
-    <div class="page" style="position: relative; height: 100%;">
-        <div style="overflow-y: scroll;" v-loading="ledgerTransactionsLoading">
+    <div class="page" v-loading="ledgerTransactionsLoading">
 
-            <!--edit stack-->
+        <!--edit stack-->
+        <div style="position: relative; z-index: 1901;">
             <router-view>
             </router-view>
+        </div>
 
-            <van-dropdown-menu ref="menuRef">
+
+
+
+        <!--create a zindex context to separate basic page and modal, and avoid
+        components like v-loading(zindex 2000) step over to popped modal-->
+        <div style="position: relative; z-index: 1900;">
+            <!--add zindex context to ensure this dropdown can step over any sibling loading-->
+            <van-dropdown-menu ref="menuRef" style="position: relative; z-index: 1000">
                 <van-dropdown-item :title="currentLedger.name" ref="ledgerSelection">
                     <van-cell-group>
                         <van-cell @click="onClickSwitchLedger(ledger)" v-for="ledger in ledgerList"
@@ -21,142 +29,140 @@
                 </van-dropdown-item>
             </van-dropdown-menu>
 
+            <!--region: amap-->
+            <!--<div class="record-header">Amap</div>-->
 
-            <div>
-                <!--region: amap-->
-                <!--<div class="record-header">Amap</div>-->
-
-                <!--<div style="position: relative" class="bg-white br8 shadow overflow-hidden">-->
-                <!--    <div id="amap" style="width: 100%; height: auto">-->
-                <!--    </div>-->
-                <!--    <div class="fake-marker"></div>-->
-                <!--</div>-->
-                <!--endregion-->
+            <!--<div style="position: relative" class="bg-white br8 shadow overflow-hidden">-->
+            <!--    <div id="amap" style="width: 100%; height: auto">-->
+            <!--    </div>-->
+            <!--    <div class="fake-marker"></div>-->
+            <!--</div>-->
+            <!--endregion-->
 
 
-                <div class="mgb20"></div>
-                <div class="record-header">Location information
-                    <el-button ref="refresh-btn" @click="onClickRefreshLocationData">
-                        <van-icon name="replay"/>
-                    </el-button>
-                </div>
-                <van-cell-group v-loading="locationLoading" class="shadow overflow-hidden br8 ">
-                    <van-cell title="Coordinate (lat, lng)"
-                              :value="`(${geoLocation.latitude}, ${geoLocation.longitude})`"/>
-                    <van-cell title="Overview" :value="`${geoLocation.formattedName}`"/>
-                </van-cell-group>
+            <div class="mgb20"></div>
+            <div class="record-header">Location information
+                <el-button ref="refresh-btn" @click="onClickRefreshLocationData">
+                    <van-icon name="replay"/>
+                </el-button>
+            </div>
 
-                <div class="mgb20"></div>
+            <van-cell-group style="position: relative; z-index: 999;"  v-loading="locationLoading" class="shadow overflow-hidden br8 ">
+                <van-cell title="Coordinate (lat, lng)"
+                          :value="`(${geoLocation.latitude}, ${geoLocation.longitude})`"/>
+                <van-cell title="Overview" :value="`${geoLocation.formattedName}`"/>
+            </van-cell-group>
 
-                <template v-for="type in transactionCategories">
-                    <van-tag
-                        class="mgr8 mgb8 pdr8 pdl8"
-                        style="line-height: 24px"
-                        type="primary"
-                        round
-                        @click="onClickOneType(type.value)"
-                    >
-                        {{ type.value }}
-                    </van-tag>
-                </template>
+            <div class="mgb20"></div>
 
-                <!--region: input area-->
-                <div class="record-header">Add Some Record</div>
-
-
-                <!--row: {{ cursorPosition.cursorRow }}, col: {{ cursorPosition.cursorColumn }}-->
-                <!--Input-->
-
-                <van-cursor-editor
-                    ref="recordInput"
-                    :value.sync="rawFormatString"
-                    @input="parseInputStringToObjects"
+            <template v-for="type in transactionCategories">
+                <van-tag
+                    class="mgr8 mgb8 pdr8 pdl8"
+                    style="line-height: 24px"
+                    type="primary"
+                    round
+                    @click="onClickOneType(type.value)"
                 >
-                </van-cursor-editor>
+                    {{ type.value }}
+                </van-tag>
+            </template>
+
+            <!--region: input area-->
+            <div class="record-header">Add Some Record</div>
 
 
-                <div class="mgb8"></div>
+            <!--row: {{ cursorPosition.cursorRow }}, col: {{ cursorPosition.cursorColumn }}-->
+            <!--Input-->
 
-                <!--region: Preview-->
-                <div class="record-header" v-show="parsedForms.length > 0">Preview</div>
-                <div style="" class="shadow br8 overflow-hidden">
-                    <template v-for="(form, index) in parsedForms">
-                        <div class="flex pd10"
-                             :style="
+            <van-cursor-editor
+                ref="recordInput"
+                :value.sync="rawFormatString"
+                @input="parseInputStringToObjects"
+            >
+            </van-cursor-editor>
+
+
+            <div class="mgb8"></div>
+
+            <!--region: Preview-->
+            <div class="record-header" v-show="parsedForms.length > 0">Preview</div>
+            <div style="" class="shadow br8 overflow-hidden">
+                <template v-for="(form, index) in parsedForms">
+                    <div class="flex pd10"
+                         :style="
                                  `border-bottom: 1px solid #f5f5f5;
                                  ${index === parsedForms.length - 1 ? 'border-bottom: none; border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;' : ''};
                                  background-color: white;
                                  `">
-                            <div class="flexg5">
-                                <div>
-                                    <span>{{ form.categoryValue ? form.categoryValue.value : "" }}</span>
-                                </div>
-                                <div class="fs14">
-                                    <span class="google-gray-400">{{ form.count ? form.count.value : "" }}</span>
-                                    <span class="pd5 google-gray-300">|</span>
-                                    <span class="google-gray-400">{{
-                                            form.description ? form.description.value : ""
-                                        }}</span>
-                                </div>
+                        <div class="flexg5">
+                            <div>
+                                <span>{{ form.categoryValue ? form.categoryValue.value : "" }}</span>
                             </div>
-                            <div class="flexg1">
-                                <span class="bold">{{ form.amount ? form.amount.value : "" }}</span>
+                            <div class="fs14">
+                                <span class="google-gray-400">{{ form.count ? form.count.value : "" }}</span>
+                                <span class="pd5 google-gray-300">|</span>
+                                <span class="google-gray-400">{{
+                                        form.description ? form.description.value : ""
+                                    }}</span>
                             </div>
                         </div>
-                    </template>
-                </div>
-                <!--endregion-->
+                        <div class="flexg1">
+                            <span class="bold">{{ form.amount ? form.amount.value : "" }}</span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <!--endregion-->
 
-                <div class="mgb8"></div>
+            <div class="mgb8"></div>
 
-                <!--endregion-->
+            <!--endregion-->
 
-                <el-button @click="onAddTrans" round plain type="primary" style="width: 100%">
-                    <i class="el-icon-plus"></i>
-                </el-button>
+            <el-button @click="onAddTrans" round plain type="primary" style="width: 100%">
+                <i class="el-icon-plus"></i>
+            </el-button>
 
-                <div class="mgb8"></div>
+            <div class="mgb8"></div>
 
-                <!--header-->
-                <div class="record-header" v-show="transactionList.length > 0">This month</div>
+            <!--header-->
+            <div class="record-header" v-show="transactionList.length > 0">This month</div>
 
-                <!--region: this month-->
-                <div style="" class="shadow br8 overflow-hidden">
-                    <!--list-->
-                    <template v-for="(form, index) in transactionList">
-                        <!--list item-->
-                        <div class="flex pdt10 pdb10 pdl16 pdr16"
-                             @click="toEditTransactionPage(form.id)"
-                             :style="
+            <!--region: this month-->
+            <div style="" class="shadow br8 overflow-hidden">
+                <!--list-->
+                <template v-for="(form, index) in transactionList">
+                    <!--list item-->
+                    <div class="flex pdt10 pdb10 pdl16 pdr16"
+                         @click="toEditTransactionPage(form.id)"
+                         :style="
                      `border-bottom: 1px solid #f5f5f5;
                      background-color: white;
                      `
                 ">
-                            <!--card left-->
-                            <div class="flexg5">
-                                <div>
-                                    <span class="pdr10">{{ form.categoryValue }}</span>
-                                    <span class="fs14 google-gray-400">test location</span>
-                                </div>
-                                <div class="fs14">
-                                    <span class="google-gray-400">{{ form.datetime | formatTimeForRecordItem }}</span>
-                                    <span class="pd5 google-gray-300">|</span>
-                                    <span class="google-gray-400">{{ form.description }}</span>
-                                </div>
+                        <!--card left-->
+                        <div class="flexg5">
+                            <div>
+                                <span class="pdr10">{{ form.categoryValue }}</span>
+                                <span class="fs14 google-gray-400">test location</span>
                             </div>
-                            <!--card right-->
-                            <div class="flexg1">
+                            <div class="fs14">
+                                <span class="google-gray-400">{{ form.datetime | formatTimeForRecordItem }}</span>
+                                <span class="pd5 google-gray-300">|</span>
+                                <span class="google-gray-400">{{ form.description }}</span>
+                            </div>
+                        </div>
+                        <!--card right-->
+                        <div class="flexg1">
                             <span class="bold">{{ form.amount }}  {{
                                     `${form.count > 1 ? 'x ' + form.count : ''}`
                                 }}</span>
-                            </div>
                         </div>
-                    </template>
-                </div>
-                <!--endregion-->
-
-
+                    </div>
+                </template>
             </div>
+            <!--endregion-->
+
+
         </div>
     </div>
 
@@ -492,7 +498,6 @@ export default class IndexView extends Vue {
     }
 
     mounted() {
-
         let a = getVueEl(this, "refresh-btn")
         a.style.padding = "4px";
         this.adjustAMapSize()

@@ -118,12 +118,12 @@ export function gotoPage(popStack: boolean, name: string, params: any) {
 
     if (pageStack.size() <= 1) {
         // if the page stack is only left with one page, this page should be able to scroll
-        document.body.style.overflowY = 'auto'
+        // document.body.style.overflowY = 'auto'
     }
 
     if (pageStack.size() >= 2) {
         // prevent the most basic page from scrolling
-        document.body.style.overflowY = 'hidden'
+        // document.body.style.overflowY = 'hidden'
     }
 
     console.debug(`pagestack:${pageStack.size()}`)

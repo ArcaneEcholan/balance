@@ -23,10 +23,10 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import pageConfig from "@/ts/pageConfig";
-let that:any
+
+let that: any
 @Component
 export default class AppView extends Vue {
-
 
     touchStartPositionX = 0
     fingerPositionX = 0
@@ -34,20 +34,30 @@ export default class AppView extends Vue {
     created() {
         that = this;
     }
+
     mounted() {
         this.registerListenersForHandlingEdgeSwipe()
 
+        // document.body.style.overflow = "hidden"
+        // can not be 100%, because there will be a little white gap in the bottom
+        document.body.style.height = "100vh"
         // let b = document
         let h = document.getElementById("header-area")!
         let p = document.getElementById("padding-area")!
         let m = document.getElementById("main-app-area")!
 
-        let vh = window.innerHeight
+        let vh = document.body.clientHeight
 
         let headerHeight = h.clientHeight
         p.style.height = headerHeight + "px"
-        m.style.position  = "relative"
+        m.style.position = "relative"
         m.style.height = (vh - headerHeight) + "px"
+        m.style.backgroundColor = "#f7f8fa"
+        m.style.overflowY = "auto"
+
+        h.style.zIndex ="1000"
+        m.style.zIndex  ="999"
+
     }
 
     registerListenersForHandlingEdgeSwipe() {

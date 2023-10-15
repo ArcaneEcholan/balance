@@ -3,7 +3,7 @@
     <div
         class="slide-panel transition"
         :id="getContainerId()"
-        :style="`display: none; z-index: 1900; ${backgroundColor?'background-color: '+backgroundColor + ';':''}`"
+        :style="`display: none; ${backgroundColor?'background-color: '+backgroundColor + ';':''}`"
     >
         <div style="height: 100%">
             <slot>content</slot>
