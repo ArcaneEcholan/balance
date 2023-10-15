@@ -21,7 +21,6 @@
         </van-dropdown-menu>
 
 
-
         <div>
             <!--region: amap-->
 
@@ -210,20 +209,12 @@ export default class IndexView extends Vue {
     transactionCategories: any[] = []
 
     ledgerTransactionsLoading = false
-    currentLedger = {name: "default"}
+    currentLedger = {id: null, name: "default"}
 
-    marker: any = null
     apiInvokingTimesSaver: any = null
     ledgersLoading = false
-    ledgerList = [
-        {name: "default"},
-        {name: "ledger1"},
-        {name: "ledger2"},
-        {name: "ledger3"},
-    ]
+    ledgerList = []
 
-    showMain = true
-    show = false
     transactionList: any[] = [];
     amap: any;
     amapGeolocationPlugin: any;
@@ -235,17 +226,8 @@ export default class IndexView extends Vue {
         formattedName: null
     };
 
-    types: any[] = [
-        "daily", "food", "fruit", "drinks", "alcohol", "transportation", "entertainment", "others"
-    ]
-    cursorPosition: any = {
-        absoluteCursorPosition: 0,
-        cursorRow: 0,
-        cursorColumn: 0
-    }
 
     created() {
-
         this.registerEvents()
 
         this.initTransactionTypes();
@@ -256,12 +238,26 @@ export default class IndexView extends Vue {
     }
 
     registerEvents() {
-        eventBus.$on('afterTransactionChanged', (newTransaction: any) => {
+        eventBus.$onIfNotExists('afterTransactionChanged', (newTransaction: any) => {
             this.updateTransaction(newTransaction)
         });
 
-        eventBus.$on('ledges-changes', (list) => {
+        eventBus.$onIfNotExists('ledges-changes', (list) => {
             this.ledgerList = list
+        })
+
+        eventBus.$onIfNotExists('ledger-deleted', (id) => {
+            this.ledgerList = this.ledgerList.filter((item: any) => {
+                return item.id !== id
+            })
+            if (this.currentLedger.id == id) {
+                if (this.ledgerList.length != 0) {
+                    this.currentLedger = this.ledgerList[0]
+                } else {
+                    // this is undefined behavior
+                    this.currentLedger = {id: null, name: "unknown"}
+                }
+            }
         })
     }
 

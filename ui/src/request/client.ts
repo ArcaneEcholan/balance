@@ -143,6 +143,13 @@ class Client {
             }
         });
     }
+
+    static deleteLedger(ledgerId: number) {
+        return request({
+            url: `/ledger/${ledgerId}`,
+            method: 'delete',
+        });
+    }
 }
 
 export default Client;

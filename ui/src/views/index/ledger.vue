@@ -153,7 +153,6 @@ export default class ManageLedgerView extends Vue {
 
     }
 
-
     onClickEdit(ledgerId: number, ledgerName: string) {
         this.editLedgerId = ledgerId
         this.editLedgerName = ledgerName
@@ -161,7 +160,19 @@ export default class ManageLedgerView extends Vue {
     }
 
     onClickDelete(ledgerId: number, ledgeName: string) {
-        this.ledgers = this.ledgers.filter((item: any) => item.id != ledgerId)
+        Client.deleteLedger(ledgerId).then(() => {
+            Notify({
+                type: "success",
+                message: "Delete success"
+            })
+            this.ledgers = this.ledgers.filter((item: any) => item.id != ledgerId)
+            eventBus.$emit("ledger-deleted", ledgerId)
+        }).catch(() => {
+            Notify({
+                type: "danger",
+                message: "Delete failed"
+            })
+        })
     }
 
     editLedgerLoading = false
