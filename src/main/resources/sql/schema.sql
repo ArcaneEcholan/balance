@@ -45,7 +45,9 @@ create table if not exists ledger
     id    int auto_increment
     primary key,
     name  varchar(255) null,
-    ctime varchar(255) null
+    ctime varchar(255) null,
+    constraint name
+    unique (name)
     );
 
 

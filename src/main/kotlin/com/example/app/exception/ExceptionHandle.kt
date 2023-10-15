@@ -67,8 +67,6 @@ class GlobalExceptionHandler {
 
     private val log = KotlinLogging.logger {}
 
-    @Value("\${spring.servlet.multipart.max-file-size}")
-    var uploadLimit: String? = null
 
     @Autowired
     lateinit var objectMapper: ObjectMapper
@@ -131,7 +129,7 @@ class GlobalExceptionHandler {
             return logExAndAssembleResponse(
                 ApiException(
                     HttpStatus.PAYLOAD_TOO_LARGE,
-                    "Limitation: $uploadLimit"
+                    "Limitation: 100MB"
                 )
             )
         }
