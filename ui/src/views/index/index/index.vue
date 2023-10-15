@@ -64,17 +64,14 @@
 
             <!--row: {{ cursorPosition.cursorRow }}, col: {{ cursorPosition.cursorColumn }}-->
             <!--Input-->
-            <van-field
+
+            <van-cursor-editor
                 ref="recordInput"
-                @click="updateCurrentCursorPosition"
-                @input="onTransactionTextAreaInput"
-                v-model="rawFormatString"
-                label="Records (per / Line)"
-                type="textarea"
-                placeholder="Message"
-                rows="2"
-                autosize
-            />
+                :value.sync="rawFormatString"
+                @input="parseInputStringToObjects"
+            >
+            </van-cursor-editor>
+
 
             <div class="mgb8"></div>
 
@@ -172,6 +169,8 @@ import eventBus from "@/ts/EventBus";
 import {Notify} from "vant";
 import {getCurrentYearAndMonth} from '@/ts/time';
 import {getRef} from "@/ts/vueUtils";
+import VanCursorEditor from "@/views/components/VanCursorEditor.vue";
+import VanCursorEditorComponent from "@/views/components/VanCursorEditor.vue";
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -197,6 +196,7 @@ Component.registerHooks([
 ]);
 
 @Component({
+    components: {VanCursorEditor},
     filters: {
         formatTimeForRecordItem: function (timeString: string | null) {
             if (!timeString) {
@@ -245,6 +245,7 @@ export default class IndexView extends Vue {
     }
 
     created() {
+
         this.registerEvents()
 
         this.initTransactionTypes();
@@ -672,7 +673,8 @@ export default class IndexView extends Vue {
     }
 
     replaceFirstWord(curStringAtInput: string, type: string) {
-        let rowNumber = this.cursorPosition.cursorRow
+        let a = this.$refs.recordInput as VanCursorEditorComponent
+        let rowNumber = a.cursorPosition.cursorRow
         let wordRange = findWordInLine(curStringAtInput, rowNumber, 1)
 
         if (wordRange == null) {
@@ -682,50 +684,19 @@ export default class IndexView extends Vue {
         curStringAtInput = replace(curStringAtInput, wordRange.start, wordRange.end, type)
         this.rawFormatString = curStringAtInput
 
-        this.onTransactionTextAreaInput()
-
-        let vantinput = (this.$refs.recordInput as any).$el
-        let input = vantinput.querySelector('textarea')
-
-        input.selectionStart = wordRange.start
-    }
-
-    onTransactionTextAreaInput() {
-        this.updateCurrentCursorPosition()
         this.parseInputStringToObjects()
+
+        this.updateTextAreaInputCursorPosition(wordRange.start)
     }
 
-    updateCurrentCursorPosition() {
-        let vantinput = (this.$refs.recordInput as any).$el
-        let inputElement = vantinput.querySelector('textarea') as HTMLTextAreaElement;
-        let result = {}
-        if (this.rawFormatString == null) {
-            result = {
-                absoluteCursorPosition: 0,
-                cursosrRow: 0,
-                cursorColumn: 0
-            }
-        } else {
-            result = this.getCurrentCursorPosition(this.rawFormatString!, inputElement)
-        }
 
+    updateTextAreaInputCursorPosition(start: number) {
+        let vantinput = (this.$refs.recordInput as VanCursorEditorComponent).$el
 
-        this.cursorPosition = result
+        let input = vantinput.querySelector('textarea')
+        input!.selectionStart = start
     }
 
-    getCurrentCursorPosition(raw: string, inputElement: HTMLTextAreaElement): any {
-        let absoluteCursorPosition = inputElement.selectionStart;
-
-        let before = raw.substring(0, absoluteCursorPosition!);
-        let row = before.split('\n').length - 1;
-        let col = absoluteCursorPosition! - before.lastIndexOf('\n') - 1;
-
-        return {
-            absoluteCursorPosition,
-            cursorRow: row,
-            cursorColumn: col,
-        };
-    }
 
     parseInputStringToObjects() {
         if (this.rawFormatString == null) {
