@@ -2,8 +2,8 @@
     <div class=''>
         <van-field
             :ref="id"
-            @click="test"
-            @input="test1"
+            @click="updateCurrentCursorPosition"
+            @input="handleInputEvent"
             :value="value"
             label="Records (per / Line)"
             type="textarea"
@@ -17,6 +17,7 @@
 <script lang='ts'>
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {v4 as uuidv4} from 'uuid';
+import {getVueEl} from "@/ts/vueUtils";
 
 @Component({})
 export default class VanCursorEditorComponent extends Vue {
@@ -35,34 +36,33 @@ export default class VanCursorEditorComponent extends Vue {
         this.id = uuidv4()
     }
 
-    test() {
-        this.updateCurrentCursorPosition(this.value ?? "")
-    }
-
-    test1(newV: string) {
-        this.updateCurrentCursorPosition(newV)
+    handleInputEvent(newV: string) {
+        this.$emit("update:value", newV)
+        this.updateCurrentCursorPositionWithValue(newV)
         this.$emit("input", newV)
     }
 
-    updateCurrentCursorPosition(newV: string) {
-        this.$emit("update:value", newV)
-        let vantinput = (this.$refs[this.id] as any).$el
-        let inputElement = vantinput.querySelector('textarea') as HTMLTextAreaElement;
+    updateCurrentCursorPosition() {
+        this.updateCurrentCursorPositionWithValue(this.value)
+    }
+
+    updateCurrentCursorPositionWithValue(newV: string | null) {
         let result = {}
         if (newV == null) {
             result = {
                 absoluteCursorPosition: 0,
-                cursosrRow: 0,
+                cursorRow: 0,
                 cursorColumn: 0
             }
         } else {
-            result = this.getCurrentCursorPosition(newV!, inputElement)
+            result = this.getCurrentCursorPosition(newV!)
         }
 
         this.cursorPosition = result
     }
 
-    getCurrentCursorPosition(raw: string, inputElement: HTMLTextAreaElement): any {
+    getCurrentCursorPosition(raw: string): any {
+        let inputElement = this.getTextArea();
         let absoluteCursorPosition = inputElement.selectionStart;
 
         let before = raw.substring(0, absoluteCursorPosition!);
@@ -76,6 +76,18 @@ export default class VanCursorEditorComponent extends Vue {
         };
     }
 
+
+    setCurrentCursorPosition(start: number) {
+        let inputElement = this.getTextArea();
+        inputElement.selectionStart = start
+        this.updateCurrentCursorPosition()
+    }
+
+
+    getTextArea():HTMLTextAreaElement {
+        let vantinput = getVueEl(this, this.id)
+        return vantinput.querySelector('textarea') as HTMLTextAreaElement
+    }
 
 }
 </script>
