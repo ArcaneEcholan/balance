@@ -1,5 +1,5 @@
 <template>
-    <div class="page" v-loading="ledgerTransactionsLoading">
+    <div class="page">
 
         <!--edit stack-->
         <div style="position: relative; z-index: 1901;">
@@ -8,26 +8,15 @@
         </div>
 
 
-
-
         <!--create a zindex context to separate basic page and modal, and avoid
         components like v-loading(zindex 2000) step over to popped modal-->
         <div style="position: relative; z-index: 1900;">
             <!--add zindex context to ensure this dropdown can step over any sibling loading-->
-            <van-dropdown-menu ref="menuRef" style="position: relative; z-index: 1000">
-                <van-dropdown-item :title="currentLedger.name" ref="ledgerSelection">
-                    <van-cell-group>
-                        <van-cell @click="onClickSwitchLedger(ledger)" v-for="ledger in ledgerList"
-                                  :title="ledger.name">
-                        </van-cell>
-                    </van-cell-group>
-                    <div style="padding: 5px 16px;">
-                        <el-button @click="onClickManageLedgerList" round plain type="primary" style="width: 100%">
-                            <i class="el-icon-edit">manage ledger</i>
-                        </el-button>
-                    </div>
-                </van-dropdown-item>
-            </van-dropdown-menu>
+
+            <div style="position: relative; z-index: 1000">
+                <ledger-switcher-component
+                ></ledger-switcher-component>
+            </div>
 
             <!--region: amap-->
             <!--<div class="record-header">Amap</div>-->
@@ -40,128 +29,46 @@
             <!--endregion-->
 
 
-            <div class="mgb20"></div>
+            <gap-component></gap-component>
+
             <div class="record-header">Location information
                 <el-button ref="refresh-btn" @click="onClickRefreshLocationData">
                     <van-icon name="replay"/>
                 </el-button>
             </div>
 
-            <van-cell-group style="position: relative; z-index: 999;"  v-loading="locationLoading" class="shadow overflow-hidden br8 ">
+            <van-cell-group style="position: relative; z-index: 999;" v-loading="locationLoading"
+                            class="shadow overflow-hidden br8 ">
                 <van-cell title="Coordinate (lat, lng)"
                           :value="`(${geoLocation.latitude}, ${geoLocation.longitude})`"/>
                 <van-cell title="Overview" :value="`${geoLocation.formattedName}`"/>
             </van-cell-group>
 
-            <div class="mgb20"></div>
+            <gap-component></gap-component>
 
-            <template v-for="type in transactionCategories">
-                <van-tag
-                    class="mgr8 mgb8 pdr8 pdl8"
-                    style="line-height: 24px"
-                    type="primary"
-                    round
-                    @click="onClickOneType(type.value)"
-                >
-                    {{ type.value }}
-                </van-tag>
-            </template>
+            <transaction-type-component @on-click-one-type="onClickOneType"></transaction-type-component>
 
             <!--region: input area-->
             <div class="record-header">Add Some Record</div>
-
-
             <!--row: {{ cursorPosition.cursorRow }}, col: {{ cursorPosition.cursorColumn }}-->
             <!--Input-->
 
-            <van-cursor-editor
-                ref="recordInput"
-                :value.sync="rawFormatString"
-                @input="parseInputStringToObjects"
-            >
-            </van-cursor-editor>
+            <add-transaction-editor-component>
 
-
-            <div class="mgb8"></div>
-
-            <!--region: Preview-->
-            <div class="record-header" v-show="parsedForms.length > 0">Preview</div>
-            <div style="" class="shadow br8 overflow-hidden">
-                <template v-for="(form, index) in parsedForms">
-                    <div class="flex pd10"
-                         :style="
-                                 `border-bottom: 1px solid #f5f5f5;
-                                 ${index === parsedForms.length - 1 ? 'border-bottom: none; border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;' : ''};
-                                 background-color: white;
-                                 `">
-                        <div class="flexg5">
-                            <div>
-                                <span>{{ form.categoryValue ? form.categoryValue.value : "" }}</span>
-                            </div>
-                            <div class="fs14">
-                                <span class="google-gray-400">{{ form.count ? form.count.value : "" }}</span>
-                                <span class="pd5 google-gray-300">|</span>
-                                <span class="google-gray-400">{{
-                                        form.description ? form.description.value : ""
-                                    }}</span>
-                            </div>
-                        </div>
-                        <div class="flexg1">
-                            <span class="bold">{{ form.amount ? form.amount.value : "" }}</span>
-                        </div>
-                    </div>
-                </template>
-            </div>
-            <!--endregion-->
-
-            <div class="mgb8"></div>
+            </add-transaction-editor-component>
 
             <!--endregion-->
 
-            <el-button @click="onAddTrans" round plain type="primary" style="width: 100%">
-                <i class="el-icon-plus"></i>
-            </el-button>
 
-            <div class="mgb8"></div>
+            <gap-component :value="'8px'"></gap-component>
 
             <!--header-->
-            <div class="record-header" v-show="transactionList.length > 0">This month</div>
 
             <!--region: this month-->
-            <div style="" class="shadow br8 overflow-hidden">
-                <!--list-->
-                <template v-for="(form, index) in transactionList">
-                    <!--list item-->
-                    <div class="flex pdt10 pdb10 pdl16 pdr16"
-                         @click="toEditTransactionPage(form.id)"
-                         :style="
-                     `border-bottom: 1px solid #f5f5f5;
-                     background-color: white;
-                     `
-                ">
-                        <!--card left-->
-                        <div class="flexg5">
-                            <div>
-                                <span class="pdr10">{{ form.categoryValue }}</span>
-                                <span class="fs14 google-gray-400">test location</span>
-                            </div>
-                            <div class="fs14">
-                                <span class="google-gray-400">{{ form.datetime | formatTimeForRecordItem }}</span>
-                                <span class="pd5 google-gray-300">|</span>
-                                <span class="google-gray-400">{{ form.description }}</span>
-                            </div>
-                        </div>
-                        <!--card right-->
-                        <div class="flexg1">
-                            <span class="bold">{{ form.amount }}  {{
-                                    `${form.count > 1 ? 'x ' + form.count : ''}`
-                                }}</span>
-                        </div>
-                    </div>
-                </template>
-            </div>
+            <transaction-list-component
+                ref="transaction-list-component"
+            ></transaction-list-component>
             <!--endregion-->
-
 
         </div>
     </div>
@@ -179,8 +86,12 @@ import eventBus from "@/ts/EventBus";
 import {Notify} from "vant";
 import {getCurrentYearAndMonth} from '@/ts/time';
 import {getRef, getVueEl} from "@/ts/vueUtils";
-import VanCursorEditor from "@/views/components/VanCursorEditor.vue";
-import VanCursorEditorComponent from "@/views/components/VanCursorEditor.vue";
+
+import TransactionListComponent from "@/views/index/index/components/TransactionListComponent.vue";
+import LedgerSwitcherComponent from "@/views/index/index/components/LedgerSwitcherComponent.vue";
+import TransactionTypeComponent from "@/views/index/index/components/TransactionTypeComponent.vue";
+import GapComponent from "@/views/components/GapComponent.vue";
+import AddTransactionEditorComponent from './components/AddTransactionEditorComponent.vue';
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -206,31 +117,23 @@ Component.registerHooks([
 ]);
 
 @Component({
-    components: {VanCursorEditor},
-    filters: {
-        formatTimeForRecordItem: function (timeString: string | null) {
-            if (!timeString) {
-                return 'unknown datetime'
-            }
-            return convertToShortDateTime(timeString);
-        }
-    }
+    components: {
+        GapComponent,
+        TransactionListComponent,
+        LedgerSwitcherComponent,
+        TransactionTypeComponent,
+        AddTransactionEditorComponent,
+    },
+
 })
 export default class IndexView extends Vue {
-    transactionCategories: any[] = []
 
-    ledgerTransactionsLoading = false
     currentLedger = {id: null, name: "default"}
 
     apiInvokingTimesSaver: any = null
-    ledgersLoading = false
-    ledgerList = []
 
-    transactionList: any[] = [];
     amap: any;
     amapGeolocationPlugin: any;
-    rawFormatString: string | null = null;
-    parsedForms: FormItem[] = [];
     geoLocation: any = {
         latitude: null,
         longitude: null,
@@ -242,75 +145,7 @@ export default class IndexView extends Vue {
     }
 
     created() {
-        this.registerEvents()
-
-        this.initTransactionTypes();
-
-        this.initLedgersAndTransactions();
-
         this.loadAmap()
-    }
-
-    registerEvents() {
-        eventBus.$onIfNotExists('afterTransactionChanged', (newTransaction: any) => {
-            this.updateTransaction(newTransaction)
-        });
-
-        eventBus.$onIfNotExists('ledges-changes', (list) => {
-            this.ledgerList = list
-        })
-
-        eventBus.$onIfNotExists('ledger-deleted', (id) => {
-            this.ledgerList = this.ledgerList.filter((item: any) => {
-                return item.id !== id
-            })
-            if (this.currentLedger.id == id) {
-                if (this.ledgerList.length != 0) {
-                    this.currentLedger = this.ledgerList[0]
-                } else {
-                    // this is undefined behavior
-                    this.currentLedger = {id: null, name: "unknown"}
-                }
-            }
-        })
-    }
-
-    updateTransaction(newTransaction
-                          :
-                          any
-    ) {
-        let found = this.transactionList.find((item) => {
-            return item.id === newTransaction.id
-        })
-        if (found) {
-            found.amount = newTransaction.amount
-            found.categoryValue = newTransaction.categoryValue
-            found.count = newTransaction.count
-            found.datetime = newTransaction.datetime
-            found.description = newTransaction.description
-        }
-    }
-
-    initTransactionTypes() {
-        Client.getTransactionCategories().then(resp => {
-            this.transactionCategories = resp.data
-        })
-    }
-
-    initLedgersAndTransactions() {
-        this.ledgersLoading = true
-        Client.getLedgerList().then((resp: any) => {
-            this.ledgersLoading = false
-            this.ledgerList = resp.data
-            eventBus.$emit('ledges-changes', this.ledgerList)
-            return Client.getTransactionListByLedgerName(this.currentLedger.name, this.nowadays())
-        }).then(resp => {
-            this.ledgersLoading = false
-            this.transactionList = resp.data
-        }).catch((err: any) => {
-            this.ledgersLoading = false
-            console.error(err)
-        })
     }
 
     loadAmap() {
@@ -454,9 +289,9 @@ export default class IndexView extends Vue {
         let finalLocationInfo = this.getFormattedNameFromLocationDetail(amapDetailLocationResp)
         // assign details
         this.geoLocation = Object.assign(this.geoLocation, finalLocationInfo);
+        this.$emit("on-cur-location-changed", this.geoLocation)
         console.debug(`get location detail: `, this.geoLocation)
     }
-
 
     getFormattedNameFromLocationDetail(amapDetailLocationResp: any) {
         let finalLocationInfo: any = {}
@@ -509,242 +344,10 @@ export default class IndexView extends Vue {
         amapElem.style.height = amapWidth + 'px'
     }
 
-    onClickSwitchLedger(ledger: any) {
-        this.ledgerTransactionsLoading = true
-        Client.getTransactionListByLedgerName(ledger.name, this.nowadays()).then((res) => {
-            this.transactionList = res.data
-            this.currentLedger = ledger
-            this.ledgerTransactionsLoading = false;
-            this.toggleLedgerSelection()
-        }).catch((err) => {
-            this.ledgerTransactionsLoading = false
-        })
-    }
-
-    onClickManageLedgerList() {
-        this.toggleLedgerSelection()
-        this.present(`manage_ledger`, {})
-    };
-
-    toggleLedgerSelection() {
-        getRef(this, "ledgerSelection").toggle()
-    }
-
-    toEditTransactionPage(recordId: string | number) {
-        // find the record
-        let foundTrans = this.transactionList.find((item) => {
-            return item.id === recordId
-        })
-
-        if (!foundTrans) {
-            return
-        }
-
-        // this.present(`/index/edit?recordId=${recordId}`)
-        this.present(`edit_transaction`, {
-            id: foundTrans.id,
-            amount: foundTrans.amount,
-            datetime: foundTrans.datetime,
-            count: foundTrans.count,
-            categoryValue: foundTrans.categoryValue,
-            description: foundTrans.description
-        })
-    }
-
-    present(viewName: string, data: any) {
-        gotoPage(false, viewName, data)
-        // pushPageWithName(viewName, data)
-    }
-
-    onAddTrans() {
-        this.checkAddTransData()
-
-        this.addTransactions(this.parsedForms);
-    }
-
-    checkAddTransData() {
-        try {
-            this.doCheckAddTransData()
-        } catch (e: any) {
-            Notify({
-                message: e.message,
-                type: 'danger'
-            })
-        }
-    }
-
-    doCheckAddTransData() {
-        let errorType = ""
-        if (this.parsedForms.length == 0) {
-            errorType = "No data to save"
-            throw new Error(errorType)
-        }
-        let error = false
-        let parseForms = this.parsedForms
-        parseForms.forEach((item: FormItem) => {
-            if (error) {
-                throw new Error(errorType)
-            }
-            let categoryValue = item.categoryValue?.value;
-            let amount = item.amount?.value;
-            let count = item.count?.value;
-            let description = item.description?.value;
-
-            // ensure no null
-            if (categoryValue == null || amount == null || count == null || description == null) {
-                error = true
-                errorType = "Information not complete"
-                throw new Error(errorType)
-            }
-
-            let countValid = this.isPositiveInteger(Number(count));
-            let amountValid = this.isFloat(Number(amount));
-            let amountDecimalPlaces = this.countDecimalPlaces(amount);
-            if (amountDecimalPlaces > 2) {
-                amountValid = false
-            }
-
-            if (!countValid || !amountValid) {
-                error = true
-                errorType = "Information format invalid"
-                throw new Error(errorType)
-            }
-        })
-        // @ts-ignore
-        if (error === true) {
-            Notification.error(errorType)
-            throw new Error(errorType)
-        }
-    }
-
-    isPositiveInteger(number: number): boolean {
-        return Number.isInteger(number) && number > 0;
-    }
-
-    isFloat(number: number) {
-        return Number(number) === number && !Number.isInteger(number) || Number.isInteger(number);
-    }
-
-    countDecimalPlaces(number: string) {
-        if (number === '') {
-            return 0; // Not a valid float string
-        }
-
-        const parts = number.split('.');
-
-        if (parts.length === 1) {
-            return 0; // No decimal point found
-        }
-
-        return parts[1].length; // Return the length of the decimal part
-    }
-
-    addTransactions(trans: any[]) {
-        let request = this.assembleAddTransactionRequest(trans)
-
-        Client.saveTransactionsByLedgerName(this.currentLedger.name, request).then((resp) => {
-            Notify({
-                message: 'save successfully',
-                type: 'success'
-            })
-            return Client.getTransactionListByLedgerName(this.currentLedger.name, this.nowadays())
-        }).then(resp => {
-            this.transactionList = resp.data
-        });
-    }
-
-    nowadays(): string {
-        return getCurrentYearAndMonth()
-    }
-
-    assembleAddTransactionRequest(trans: any[]): any[] {
-        let request = trans.map((tran) => {
-            let requestTran = {
-                categoryValue: tran.categoryValue.value,
-                amount: tran.amount.value,
-                count: tran.count.value,
-                description: tran.description.value,
-                location: this.geoLocation,
-            };
-
-            return requestTran;
-        });
-        return request
-    }
-
-
     onClickOneType(type: string) {
-        let curStringAtInput = this.rawFormatString
-        if (curStringAtInput == null || curStringAtInput == "") {
-            return;
-        }
-
-        this.replaceFirstWord(curStringAtInput, type)
+        getRef(this, "add-transaction-editor-component").replaceFirstWord(type)
     }
 
-    replaceFirstWord(curStringAtInput: string, type: string) {
-        let a = this.$refs.recordInput as VanCursorEditorComponent
-        let rowNumber = a.cursorPosition.cursorRow
-        let wordRange = findWordInLine(curStringAtInput, rowNumber, 1)
-
-        if (wordRange == null) {
-            return;
-        }
-
-        curStringAtInput = replace(curStringAtInput, wordRange.start, wordRange.end, type)
-        this.rawFormatString = curStringAtInput
-
-        this.parseInputStringToObjects()
-
-        this.updateTextAreaInputCursorPosition(wordRange.start)
-    }
-
-
-    updateTextAreaInputCursorPosition(start: number) {
-        let vantinput = (this.$refs.recordInput as VanCursorEditorComponent).$el
-
-        let input = vantinput.querySelector('textarea')
-        input!.selectionStart = start
-    }
-
-
-    parseInputStringToObjects() {
-        if (this.rawFormatString == null) {
-            return;
-        }
-        // food 44.00 kfc
-        // fruit 33.00 watermalon
-        let wordsOrder = ['categoryValue', 'amount', 'count', 'description'];
-
-        var lines = this.rawFormatString.split('\n');
-
-        let objs = lines
-            .filter((line) => !/^\s*$/.test(line))
-            .map((line) => line.trim())
-            .map((line) => {
-                let words = line.split(' ').filter((word) => word !== '');
-
-                let obj = wordsOrder.reduce(
-                    (obj, cur, index) =>
-                        Object.assign(obj, {[cur]: words[index]}),
-                    {},
-                );
-
-                return obj;
-            }).map((obj: any) => {
-                let objWithViewStatus = {};
-                const keys = Object.keys(obj);
-                return keys.reduce((objWithViewStatus, key) => {
-                    return Object.assign(objWithViewStatus, {
-                        [key]: {
-                            value: obj[key],
-                            isValid: false,
-                        },
-                    });
-                }, objWithViewStatus);
-            });
-        this.parsedForms = objs as FormItem[];
-    }
 
 }
 </script>
