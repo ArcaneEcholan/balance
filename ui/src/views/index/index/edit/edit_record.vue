@@ -43,7 +43,7 @@
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentationView from "@/components/ModalPresentation.vue";
-import {gotoPage} from "@/ts/pageStack";
+import {gotoPage, popPage} from "@/ts/pageStack";
 import pageStack from "@/ts/pageStack";
 import {Notify} from "vant";
 import Client from "@/request/client";
@@ -212,8 +212,7 @@ export default class EditRecordView extends Vue {
 
     }
     close100() {
-        gotoPage(true, "home", {})
-
+        popPage()
     }
     close200() {
 

@@ -79,7 +79,7 @@
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentationView from "@/components/ModalPresentation.vue";
-import {gotoPage} from "@/ts/pageStack";
+import {gotoPage, popPage} from "@/ts/pageStack";
 import {Notify} from "vant";
 import pageConfig from "@/ts/pageConfig";
 import {getHtmlElem, getRef, getVueEl} from "@/ts/vueUtils";
@@ -286,8 +286,7 @@ export default class ManageLedgerView extends Vue {
     }
 
     close100() {
-        gotoPage(true, "home", {})
-
+        popPage()
     }
 
     onclose() {

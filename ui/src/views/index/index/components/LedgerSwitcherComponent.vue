@@ -18,7 +18,7 @@
 <script lang='ts'>
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {getRef} from "@/ts/vueUtils";
-import {gotoPage} from "@/ts/pageStack";
+import {gotoPage, pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
 @Component({})
@@ -87,7 +87,7 @@ export default class LedgerSwitcherComponent extends Vue {
     }
 
     present(viewName: string, data: any) {
-        gotoPage(false, viewName, data)
+        pushPage(viewName, data)
         // pushPageWithName(viewName, data)
     }
 }

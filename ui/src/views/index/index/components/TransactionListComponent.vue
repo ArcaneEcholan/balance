@@ -38,7 +38,7 @@
 <script lang='ts'>
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {convertToShortDateTime} from "@/ts/utils";
-import {gotoPage} from "@/ts/pageStack";
+import {gotoPage, pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import {getCurrentYearAndMonth} from "@/ts/time";
 import eventBus from "@/ts/EventBus";
@@ -130,7 +130,7 @@ export default class TransactionListComponent extends Vue {
     }
 
     present(viewName: string, data: any) {
-        gotoPage(false, viewName, data)
+        pushPage(viewName, data)
         // pushPageWithName(viewName, data)
     }
 }

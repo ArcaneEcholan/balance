@@ -11,7 +11,7 @@ Vue.config.productionTip = false;
 
 
 import 'vant/lib/index.css';
-
+import { Tabbar, TabbarItem } from 'vant';
 import {Cell, Field, CellGroup} from 'vant';
 import {Popup} from 'vant';
 import {Button} from 'vant';
@@ -23,6 +23,8 @@ import { Tag } from 'vant';
 import { DropdownMenu, DropdownItem } from 'vant'
 import { SwipeCell } from 'vant';
 import { ActionSheet } from 'vant';
+Vue.use(Tabbar);
+Vue.use(TabbarItem);
 Vue.use(Notify);
 Vue.use(Button);
 Vue.use(Popup);

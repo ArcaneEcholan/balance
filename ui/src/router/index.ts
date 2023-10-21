@@ -1,9 +1,10 @@
 import Vue from 'vue';
 import VueRouter, {RouteConfig} from 'vue-router';
-import IndexView from "@/views/index/index/index.vue";
-import EditRecordView from "@/views/index/edit/edit_record.vue";
+import HomeIndexView from "@/views/index/index/index.vue";
+import EditRecordView from "@/views/index/index/edit/edit_record.vue";
 import IndexIndexView from "@/views/index/index.vue";
 import ManageLedgerView from "@/views/index/ledger.vue";
+import StatisticIndexView from "@/views/index/statictics/index.vue";
 
 Vue.use(VueRouter);
 
@@ -13,9 +14,9 @@ const routes: Array<RouteConfig> = [
         component: IndexIndexView,
     },
     {
-        path: '/index',
+        path: '/home',
         name: 'home',
-        component: IndexView,
+        component: HomeIndexView,
         meta: {
         },
         children: [
@@ -36,6 +37,23 @@ const routes: Array<RouteConfig> = [
                 path: 'manage_ledger',
                 component: ManageLedgerView
             },
+        ]
+
+    },
+    {
+        path: '/statistics',
+        name: 'statistics',
+        component: StatisticIndexView,
+        meta: {
+        },
+        children: [
+            // {
+            //     meta: {
+            //     },
+            //     name: 'edit_transaction',
+            //     path: 'edit',
+            //     component: EditRecordView,
+            // }
         ]
 
     }
