@@ -7,7 +7,6 @@
             </router-view>
         </div>
 
-
         <!--create a zindex context to separate basic page and modal, and avoid
         components like v-loading(zindex 2000) step over to popped modal-->
         <div style="position: relative; z-index: 1900;">
@@ -77,14 +76,8 @@
 <script lang="ts">
 import AMapLoader from '@amap/amap-jsapi-loader';
 import {Component, Vue} from 'vue-property-decorator';
-import {Notification} from 'element-ui';
-import Client from '@/request/client';
 import request from '@/request';
-import {convertToShortDateTime, findWordInLine, replace} from "@/ts/utils";
-import {gotoPage} from "@/ts/pageStack";
-import eventBus from "@/ts/EventBus";
 import {Notify} from "vant";
-import {getCurrentYearAndMonth} from '@/ts/time';
 import {getRef, getVueEl} from "@/ts/vueUtils";
 
 import TransactionListComponent from "@/views/index/index/components/TransactionListComponent.vue";
@@ -192,7 +185,6 @@ export default class IndexView extends Vue {
             }, 500)
         })
     }
-
 
     locationLoading = false
 
@@ -348,7 +340,6 @@ export default class IndexView extends Vue {
         getRef(this, "add-transaction-editor-component").replaceFirstWord(type)
     }
 
-
 }
 </script>
 <style lang="scss" scoped>
@@ -368,14 +359,12 @@ export default class IndexView extends Vue {
     background-size: cover;
 }
 
-
 .page {
     box-sizing: border-box;
     //padding: 0 8px 0 8px;
     padding: 8px;
     background-color: #f7f8fa;
 }
-
 
 .record-header {
     padding: 16px 16px 8px;

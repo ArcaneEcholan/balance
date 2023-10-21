@@ -16,6 +16,19 @@
         <div id="main-app-area">
             <router-view/>
         </div>
+
+        <div id="tabbar-area">
+            <van-tabbar v-model="activeTabBar" @change="onChange">
+                <van-tabbar-item name="home" icon="home-o">home</van-tabbar-item>
+                <van-tabbar-item name="statistics">
+                    <span>statistic</span>
+                    <template #icon="props">
+                        <span v-if="props.active"><i style="color:#1989fa" class="el-icon-pie-chart"></i></span>
+                        <span v-else><i class="el-icon-pie-chart"></i></span>
+                    </template>
+                </van-tabbar-item>
+            </van-tabbar>
+        </div>
     </div>
 </template>
 
@@ -23,16 +36,23 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import pageConfig from "@/ts/pageConfig";
-
+import pageStack, {pushPage, replacePage} from "@/ts/pageStack";
 let that: any
 @Component
 export default class AppView extends Vue {
 
     touchStartPositionX = 0
+
     fingerPositionX = 0
+
+    activeTabBar = "home"
 
     created() {
         that = this;
+    }
+
+    onChange(name:string) {
+        replacePage(name, {})
     }
 
     mounted() {
@@ -45,18 +65,19 @@ export default class AppView extends Vue {
         let h = document.getElementById("header-area")!
         let p = document.getElementById("padding-area")!
         let m = document.getElementById("main-app-area")!
+        let t = document.getElementById("tabbar-area")!
 
         let vh = document.body.clientHeight
 
         let headerHeight = h.clientHeight
         p.style.height = headerHeight + "px"
         m.style.position = "relative"
-        m.style.height = (vh - headerHeight) + "px"
+        m.style.height = (vh - headerHeight - 50) + "px"
         m.style.backgroundColor = "#f7f8fa"
         m.style.overflowY = "auto"
 
-        h.style.zIndex ="1000"
-        m.style.zIndex  ="999"
+        h.style.zIndex = "1000"
+        m.style.zIndex = "999"
 
     }
 
