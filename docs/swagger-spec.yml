@@ -11,8 +11,68 @@ tags:
 
 
 paths:
-
-
+  /statistics:
+    get:
+      tags:
+        - statistics
+      parameters:
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: ledger_name
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  comparison:
+                    type: object
+                    properties:
+                      last_month_total:
+                        type: string
+                      this_month_total:
+                        type: string
+                      percent:
+                        type: number
+                  type_rank_list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        value:
+                          type: string
+                        total:
+                          type: string
+                  rank_list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        amount:
+                          type: string
+                        description:
+                          type: string
+                        datetime:
+                          type: string
+                        count:
+                          type: integer
+                        total:
+                          type: string
   /ledger:
     post:
       tags:

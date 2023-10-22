@@ -36,6 +36,7 @@ class Client {
             },
         });
     }
+
     static uploadPlaygroundProjectTemplate(
         formData: FormData,
     ): AxiosPromise<any> {
@@ -45,6 +46,7 @@ class Client {
             data: formData,
         });
     }
+
     static updatePlaygroundProjectTemplateBinary(
         playgroundProjectTemplateId: number,
         formData: FormData,
@@ -78,16 +80,17 @@ class Client {
         return request({
             url: `/playground-project-template/${playgroundProjectTemplateId}`,
             method: 'get',
-            params: { playgroundProjectTemplateId },
+            params: {playgroundProjectTemplateId},
             responseType: 'blob',
         });
     }
+
     // endregion
     static getTransactionList(yearHyphenMonth: string) {
         return request({
             url: `/transactions`,
             method: 'get',
-            params: { month: yearHyphenMonth },
+            params: {month: yearHyphenMonth},
         });
     }
 
@@ -95,12 +98,12 @@ class Client {
         return request({
             url: `/transactions/${encodeURIComponent(ledgerName)}`,
             method: 'get',
-            params: { month: yearHyphenMonth },
+            params: {month: yearHyphenMonth},
         });
     }
 
     static updateTransaction(recordId: number | string | null,
-                                categoryValue: string,
+                             categoryValue: string,
                              amount: string,
                              datetime: string | null,
                              count: string,
@@ -149,6 +152,14 @@ class Client {
             url: `/ledger/${ledgerId}`,
             method: 'delete',
         });
+    }
+
+    static getStatisticsData(currentMonth: string) {
+        return request({
+            url: `/statistics`,
+            method: 'get',
+            params: {month: currentMonth},
+        })
     }
 }
 
