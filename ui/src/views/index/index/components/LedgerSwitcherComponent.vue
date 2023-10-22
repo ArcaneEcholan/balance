@@ -18,7 +18,7 @@
 <script lang='ts'>
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {getRef} from "@/ts/vueUtils";
-import {gotoPage, pushPage} from "@/ts/pageStack";
+import {pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
 @Component({})

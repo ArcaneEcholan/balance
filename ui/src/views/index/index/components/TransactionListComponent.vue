@@ -36,9 +36,9 @@
 </template>
 
 <script lang='ts'>
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import {convertToShortDateTime} from "@/ts/utils";
-import {gotoPage, pushPage} from "@/ts/pageStack";
+import {pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import {getCurrentYearAndMonth} from "@/ts/time";
 import eventBus from "@/ts/EventBus";

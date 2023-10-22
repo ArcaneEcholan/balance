@@ -79,7 +79,7 @@
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentationView from "@/components/ModalPresentation.vue";
-import {gotoPage, popPage} from "@/ts/pageStack";
+import {popPage} from "@/ts/pageStack";
 import {Notify} from "vant";
 import pageConfig from "@/ts/pageConfig";
 import {getHtmlElem, getRef, getVueEl} from "@/ts/vueUtils";
