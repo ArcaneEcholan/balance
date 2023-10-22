@@ -9,17 +9,17 @@
                     <div style="width: fit-content" id="compare-total-percentage-text">
                         <i class="el-icon-top"
                            style="color: red">
-                            50%
+                            {{ `${(percent * 100).toFixed(2)}%` }}
                         </i>
                     </div>
                 </div>
                 <div class="flexg1" id="compare-detail">
-                    <div>last month: 3000</div>
-                    <div style="width: 50%">
+                    <div>last month: {{ lastMonthTotal }}</div>
+                    <div :style="`width: ${percent1}`">
                         <div style="width: 100%; height: 6px; background-color: #409eff; border-radius: 100px"></div>
                     </div>
-                    <div>this month: 6000</div>
-                    <div>
+                    <div>this month: {{ thisMonthTotal }}</div>
+                    <div :style="`width: ${percent2}`">
                         <div style="width: 100%; height: 6px; background-color: #409eff; border-radius: 100px"></div>
                     </div>
                 </div>
@@ -32,18 +32,18 @@
                 type ranking
             </div>
             <div>
-                <div v-for="i in [1, 0.6, 0.5, 0.1]">
+                <div v-for="i in typeRankList">
                     <div class="flex">
                         <div class="flexg1 rank">
                             <div class="rank-text" style="width: fit-content">1</div>
                         </div>
                         <div class="flexg9">
                             <div class="flex justify-between">
-                                <div>alcohol</div>
-                                <div>1000</div>
+                                <div>{{i.type}}</div>
+                                <div>{{i.total}}</div>
                             </div>
 
-                            <div :style="`width: ${i*100}%`">
+                            <div :style="`width: ${i.percent*100}%`">
                                 <div
                                     style="width: 100%; height: 6px; background-color: #409eff; border-radius: 100px">
                                 </div>
@@ -59,18 +59,18 @@
                 single ranking
             </div>
             <div>
-                <div v-for="i in [1, 0.6, 0.5, 0.1]">
+                <div v-for="i in rankList">
                     <div class="flex">
                         <div class="flexg1 rank">
                             <div class="rank-text" style="width: fit-content">1</div>
                         </div>
                         <div class="flexg9">
                             <div class="flex justify-between">
-                                <div>alcohol</div>
-                                <div>1000</div>
+                                <div>{{i.description}}</div>
+                                <div>{{i.total}}</div>
                             </div>
 
-                            <div :style="`width: ${i*100}%`">
+                            <div :style="`width: ${i.percent*100}%`">
                                 <div
                                     style="width: 100%; height: 6px; background-color: #409eff; border-radius: 100px">
                                 </div>
@@ -86,9 +86,40 @@
 
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
+import Client from "@/request/client";
+import {getCurrentMonth, getCurrentYearAndMonth} from "@/ts/time";
 
 @Component({})
 export default class StatisticIndexView extends Vue {
+    percent: string = ""
+    lastMonthTotal: string = ""
+    thisMonthTotal: string = ""
+    typeRankList: any[] = []
+    rankList: any[] = []
+
+    percent1: string = ""
+    percent2: string = ""
+
+    getPercent() {
+        let i = Number(this.lastMonthTotal) > Number(this.thisMonthTotal) ? Number(this.lastMonthTotal) : Number(this.thisMonthTotal)
+        if (i !== 0) {
+            this.percent1 = (Number(this.lastMonthTotal) / i * 100).toFixed(2) + "%"
+            this.percent2 = (Number(this.thisMonthTotal) / i * 100).toFixed(2) + "%"
+        }
+    }
+
+    created() {
+        Client.getStatisticsData(getCurrentYearAndMonth()).then((resp: any) => {
+            resp = resp.data
+            this.percent = resp.percent
+            this.lastMonthTotal = resp.last_month_total
+            this.thisMonthTotal = resp.this_month_total
+            this.typeRankList = resp.type_rank_list
+            this.rankList = resp.rank_list
+            this.getPercent()
+        })
+    }
+
     format() {
         return ""
     }

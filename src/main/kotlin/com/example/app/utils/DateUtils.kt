@@ -22,7 +22,24 @@ fun getMaxDays(formattedInput: String): Int {
     val yearMonth = YearMonth.parse(formattedInput, formatter)
     return yearMonth.lengthOfMonth()
 }
+fun getLastMonth(inputDateString: String): String {
+    // Parse the input string to a LocalDate
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val date = LocalDate.parse(inputDateString, formatter)
 
+    // Subtract one month to get the last month
+    val lastMonth = date.minusMonths(1)
+
+    // Format the last month as "yyyy-MM"
+    val lastMonthStr = lastMonth.format(formatter)
+    println("Last month of $inputDateString is $lastMonthStr")
+    val i = lastMonth.monthValue
+    return if (i < 10) {
+        lastMonth.year.toString() + "-0" + lastMonth.monthValue
+    } else {
+        lastMonth.year.toString() + "-" + lastMonth.monthValue
+    }
+}
 fun getMonthRange(formattedInput: String?): MonthRangeBean {
     val formatter = DateTimeFormatterBuilder()
         .parseCaseInsensitive()
