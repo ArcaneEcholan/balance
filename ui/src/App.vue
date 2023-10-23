@@ -13,11 +13,11 @@
 
         <div id="padding-area"></div>
 
-        <div id="main-app-area">
+        <div id="main-app-area" style="position: relative; z-index: 2">
             <router-view/>
         </div>
 
-        <div id="tabbar-area">
+        <div id="tabbar-area" style="position: relative; z-index: 1">
             <van-tabbar v-model="activeTabBar" @change="onChange">
                 <van-tabbar-item name="home" icon="home-o">home</van-tabbar-item>
                 <van-tabbar-item name="statistics">
@@ -60,7 +60,7 @@ export default class AppView extends Vue {
 
         // document.body.style.overflow = "hidden"
         // can not be 100%, because there will be a little white gap in the bottom
-        document.body.style.height = "100vh"
+        document.body.style.height = document.documentElement.clientHeight + "px"
         // let b = document
         let h = document.getElementById("header-area")!
         let p = document.getElementById("padding-area")!
@@ -149,9 +149,7 @@ body {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    //text-align: center;
     color: #2c3e50;
-    height: 660px;
 }
 
 nav {
