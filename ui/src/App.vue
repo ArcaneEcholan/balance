@@ -60,7 +60,7 @@ export default class AppView extends Vue {
 
         // document.body.style.overflow = "hidden"
         // can not be 100%, because there will be a little white gap in the bottom
-        document.body.style.height = "100vh"
+        document.body.style.height = document.documentElement.clientHeight + "px"
         // let b = document
         let h = document.getElementById("header-area")!
         let p = document.getElementById("padding-area")!
