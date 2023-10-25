@@ -1,6 +1,5 @@
 import axios from 'axios';
 import {PageLocation} from '@/ts/dynamicLocation';
-import {Notification} from 'element-ui';
 import {Notify} from "vant";
 
 // create an axios instance

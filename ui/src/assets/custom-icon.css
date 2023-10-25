@@ -1,0 +1,24 @@
+.arrow-rotate-right-svg {
+    /* Replace 'path/to/icon.png' with the actual path to your external icon file */
+    background-image: url(./arrow-rotate-right.svg);
+    /* Set the desired width and height for the icon */
+    width: 14px;
+    height: 14px;
+    /* Additional styles for positioning, colors, etc. */
+    display: block;
+    /* Control how the background image should be scaled within the container */
+    background-size: contain;
+}
+
+.pie-chart-svg {
+    /* Replace 'path/to/icon.png' with the actual path to your external icon file */
+    background-image: url(./pie-chart.svg);
+    /* Set the desired width and height for the icon */
+    width: 14px;
+    height: 14px;
+    /* Additional styles for positioning, colors, etc. */
+    display: block;
+    /* Control how the background image should be scaled within the container */
+    background-size: contain;
+}
+

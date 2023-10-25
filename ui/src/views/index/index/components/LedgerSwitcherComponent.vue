@@ -7,9 +7,12 @@
                 </van-cell>
             </van-cell-group>
             <div style="padding: 5px 16px;">
-                <el-button @click="onClickManageLedgerList" round plain type="primary" style="width: 100%">
-                    <i class="el-icon-edit">manage ledger</i>
-                </el-button>
+                <van-button style="width: 100%; color: #1989fa; border: 1px solid #1989fa; border-radius: 5px;"
+                            plain
+                            @click="onClickManageLedgerList"
+                >
+                    manage ledger
+                </van-button>
             </div>
         </van-dropdown-item>
     </van-dropdown-menu>

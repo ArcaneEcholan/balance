@@ -1,5 +1,4 @@
 import router from "@/router";
-import {Notification} from "element-ui";
 
 class StackItem {
     name: string | null = null;
@@ -140,7 +139,6 @@ export function replacePage(name: string, params: any) {
 
 function closeIt() {
     pageStack.clear()
-    Notification.info("clear stack size")
 }
 
 window.onbeforeunload = closeIt;

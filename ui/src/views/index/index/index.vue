@@ -31,12 +31,10 @@
             <gap-component></gap-component>
 
             <div class="record-header">Location information
-                <el-button ref="refresh-btn" @click="onClickRefreshLocationData">
-                    <van-icon name="replay"/>
-                </el-button>
+                <van-button @click="onClickRefreshLocationData" ref="refresh-btn" type="default"> <i class="arrow-rotate-right-svg"></i></van-button>
             </div>
 
-            <van-cell-group style="position: relative; z-index: 999;" v-loading="locationLoading"
+            <van-cell-group style="position: relative; z-index: 999;""
                             class="shadow overflow-hidden br8 ">
                 <van-cell title="Coordinate (lat, lng)"
                           :value="`(${geoLocation.latitude}, ${geoLocation.longitude})`"/>
@@ -325,7 +323,10 @@ export default class IndexView extends Vue {
     }
 
     mounted() {
-        let a = getVueEl(this, "refresh-btn")
+        let a = getRef(this, "refresh-btn")
+        a.style.height = "auto";
+        a.style.width = "auto";
+
         a.style.padding = "4px";
         this.adjustAMapSize()
     }
@@ -344,6 +345,7 @@ export default class IndexView extends Vue {
 </script>
 <style lang="scss" scoped>
 @import "~@/style/common-style.scss";
+@import "~@/assets/custom-icon.css";
 
 .fake-marker {
     display: block;

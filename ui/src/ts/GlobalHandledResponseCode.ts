@@ -1,4 +1,3 @@
-import { Notification } from 'element-ui';
 
 class ErrorCode {
     static SUCCESS = 'SUCCESS';
@@ -11,10 +10,10 @@ class GlobalHandledRespCode {
     constructor() {
         this.codeHandlerMapping = {
             TOKEN_MISSING: () => {
-                Notification.error('OTHER ERROR');
+                console.log('token missing')
             },
             SERVER_ERROR: () => {
-                Notification.error('SERVER ERROR');
+                console.log('server error')
             },
         };
     }
@@ -23,7 +22,7 @@ class GlobalHandledRespCode {
         if (this.codeHandlerMapping[code] != null) {
             this.codeHandlerMapping[code]();
         } else {
-            Notification.error(code);
+            console.log(`Unhandled global response code: ${code}`)
         }
     }
 

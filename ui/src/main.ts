@@ -2,15 +2,13 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import store from './store';
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
 import './permission'; // permission control
-Vue.use(ElementUI);
 
 Vue.config.productionTip = false;
 
-
 import 'vant/lib/index.css';
+
+import { Loading } from 'vant';
 import { Tabbar, TabbarItem } from 'vant';
 import {Cell, Field, CellGroup} from 'vant';
 import {Popup} from 'vant';
@@ -23,6 +21,7 @@ import { Tag } from 'vant';
 import { DropdownMenu, DropdownItem } from 'vant'
 import { SwipeCell } from 'vant';
 import { ActionSheet } from 'vant';
+Vue.use(Loading);
 Vue.use(Tabbar);
 Vue.use(TabbarItem);
 Vue.use(Notify);

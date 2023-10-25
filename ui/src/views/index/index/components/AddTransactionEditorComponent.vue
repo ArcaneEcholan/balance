@@ -38,24 +38,25 @@
         </div>
         <gap-component :value="'8px'"></gap-component>
 
-        <el-button @click="onAddTrans" round plain type="primary" style="width: 100%">
-            <i class="el-icon-plus"></i>
-        </el-button>
+        <van-button style="color: #1989fa; border: 1px solid #1989fa; border-radius: 5px;" ref="add-transaction-btn"
+                    plain @click="onAddTrans">
+            <van-icon name="plus"/>
+        </van-button>
     </div>
 
 </template>
 
 <script lang='ts'>
 
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import VanCursorEditorComponent from "@/views/components/VanCursorEditor.vue";
 import {findWordInLine, replace} from "@/ts/utils";
 import GapComponent from "@/views/components/GapComponent.vue";
 import {Notify} from "vant";
-import {Notification} from "element-ui";
 import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
 import {getCurrentYearAndMonth} from "@/ts/time";
+import {getRef} from "@/ts/vueUtils";
 
 
 class FormItemField {
@@ -82,6 +83,12 @@ export default class AddTransactionEditorComponent extends Vue {
 
     curLedger: any = {name: "default"}
 
+
+    mounted() {
+        let a = getRef(this, 'add-transaction-btn')
+        a.style.width = "100%"
+    }
+
     created() {
         eventBus.$on("on-cur-ledger-changed", (ledger) => {
             this.curLedger = ledger
@@ -93,7 +100,7 @@ export default class AddTransactionEditorComponent extends Vue {
 
         eventBus.$on("on-cur-location-changed", (loc) => {
             this.geoLocation = loc
-        } )
+        })
 
     }
 
@@ -152,7 +159,12 @@ export default class AddTransactionEditorComponent extends Vue {
         })
         // @ts-ignore
         if (error === true) {
-            Notification.error(errorType)
+            Notify(
+                {
+                    message: errorType,
+                    type: 'danger'
+                }
+            )
             throw new Error(errorType)
         }
     }

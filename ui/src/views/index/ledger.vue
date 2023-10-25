@@ -20,11 +20,13 @@
                                 </van-cell-group>
                                 <div class="pdb16 pdt16"></div>
                                 <div class="">
-                                    <el-button round plain type="primary" style="width: 100%"
-                                               @click="submitEditLedger"
-                                               :disabled="editLedgerLoading"
-                                    >Submit
-                                    </el-button>
+                                    <van-button style="width: 100%; color: #1989fa; border: 1px solid #1989fa; border-radius: 5px;"
+                                                plain
+                                                @click="submitEditLedger"
+                                                :disabled="editLedgerLoading"
+                                    >
+                                        Submit
+                                    </van-button>
                                 </div>
                             </div>
                         </van-action-sheet>
@@ -38,18 +40,20 @@
                                 </van-cell-group>
                                 <div class="pdb16 pdt16"></div>
                                 <div class="">
-                                    <el-button round plain type="primary" style="width: 100%"
-                                               @click="submitAddLedger"
-                                               :disabled="addLedgerLoading"
-                                    >Submit
-                                    </el-button>
+                                    <van-button style="width: 100%; color: #1989fa; border: 1px solid #1989fa; border-radius: 5px;"
+                                                plain
+                                                @click="submitAddLedger"
+                                                :disabled="addLedgerLoading"
+                                    >
+                                        Submit
+                                    </van-button>
                                 </div>
                             </div>
                         </van-action-sheet>
 
                         <div class="pdb16 pdt16"></div>
                         <div class="record-header">Ledgers</div>
-                        <van-cell-group v-loading="ledgersLoading" class="shadow overflow-hidden br8">
+                        <van-cell-group class="shadow overflow-hidden br8">
                             <van-swipe-cell v-for="ledger in ledgers">
                                 <van-cell :border="false" :title="ledger.name"/>
                                 <template #right>
@@ -67,8 +71,18 @@
                     <div
                         ref="bottom-tool-bar"
                         style="position: absolute; bottom: 0;left: 0; right: 0; background-color: white; border-top: 1px solid #ebedf0; width: 100%">
-                        <el-button type="primary" ref="add-ledger-btn" size="mini"><i class="el-icon-plus"></i>
-                        </el-button>
+
+
+                        <van-button style="
+                        background-color: #1989fa;
+                        color: white; border: 1px solid #1989fa; border-radius: 5px;"
+                                    plain
+                                    @click="submitEditLedger"
+                                    :disabled="editLedgerLoading"
+                                    ref="add-ledger-btn"
+                        >
+                            <van-icon name="plus"></van-icon>
+                        </van-button>
                     </div>
                 </div>
             </template>
@@ -256,8 +270,9 @@ export default class ManageLedgerView extends Vue {
         pageMainArea.style.height = pageMainAreaHeight + "px"
         bottomToolBar.style.height = bottomToolBarHeight + "px"
 
-        let e = getVueEl(this, "add-ledger-btn")
+        let e = getRef(this, "add-ledger-btn")
 
+        e.style.height = "auto"
         e.style.padding = `${5}px`
         e.style.borderRadius = `${8}px`
         e.style.position = "relative"

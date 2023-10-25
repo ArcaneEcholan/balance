@@ -26,15 +26,15 @@
                     </van-cell-group>
                     <div class="pdb16 pdt16"></div>
                     <div class=" ">
-                        <el-button round plain type="primary" style="width: 100%"
-                                   @click="submit"
-
-                                   :disabled="!submitEnable"
-                        >Submit
-                        </el-button>
+                        <van-button style="width: 100%; color: #1989fa; border: 1px solid #1989fa; border-radius: 5px;"
+                                    plain
+                                    @click="submit"
+                                    :disabled="!submitEnable"
+                        >
+                            Submit
+                        </van-button>
                     </div>
                 </div>
-
             </template>
         </modal-presentation>
     </div>

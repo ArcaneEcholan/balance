@@ -23,8 +23,10 @@
                 <van-tabbar-item name="statistics">
                     <span>statistic</span>
                     <template #icon="props">
-                        <span v-if="props.active"><i style="color:#1989fa" class="el-icon-pie-chart"></i></span>
-                        <span v-else><i class="el-icon-pie-chart"></i></span>
+                        <span v-if="props.active"><i style="
+                        filter: invert(35%) sepia(95%) saturate(1600%) hue-rotate(196deg) brightness(103%) contrast(96%);
+                        color:#1989fa; width: 22px; height: 22px;" class="pie-chart-svg"></i></span>
+                        <span v-else><i style="width: 22px; height: 22px;" class="pie-chart-svg"></i></span>
                     </template>
                 </van-tabbar-item>
             </van-tabbar>
@@ -132,6 +134,7 @@ export default class AppView extends Vue {
 </script>
 
 <style lang="scss">
+@import "~@/assets/custom-icon.css";
 
 body {
     padding: 0;
