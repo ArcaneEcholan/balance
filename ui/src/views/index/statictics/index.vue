@@ -7,10 +7,11 @@
             <div class="flex" style="width: 100%">
                 <div class="flexg1" id="compare-total-percentage">
                     <div style="width: fit-content" id="compare-total-percentage-text">
-                        <i class="el-icon-top"
-                           style="color: red">
-                            {{ `${(percent * 100).toFixed(2)}%` }}
-                        </i>
+                        <div class="flex">
+                            <i id="percent-arrow" class="arrow-up-svg red-svg-color">
+                            </i>
+                            <span>{{ `${percent}` }}</span>
+                        </div>
                     </div>
                 </div>
                 <div class="flexg1" id="compare-detail">
@@ -117,6 +118,9 @@ export default class StatisticIndexView extends Vue {
             this.typeRankList = resp.type_rank_list
             this.rankList = resp.rank_list
             this.getPercent()
+            this.$nextTick(() => {
+                this.centerPercentText()
+            })
         })
     }
 
@@ -124,7 +128,7 @@ export default class StatisticIndexView extends Vue {
         return ""
     }
 
-    mounted() {
+    centerPercentText() {
         let t = document.getElementById("compare-total-percentage")
         let tt = document.getElementById("compare-total-percentage-text")
         let d = document.getElementById("compare-detail")
@@ -133,12 +137,35 @@ export default class StatisticIndexView extends Vue {
         let tw = t!.clientWidth
         let tth = tt!.clientHeight
         let ttw = tt!.clientWidth
-
         // center tt in t
         tt!.style.top = ((th - tth) / 2) + "px"
         tt!.style.left = ((tw - ttw) / 2) + "px"
         tt!.style.position = "relative"
+        if(this.percent === "") {
+            return
+        }
+        let e = document.getElementById("compare-total-percentage-text") as HTMLElement
 
+        let i = document.getElementById("percent-arrow") as HTMLElement
+        if(this.percent.startsWith('-')) {
+            i.className = ""
+            i.className = "arrow-down-svg green-svg-color"
+            e.style.color = "green"
+        } else if(this.percent === "infinite") {
+            i.className = ""
+            i.className = "minus-svg gray-svg-color"
+            e.style.color = "gray"
+        } else {
+            i.className = ""
+            i.className = "arrow-up-svg red-svg-color"
+            e.style.color = "red"
+        }
+
+
+    }
+
+    mounted() {
+        this.centerPercentText()
 
         let rs = document.getElementsByClassName("rank")
         let rts = document.getElementsByClassName("rank-text")
@@ -169,6 +196,7 @@ export default class StatisticIndexView extends Vue {
 </script>
 <style lang='scss' scoped>
 @import "~@/style/common-style.scss";
+@import "~@/assets/custom-icon.css";
 
 .page {
     box-sizing: border-box;

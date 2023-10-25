@@ -64,14 +64,16 @@ class StatisticsController {
         )
     }
 
-    private fun getPercent(thisMonthTotal: BigDecimal, lastMonthTotal: BigDecimal): BigDecimal {
+    private fun getPercent(thisMonthTotal: BigDecimal, lastMonthTotal: BigDecimal): String {
+        var r = ""
         var percent = BigDecimal(0)
         if (lastMonthTotal.equals(BigDecimal(0))) {
-            percent = BigDecimal(-1)
+            r = "infinite"
         } else {
             percent = (thisMonthTotal - lastMonthTotal) / lastMonthTotal
+            r = percent.multiply(BigDecimal(100)).toString() + "%";
         }
-        return percent
+        return r
     }
 
     private fun getThisMonthRankList(thisMonthTrans: List<TransactionVO>): List<Any> {
@@ -86,7 +88,8 @@ class StatisticsController {
             var percent = ""
 
         }
-        var r =  thisMonthTrans.map {
+
+        var r = thisMonthTrans.map {
             if (it.categoryValue == null) {
                 it.categoryValue = "unknown"
             }
@@ -111,7 +114,7 @@ class StatisticsController {
             }
         }.filterNotNull().sortedByDescending { BigDecimal(it.total) }
 
-        if(r.isEmpty()) {
+        if (r.isEmpty()) {
             return r;
         }
         var f = r.first()
@@ -200,7 +203,7 @@ class StatisticsController {
             it
         }.toMutableList()
 
-        if(r.isEmpty()) {
+        if (r.isEmpty()) {
             return r;
         }
         var f = r.first()
