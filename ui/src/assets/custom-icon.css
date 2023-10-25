@@ -22,3 +22,63 @@
     background-size: contain;
 }
 
+
+.pie-chart-svg {
+    /* Replace 'path/to/icon.png' with the actual path to your external icon file */
+    background-image: url(./pie-chart.svg);
+    /* Set the desired width and height for the icon */
+    width: 14px;
+    height: 14px;
+    /* Additional styles for positioning, colors, etc. */
+    display: block;
+    /* Control how the background image should be scaled within the container */
+    background-size: contain;
+}
+
+
+.arrow-up-svg {
+    /* Replace 'path/to/icon.png' with the actual path to your external icon file */
+    background-image: url(./arrow-up.svg);
+    /* Set the desired width and height for the icon */
+    width: 14px;
+    height: 14px;
+    /* Additional styles for positioning, colors, etc. */
+    display: block;
+    /* Control how the background image should be scaled within the container */
+    background-size: contain;
+}
+
+.arrow-down-svg {
+    /* Replace 'path/to/icon.png' with the actual path to your external icon file */
+    background-image: url(./arrow-down.svg);
+    /* Set the desired width and height for the icon */
+    width: 14px;
+    height: 14px;
+    /* Additional styles for positioning, colors, etc. */
+    display: block;
+    /* Control how the background image should be scaled within the container */
+    background-size: contain;
+}
+.minus-svg {
+    /* Replace 'path/to/icon.png' with the actual path to your external icon file */
+    background-image: url(./minus.svg);
+    /* Set the desired width and height for the icon */
+    width: 14px;
+    height: 14px;
+    /* Additional styles for positioning, colors, etc. */
+    display: block;
+    /* Control how the background image should be scaled within the container */
+    background-size: contain;
+}
+
+.green-svg-color{
+    filter: invert(58%) sepia(85%) saturate(3704%) hue-rotate(87deg) brightness(124%) contrast(118%);
+}
+
+.gray-svg-color{
+    filter: invert(52%) sepia(26%) saturate(0%) hue-rotate(176deg) brightness(92%) contrast(96%);
+}
+
+.red-svg-color{
+    filter: invert(18%) sepia(95%) saturate(7385%) hue-rotate(359deg) brightness(105%) contrast(114%);
+}
