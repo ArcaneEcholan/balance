@@ -21,6 +21,8 @@ import { Tag } from 'vant';
 import { DropdownMenu, DropdownItem } from 'vant'
 import { SwipeCell } from 'vant';
 import { ActionSheet } from 'vant';
+import { DatetimePicker } from 'vant';
+Vue.use(DatetimePicker);
 Vue.use(Loading);
 Vue.use(Tabbar);
 Vue.use(TabbarItem);

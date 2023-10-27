@@ -1,5 +1,25 @@
 <template>
     <div class='page'>
+        <div>
+            <van-button plain type="info " @click="show=true">month</van-button>
+        </div>
+        <div class="shadow br8 overflow-hidden">
+            <van-action-sheet :closeable="false" v-model="show" title="">
+                <van-datetime-picker
+                    @cancel="onCancel"
+                    @confirm="onPickDate"
+                    v-model="currentDate"
+                    title="Choose Year-Month"
+                    :min-date="minDate"
+                    :max-date="maxDate"
+                    :type="columnsType"
+                >
+                    <template #default></template>
+                </van-datetime-picker>
+            </van-action-sheet>
+        </div>
+
+        <gap-component></gap-component>
         <div class="card shadow">
             <div>
                 compare
@@ -40,8 +60,8 @@
                         </div>
                         <div class="flexg9">
                             <div class="flex justify-between">
-                                <div>{{i.type}}</div>
-                                <div>{{i.total}}</div>
+                                <div>{{ i.type }}</div>
+                                <div>{{ i.total }}</div>
                             </div>
 
                             <div :style="`width: ${i.percent*100}%`">
@@ -67,8 +87,8 @@
                         </div>
                         <div class="flexg9">
                             <div class="flex justify-between">
-                                <div>{{i.description}}</div>
-                                <div>{{i.total}}</div>
+                                <div>{{ i.description }}</div>
+                                <div>{{ i.total }}</div>
                             </div>
 
                             <div :style="`width: ${i.percent*100}%`">
@@ -88,10 +108,22 @@
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
 import Client from "@/request/client";
-import {getCurrentMonth, getCurrentYearAndMonth} from "@/ts/time";
+import {getCurrentYearAndMonth} from "@/ts/time";
+import GapComponent from "@/views/components/GapComponent.vue";
+import {shallowMount} from "@vue/test-utils";
 
-@Component({})
+@Component({
+    methods: {shallowMount},
+    components: {GapComponent}
+})
 export default class StatisticIndexView extends Vue {
+    show = false
+    minDate = new Date(2020, 0, 1)
+    maxDate = new Date(2100, 0, 1)
+    currentDate = new Date()
+
+    columnsType = "year-month"
+
     percent: string = ""
     lastMonthTotal: string = ""
     thisMonthTotal: string = ""
@@ -100,6 +132,19 @@ export default class StatisticIndexView extends Vue {
 
     percent1: string = ""
     percent2: string = ""
+
+    onPickDate() {
+        this.init()
+        this.show = false
+    }
+
+    onCancel() {
+        this.show = false
+    }
+
+    getCurrentDate() {
+        return this.currentDate.getFullYear() + "-" + (this.currentDate.getMonth() + 1)
+    }
 
     getPercent() {
         let i = Number(this.lastMonthTotal) > Number(this.thisMonthTotal) ? Number(this.lastMonthTotal) : Number(this.thisMonthTotal)
@@ -110,7 +155,11 @@ export default class StatisticIndexView extends Vue {
     }
 
     created() {
-        Client.getStatisticsData(getCurrentYearAndMonth()).then((resp: any) => {
+      this.init()
+    }
+
+    init() {
+        Client.getStatisticsData(this.getCurrentDate()).then((resp: any) => {
             resp = resp.data
             this.percent = resp.percent
             this.lastMonthTotal = resp.last_month_total
@@ -123,7 +172,6 @@ export default class StatisticIndexView extends Vue {
             })
         })
     }
-
     format() {
         return ""
     }
@@ -141,17 +189,17 @@ export default class StatisticIndexView extends Vue {
         tt!.style.top = ((th - tth) / 2) + "px"
         tt!.style.left = ((tw - ttw) / 2) + "px"
         tt!.style.position = "relative"
-        if(this.percent === "") {
+        if (this.percent === "") {
             return
         }
         let e = document.getElementById("compare-total-percentage-text") as HTMLElement
 
         let i = document.getElementById("percent-arrow") as HTMLElement
-        if(this.percent.startsWith('-')) {
+        if (this.percent.startsWith('-')) {
             i.className = ""
             i.className = "arrow-down-svg green-svg-color"
             e.style.color = "green"
-        } else if(this.percent === "infinite") {
+        } else if (this.percent === "infinite") {
             i.className = ""
             i.className = "minus-svg gray-svg-color"
             e.style.color = "gray"

@@ -24,7 +24,7 @@ fun getMaxDays(formattedInput: String): Int {
 }
 fun getLastMonth(inputDateString: String): String {
     // Parse the input string to a LocalDate
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val formatter = DateTimeFormatter.ofPattern("y-M-d")
     val date = LocalDate.parse(inputDateString, formatter)
 
     // Subtract one month to get the last month
