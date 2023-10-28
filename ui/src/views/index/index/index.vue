@@ -10,8 +10,9 @@
         <!--create a zindex context to separate basic page and modal, and avoid
         components like v-loading(zindex 2000) step over to popped modal-->
         <div style="position: relative; z-index: 1900;">
-            <!--add zindex context to ensure this dropdown can step over any sibling loading-->
 
+            <main-page-current-date-picker-component></main-page-current-date-picker-component>
+            <!--add zindex context to ensure this dropdown can step over any sibling loading-->
             <div style="position: relative; z-index: 1000">
                 <ledger-switcher-component
                 ></ledger-switcher-component>
@@ -34,7 +35,7 @@
                 <van-button @click="onClickRefreshLocationData" ref="refresh-btn" type="default"> <i class="arrow-rotate-right-svg"></i></van-button>
             </div>
 
-            <van-cell-group style="position: relative; z-index: 999;""
+            <van-cell-group style="position: relative; z-index: 999;"
                             class="shadow overflow-hidden br8 ">
                 <van-cell title="Coordinate (lat, lng)"
                           :value="`(${geoLocation.latitude}, ${geoLocation.longitude})`"/>
@@ -83,6 +84,9 @@ import LedgerSwitcherComponent from "@/views/index/index/components/LedgerSwitch
 import TransactionTypeComponent from "@/views/index/index/components/TransactionTypeComponent.vue";
 import GapComponent from "@/views/components/GapComponent.vue";
 import AddTransactionEditorComponent from './components/AddTransactionEditorComponent.vue';
+import { provideListeners } from '@/page-eventbus-registration-mixin';
+import eventBus from "@/ts/EventBus";
+import MainPageCurrentDatePickerComponent from "@/views/index/index/components/MainPageCurrentDatePickerComponent.vue";
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -109,6 +113,7 @@ Component.registerHooks([
 
 @Component({
     components: {
+        MainPageCurrentDatePickerComponent,
         GapComponent,
         TransactionListComponent,
         LedgerSwitcherComponent,
@@ -118,8 +123,6 @@ Component.registerHooks([
 
 })
 export default class IndexView extends Vue {
-
-    currentLedger = {id: null, name: "default"}
 
     apiInvokingTimesSaver: any = null
 

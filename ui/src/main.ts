@@ -22,6 +22,7 @@ import { DropdownMenu, DropdownItem } from 'vant'
 import { SwipeCell } from 'vant';
 import { ActionSheet } from 'vant';
 import { DatetimePicker } from 'vant';
+import eventBus from "@/ts/EventBus";
 Vue.use(DatetimePicker);
 Vue.use(Loading);
 Vue.use(Tabbar);
@@ -41,6 +42,9 @@ Vue.use(DropdownItem);
 Vue.use(ActionSheet);
 
 Vue.use(SwipeCell);
+
+import PageEventbusRegistrationMixin from "@/page-eventbus-registration-mixin";
+Vue.mixin(PageEventbusRegistrationMixin)
 
 // Vue.prototype.$customFuncs = {
 //     getRef,

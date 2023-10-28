@@ -42,6 +42,8 @@ import {pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import {getCurrentYearAndMonth} from "@/ts/time";
 import eventBus from "@/ts/EventBus";
+import {Notify} from "vant";
+import {provideListeners} from "@/page-eventbus-registration-mixin";
 
 @Component({
     filters: {
@@ -58,20 +60,59 @@ export default class TransactionListComponent extends Vue {
     transactionList: any[] = []
 
     created() {
-        eventBus.$on('afterTransactionChanged', (newTransaction: any) => {
-            this.updateTransaction(newTransaction)
-        });
+        provideListeners(this, [
+            {
+                eventName: 'on-transaction-updated',
+                handler: (newTransaction: any) => this.updateTransaction(newTransaction)
 
-        eventBus.$on('update-all-transactions', (trans: any[]) => {
-            this.transactionList = trans
-        })
-
-        eventBus.$on('on-cur-ledger-changed', (ledger: any) => {
-            this.updateTransListByLedger(ledger)
-        })
-
+            },
+            {
+                eventName: 'on-cur-ledger-changed',
+                handler: () => this.onRefreshTransactionList()
+            },
+            {
+                eventName: 'on-cur-date-changed',
+                handler: () => this.onRefreshTransactionList()
+            },
+            {
+                eventName: 'refresh-transaction-list',
+                handler: () => this.onRefreshTransactionList()
+            }
+        ])
         this.initTransactions()
     }
+
+    onRefreshTransactionList() {
+        try {
+            this.doRefreshTransactionList()
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    doRefreshTransactionList() {
+        let currentLedgerName = this.getCurrentLedgerName()
+        let currentDate = this.getCurrentDate()
+        this.getAndUpdateTransListByLedgerNameAndMonth(currentLedgerName, currentDate)
+    }
+
+    getCurrentDate() {
+        let currentDate = eventBus.$emitWithReturnValue('on-get-main-page-cur-date', null)
+        if (currentDate == null) {
+            Notify({type: 'danger', message: 'current date is null'})
+            throw new Error('current date is null')
+        }
+        return currentDate
+    }
+
+    getAndUpdateTransListByLedgerNameAndMonth(ledgerName: any, yearHyphenMonth: string) {
+        Client.getTransactionListByLedgerName(ledgerName, yearHyphenMonth).then((res) => {
+            this.transactionList = res.data
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+
 
     updateTransListByLedger(ledger: any) {
         Client.getTransactionListByLedgerName(ledger.name, this.nowadays()).then((res) => {
@@ -133,6 +174,18 @@ export default class TransactionListComponent extends Vue {
         pushPage(viewName, data)
         // pushPageWithName(viewName, data)
     }
+
+    getCurrentLedgerName(): string {
+        let currentLedgerName =
+            eventBus.$emitWithReturnValue('on-get-current-ledger-name', null)
+        if (currentLedgerName == null) {
+            Notify({type: 'danger', message: 'current ledger is null'})
+            throw new Error('current ledger is null')
+        }
+        return currentLedgerName;
+    }
+
+
 }
 </script>
 <style lang='scss' scoped>

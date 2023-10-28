@@ -24,12 +24,16 @@ import {getRef} from "@/ts/vueUtils";
 import {pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
+import {provideListeners} from "@/page-eventbus-registration-mixin";
 @Component({})
 export default class LedgerSwitcherComponent extends Vue {
 
 
     ledgersLoading = false
     created() {
+        eventBus.$on("on-get-current-ledger-name", (args) => {
+             return this.currentLedger.name
+        })
 
         eventBus.$on('ledges-changes', (list) => {
             this.ledgerList = list

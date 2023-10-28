@@ -143,7 +143,7 @@ export default class EditRecordView extends Vue {
                 this.datetime = newTrans.datetime
                 this.count = newTrans.count
                 this.description = newTrans.description
-                eventBus.$emit("afterTransactionChanged", newTrans)
+                eventBus.$emit("on-transaction-updated", newTrans)
                 Notify({
                     type: "success",
                     message: "Update success"

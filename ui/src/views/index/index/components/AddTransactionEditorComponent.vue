@@ -200,10 +200,8 @@ export default class AddTransactionEditorComponent extends Vue {
                 message: 'save successfully',
                 type: 'success'
             })
-            return Client.getTransactionListByLedgerName(ledgerName, this.nowadays())
-        }).then(resp => {
-            eventBus.$emit("update-all-transactions", resp.data)
-        });
+            eventBus.$emit("refresh-transaction-list", null)
+        })
     }
 
     nowadays(): string {
