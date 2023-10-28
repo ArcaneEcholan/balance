@@ -2,7 +2,7 @@
     <div class=''>
         <div>
             <div>
-                <van-button plain type="info " @click="show=true">month</van-button>
+                <van-button plain type="info" @click="show=true">month</van-button>
             </div>
             <div class="shadow br8 overflow-hidden">
                 <van-action-sheet :closeable="false" v-model="show" title="">
@@ -27,8 +27,11 @@
 import {Component, Vue} from 'vue-property-decorator';
 import eventBus from "@/ts/EventBus";
 import {provideListeners} from "@/page-eventbus-registration-mixin";
+import CommonButton from "@/views/components/CommonButton.vue";
 
-@Component({})
+@Component({
+    components: {CommonButton}
+})
 export default class MainPageCurrentDatePickerComponent extends Vue {
     show = false
     minDate = new Date(2020, 0, 1)

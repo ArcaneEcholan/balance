@@ -7,12 +7,7 @@
                 </van-cell>
             </van-cell-group>
             <div style="padding: 5px 16px;">
-                <van-button style="width: 100%; color: #1989fa; border: 1px solid #1989fa; border-radius: 5px;"
-                            plain
-                            @click="onClickManageLedgerList"
-                >
-                    manage ledger
-                </van-button>
+                <common-button @click="onClickManageLedgerList"><template #default>ledgers</template></common-button>
             </div>
         </van-dropdown-item>
     </van-dropdown-menu>
@@ -25,7 +20,10 @@ import {pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
 import {provideListeners} from "@/page-eventbus-registration-mixin";
-@Component({})
+import CommonButton from "@/views/components/CommonButton.vue";
+@Component({
+    components: {CommonButton}
+})
 export default class LedgerSwitcherComponent extends Vue {
 
 

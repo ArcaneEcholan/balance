@@ -13,41 +13,31 @@
                     <div class="page" style="overflow-y: scroll;" ref="page-main-area">
                         <van-action-sheet v-model="show" title="Title">
                             <div class="page">
-                                <div class="pdb16 pdt16"></div>
+                                <gap-component :value="'32px'"></gap-component>
                                 <div class="record-header">Edit Fields</div>
                                 <van-cell-group class="shadow overflow-hidden br8 ">
                                     <van-field v-model="editLedgerName" type="text" label="name"/>
                                 </van-cell-group>
-                                <div class="pdb16 pdt16"></div>
-                                <div class="">
-                                    <van-button style="width: 100%; color: #1989fa; border: 1px solid #1989fa; border-radius: 5px;"
-                                                plain
-                                                @click="submitEditLedger"
-                                                :disabled="editLedgerLoading"
-                                    >
-                                        Submit
-                                    </van-button>
-                                </div>
+                                <gap-component></gap-component>
+                                <common-button @click="submitEditLedger"
+                                               :disabled="editLedgerLoading">
+                                    <template #default>Submit</template>
+                                </common-button>
                             </div>
                         </van-action-sheet>
 
                         <van-action-sheet v-model="addLedgerShow" title="Title">
                             <div class="page">
-                                <div class="pdb16 pdt16"></div>
+                                <gap-component :value="'32px'"></gap-component>
                                 <div class="record-header">Add Fields</div>
                                 <van-cell-group class="shadow overflow-hidden br8 ">
                                     <van-field v-model="addLedgerName" type="text" label="name"/>
                                 </van-cell-group>
-                                <div class="pdb16 pdt16"></div>
-                                <div class="">
-                                    <van-button style="width: 100%; color: #1989fa; border: 1px solid #1989fa; border-radius: 5px;"
-                                                plain
-                                                @click="submitAddLedger"
-                                                :disabled="addLedgerLoading"
-                                    >
-                                        Submit
-                                    </van-button>
-                                </div>
+                                <gap-component></gap-component>
+                                <common-button @click="submitAddLedger"
+                                               :disabled="addLedgerLoading">
+                                    <template #default>Submit</template>
+                                </common-button>
                             </div>
                         </van-action-sheet>
 
@@ -99,6 +89,8 @@ import pageConfig from "@/ts/pageConfig";
 import {getHtmlElem, getRef, getVueEl} from "@/ts/vueUtils";
 import eventBus from "@/ts/EventBus";
 import Client from "@/request/client";
+import CommonButton from "@/views/components/CommonButton.vue";
+import GapComponent from "@/views/components/GapComponent.vue";
 
 class FormItem {
     categoryValue: string | null = null;
@@ -115,6 +107,8 @@ class FormItem {
 // ]);
 @Component({
     components: {
+        GapComponent,
+        CommonButton,
         ModalPresentation: ModalPresentationView
     }
 })
