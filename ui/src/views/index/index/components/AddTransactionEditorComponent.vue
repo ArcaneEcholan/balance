@@ -55,10 +55,8 @@ import GapComponent from "@/views/components/GapComponent.vue";
 import {Notify} from "vant";
 import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
-import {getCurrentYearAndMonth} from "@/ts/time";
-import {getRef} from "@/ts/vueUtils";
 import CommonButton from "@/views/components/CommonButton.vue";
-
+import {provideListeners} from "@/page-eventbus-registration-mixin";
 
 class FormItemField {
     value: string | null = null;
@@ -85,18 +83,26 @@ export default class AddTransactionEditorComponent extends Vue {
     curLedger: any = {name: "default"}
 
     created() {
-        eventBus.$on("on-cur-ledger-changed", (ledger) => {
-            this.curLedger = ledger
-        })
-
-        eventBus.$on("on-click-one-type", (type) => {
-            this.replaceFirstWord(type)
-        })
-
-        eventBus.$on("on-cur-location-changed", (loc) => {
-            this.geoLocation = loc
-        })
-
+        provideListeners(this, [
+            {
+                eventName: "on-click-one-type",
+                handler: (type: string) => {
+                    this.replaceFirstWord(type)
+                }
+            },
+            {
+                eventName: "on-cur-ledger-changed",
+                handler: (ledger: any) => {
+                    this.curLedger = ledger
+                }
+            },
+            {
+                eventName: "on-cur-location-changed",
+                handler: (loc: any) => {
+                    this.geoLocation = loc
+                }
+            }
+        ])
     }
 
     onAddTrans() {
@@ -197,10 +203,6 @@ export default class AddTransactionEditorComponent extends Vue {
             })
             eventBus.$emit("refresh-transaction-list", null)
         })
-    }
-
-    nowadays(): string {
-        return getCurrentYearAndMonth()
     }
 
     assembleAddTransactionRequest(trans: any[]): any[] {
