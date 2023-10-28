@@ -15,7 +15,7 @@
                             <!--test-->
                         </div>
                     </div>
-                    <div class="pdb16 pdt16"></div>
+                    <gap-component :value="'32px'"></gap-component>
                     <div class="record-header">Edit Fields</div>
                     <van-cell-group class="shadow overflow-hidden br8 ">
                         <van-field v-model="categoryValue" type="string" label="category"/>
@@ -24,16 +24,8 @@
                         <van-field v-model="count" type="digit" label="count"/>
                         <van-field v-model="description" type="text" label="description"/>
                     </van-cell-group>
-                    <div class="pdb16 pdt16"></div>
-                    <div class=" ">
-                        <van-button style="width: 100%; color: #1989fa; border: 1px solid #1989fa; border-radius: 5px;"
-                                    plain
-                                    @click="submit"
-                                    :disabled="!submitEnable"
-                        >
-                            Submit
-                        </van-button>
-                    </div>
+                    <gap-component></gap-component>
+                    <common-button :disabled="!submitEnable" @click="submit"><template #default>Submit</template></common-button>
                 </div>
             </template>
         </modal-presentation>
@@ -49,6 +41,8 @@ import Client from "@/request/client";
 import {countDecimalPlaces, isFloat, isPositiveInteger} from '@/ts/utils';
 import eventBus from "@/ts/EventBus";
 import pageConfig from "@/ts/pageConfig";
+import CommonButton from "@/views/components/CommonButton.vue";
+import GapComponent from "@/views/components/GapComponent.vue";
 
 class FormItem {
     categoryValue: string | null = null;
@@ -65,6 +59,8 @@ class FormItem {
 // ]);
 @Component({
     components: {
+        GapComponent,
+        CommonButton,
         ModalPresentation: ModalPresentationView
     }
 })

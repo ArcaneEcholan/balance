@@ -11,63 +11,41 @@
         components like v-loading(zindex 2000) step over to popped modal-->
         <div style="position: relative; z-index: 1900;">
 
-            <main-page-current-date-picker-component></main-page-current-date-picker-component>
-            <!--add zindex context to ensure this dropdown can step over any sibling loading-->
-            <div style="position: relative; z-index: 1000">
-                <ledger-switcher-component
-                ></ledger-switcher-component>
+            <div id="main-page-fix-header"
+                 style="position: fixed; top: 46px; left:0; right: 0; width: 100%;background-color: white;">
+                <div class="flex">
+                    <main-page-current-date-picker-component></main-page-current-date-picker-component>
+                    <ledger-switcher-component></ledger-switcher-component>
+                    <van-button plain type="info" @click="onclickAddRecord">+</van-button>
+
+                    <div class="shadow br8 overflow-hidden">
+                        <van-action-sheet :closeable="false" v-model="show" title="Add Records">
+                            <div class="pdl8 pdr8">
+                                <transaction-type-component
+                                    @on-click-one-type="onClickOneType"></transaction-type-component>
+                                <div class="record-header">Add Some Record</div>
+                                <add-transaction-editor-component
+                                    ref="add-transaction-editor-component"></add-transaction-editor-component>
+                            </div>
+                        </van-action-sheet>
+                    </div>
+                </div>
+                <!--region: amap-->
+                <!--<div class="record-header">Amap</div>-->
+
+                <!--<div style="position: relative" class="bg-white br8 shadow overflow-hidden">-->
+                <!--    <div id="amap" style="width: 100%; height: auto">-->
+                <!--    </div>-->
+                <!--    <div class="fake-marker"></div>-->
+                <!--</div>-->
+                <!--endregion-->
             </div>
-
-            <!--region: amap-->
-            <!--<div class="record-header">Amap</div>-->
-
-            <!--<div style="position: relative" class="bg-white br8 shadow overflow-hidden">-->
-            <!--    <div id="amap" style="width: 100%; height: auto">-->
-            <!--    </div>-->
-            <!--    <div class="fake-marker"></div>-->
-            <!--</div>-->
-            <!--endregion-->
-
-
-            <gap-component></gap-component>
-
-            <div class="record-header">Location information
-                <van-button @click="onClickRefreshLocationData" ref="refresh-btn" type="default"> <i class="arrow-rotate-right-svg"></i></van-button>
-            </div>
-
-            <van-cell-group style="position: relative; z-index: 999;"
-                            class="shadow overflow-hidden br8 ">
-                <van-cell title="Coordinate (lat, lng)"
-                          :value="`(${geoLocation.latitude}, ${geoLocation.longitude})`"/>
-                <van-cell title="Overview" :value="`${geoLocation.formattedName}`"/>
-            </van-cell-group>
-
-            <gap-component></gap-component>
-
-            <transaction-type-component @on-click-one-type="onClickOneType"></transaction-type-component>
-
-            <!--region: input area-->
-            <div class="record-header">Add Some Record</div>
-            <!--row: {{ cursorPosition.cursorRow }}, col: {{ cursorPosition.cursorColumn }}-->
-            <!--Input-->
-
-            <add-transaction-editor-component>
-
-            </add-transaction-editor-component>
-
-            <!--endregion-->
-
-
+            <div id="main-page-fix-header-placeholder"></div>
             <gap-component :value="'8px'"></gap-component>
 
-            <!--header-->
-
-            <!--region: this month-->
             <transaction-list-component
                 ref="transaction-list-component"
             ></transaction-list-component>
-            <!--endregion-->
-
         </div>
     </div>
 
@@ -77,16 +55,15 @@ import AMapLoader from '@amap/amap-jsapi-loader';
 import {Component, Vue} from 'vue-property-decorator';
 import request from '@/request';
 import {Notify} from "vant";
-import {getRef, getVueEl} from "@/ts/vueUtils";
+import {getRef} from "@/ts/vueUtils";
 
 import TransactionListComponent from "@/views/index/index/components/TransactionListComponent.vue";
 import LedgerSwitcherComponent from "@/views/index/index/components/LedgerSwitcherComponent.vue";
 import TransactionTypeComponent from "@/views/index/index/components/TransactionTypeComponent.vue";
 import GapComponent from "@/views/components/GapComponent.vue";
 import AddTransactionEditorComponent from './components/AddTransactionEditorComponent.vue';
-import { provideListeners } from '@/page-eventbus-registration-mixin';
-import eventBus from "@/ts/EventBus";
 import MainPageCurrentDatePickerComponent from "@/views/index/index/components/MainPageCurrentDatePickerComponent.vue";
+import CommonButton from "@/views/components/CommonButton.vue";
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -113,6 +90,7 @@ Component.registerHooks([
 
 @Component({
     components: {
+        CommonButton,
         MainPageCurrentDatePickerComponent,
         GapComponent,
         TransactionListComponent,
@@ -123,7 +101,11 @@ Component.registerHooks([
 
 })
 export default class IndexView extends Vue {
+    onclickAddRecord() {
+        this.show = true
+    }
 
+    show = false
     apiInvokingTimesSaver: any = null
 
     amap: any;
@@ -326,12 +308,19 @@ export default class IndexView extends Vue {
     }
 
     mounted() {
-        let a = getRef(this, "refresh-btn")
-        a.style.height = "auto";
-        a.style.width = "auto";
+        // let a = getRef(this, "refresh-btn")
+        // a.style.height = "auto";
+        // a.style.width = "auto";
+        //
+        // a.style.padding = "4px";
+        // this.adjustAMapSize()
 
-        a.style.padding = "4px";
-        this.adjustAMapSize()
+
+        let b = document.getElementById("main-page-fix-header")!
+        let bh = b.clientHeight
+
+        let c = document.getElementById("main-page-fix-header-placeholder")!
+        c.style.height = bh + "px";
     }
 
     adjustAMapSize() {
