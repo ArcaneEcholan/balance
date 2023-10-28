@@ -1,36 +1,44 @@
 <template>
-    <van-dropdown-menu>
-        <van-dropdown-item :title="currentLedger.name" ref="ledgerSelection">
-            <van-cell-group>
-                <van-cell @click="onClickSwitchLedger(ledger)" v-for="ledger in ledgerList"
-                          :title="ledger.name">
-                </van-cell>
-            </van-cell-group>
-            <div style="padding: 5px 16px;">
-                <common-button @click="onClickManageLedgerList"><template #default>ledgers</template></common-button>
-            </div>
-        </van-dropdown-item>
-    </van-dropdown-menu>
+    <div>
+        <div>
+            <van-button plain type="info" @click="show=true">{{currentLedger.name}}</van-button>
+        </div>
+        <div class="shadow br8 overflow-hidden">
+            <van-action-sheet :closeable="false" v-model="show" title="">
+                <van-cell-group>
+                    <van-cell @click="onClickSwitchLedger(ledger)" v-for="ledger in ledgerList"
+                              :title="ledger.name">
+                    </van-cell>
+                </van-cell-group>
+                <div style="padding: 5px 16px;">
+                    <common-button @click="onClickManageLedgerList">
+                        <template #default>ledgers</template>
+                    </common-button>
+                </div>
+            </van-action-sheet>
+        </div>
+    </div>
 </template>
 
 <script lang='ts'>
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import {getRef} from "@/ts/vueUtils";
 import {pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
-import {provideListeners} from "@/page-eventbus-registration-mixin";
 import CommonButton from "@/views/components/CommonButton.vue";
+
 @Component({
     components: {CommonButton}
 })
 export default class LedgerSwitcherComponent extends Vue {
-
+    show = false
 
     ledgersLoading = false
+
     created() {
         eventBus.$on("on-get-current-ledger-name", (args) => {
-             return this.currentLedger.name
+            return this.currentLedger.name
         })
 
         eventBus.$on('ledges-changes', (list) => {
@@ -88,7 +96,11 @@ export default class LedgerSwitcherComponent extends Vue {
     }
 
     toggleLedgerSelection() {
-        getRef(this, "ledgerSelection").toggle()
+        if(this.show == true) {
+            this.show = false
+        } else {
+            this.show = false
+        }
     }
 
     present(viewName: string, data: any) {

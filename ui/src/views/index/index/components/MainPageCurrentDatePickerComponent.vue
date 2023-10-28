@@ -2,7 +2,7 @@
     <div class=''>
         <div>
             <div>
-                <van-button plain type="info" @click="show=true">month</van-button>
+                <van-button plain type="info" @click="show=true">{{this.getCurrentDate()}}</van-button>
             </div>
             <div class="shadow br8 overflow-hidden">
                 <van-action-sheet :closeable="false" v-model="show" title="">
