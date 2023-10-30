@@ -51,7 +51,7 @@ create table if not exists ledger
     );
 
 
-create table if not exists balance.ledger_transaction
+create table if not exists ledger_transaction
 (
     id             int auto_increment
     primary key,
