@@ -7,8 +7,6 @@ WORKDIR /app
 # Copy the JAR file from the target folder into the container's /app folder
 COPY target/server.jar /app/server.jar
 
-COPY appconfig/application.yml /app/application.yml
-
 # Copy the application.yml file from the docker folder into the container's /app folder
 #COPY docker/application.yml /app/
 

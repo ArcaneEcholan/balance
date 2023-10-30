@@ -1,6 +1,6 @@
 #Workflow name
 
-name: CI/CD Pipeline
+name: dev pipeline
 
 on:
   push:
@@ -64,9 +64,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           # Set artifact name
-          name: server-artifact
+          name: server-dev-artifact
           # From this path
-          path: target/server.jar
+          path: target/server-dev.jar
 
   build-and-deploy:
     needs: build
@@ -78,7 +78,7 @@ jobs:
       - name: Download JAR artifact
         uses: actions/download-artifact@v2
         with:
-          name: server-artifact
+          name: server-dev-artifact
           path: target
 
       - name: Log in to Docker Hub
@@ -93,7 +93,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest-alpine
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:dev-alpine
 
       - name: Login to server and deploy
         uses: appleboy/ssh-action@master
@@ -102,4 +102,4 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 40020
-          script: cd ~ && ./deploy-balance.sh wc123456
+          script: cd ~ && ./deploy-balance-dev.sh wc123456
