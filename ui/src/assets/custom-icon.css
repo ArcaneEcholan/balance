@@ -71,6 +71,18 @@
     background-size: contain;
 }
 
+.home-svg {
+    /* Replace 'path/to/icon.png' with the actual path to your external icon file */
+    background-image: url(./home.svg);
+    /* Set the desired width and height for the icon */
+    width: 14px;
+    height: 14px;
+    /* Additional styles for positioning, colors, etc. */
+    display: block;
+    /* Control how the background image should be scaled within the container */
+    background-size: contain;
+}
+
 .green-svg-color{
     filter: invert(58%) sepia(85%) saturate(3704%) hue-rotate(87deg) brightness(124%) contrast(118%);
 }
@@ -81,4 +93,8 @@
 
 .red-svg-color{
     filter: invert(18%) sepia(95%) saturate(7385%) hue-rotate(359deg) brightness(105%) contrast(114%);
+}
+
+.van-blue-svg-color {
+    filter: invert(46%) sepia(46%) saturate(5434%) hue-rotate(195deg) brightness(102%) contrast(96%);
 }

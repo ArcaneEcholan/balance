@@ -18,18 +18,54 @@
         </div>
 
         <div id="tabbar-area" style="position: relative; z-index: 1">
-            <van-tabbar v-model="activeTabBar" @change="onChange">
-                <van-tabbar-item name="home" icon="home-o">home</van-tabbar-item>
-                <van-tabbar-item name="statistics">
-                    <span>statistic</span>
-                    <template #icon="props">
-                        <span v-if="props.active"><i style="
-                        filter: invert(35%) sepia(95%) saturate(1600%) hue-rotate(196deg) brightness(103%) contrast(96%);
-                        color:#1989fa; width: 22px; height: 22px;" class="pie-chart-svg"></i></span>
-                        <span v-else><i style="width: 22px; height: 22px;" class="pie-chart-svg"></i></span>
-                    </template>
-                </van-tabbar-item>
-            </van-tabbar>
+            <div class="flex">
+                <div @click="onClickHome" class="flex column flex-center flexg1">
+                    <div>
+                        <span v-if="activeTabBar == 'home'" class="van-blue-svg-color">
+                           <i style="width: 22px; height: 22px;" class="home-svg"></i>
+                        </span>
+                        <span v-else>
+                            <i style="width: 22px; height: 22px;" class="home-svg"></i>
+                        </span>
+                    </div>
+                    <div v-if="activeTabBar == 'home'" style="color: #1989fa;">
+                        <span class="fs12" style="line-height: 1">home</span>
+                    </div>
+                    <div v-else>
+                        <span class="fs12" style="line-height: 1">home</span>
+                    </div>
+                </div>
+                <div @click="onClickStatistics" class="flex column flex-center flexg1">
+                    <div>
+                          <span v-if="activeTabBar == 'statistics'" class="van-blue-svg-color">
+                            <i style="width: 22px; height: 22px;" class="pie-chart-svg"></i>
+                        </span>
+                        <span v-else>
+                            <i style="width: 22px; height: 22px;" class="pie-chart-svg"></i>
+                        </span>
+                    </div>
+                    <div v-if="activeTabBar == 'statistics'" style="color: #1989fa;">
+                        <span class="fs12" style="line-height: 1">statistics</span>
+                    </div>
+                    <div v-else>
+                        <span class="fs12" style="line-height: 1">statistics</span>
+                    </div>
+                </div>
+            </div>
+
+            <!--<van-tabbar v-model="activeTabBar" @change="onChange">-->
+            <!--    <van-tabbar-item name="home" icon="home-o">home</van-tabbar-item>-->
+            <!--    <van-tabbar-item name="statistics">-->
+            <!--        <span>statistic</span>-->
+            <!--        <template #icon="props">-->
+            <!--            <span v-if="props.active">-->
+            <!--                <i style="-->
+            <!--            filter: invert(35%) sepia(95%) saturate(1600%) hue-rotate(196deg) brightness(103%) contrast(96%);-->
+            <!--            color:#1989fa; width: 22px; height: 22px;" class="pie-chart-svg"></i></span>-->
+            <!--            <span v-else><i style="width: 22px; height: 22px;" class="pie-chart-svg"></i></span>-->
+            <!--        </template>-->
+            <!--    </van-tabbar-item>-->
+            <!--</van-tabbar>-->
         </div>
     </div>
 </template>
@@ -38,7 +74,8 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import pageConfig from "@/ts/pageConfig";
-import pageStack, {pushPage, replacePage} from "@/ts/pageStack";
+import {replacePage} from "@/ts/pageStack";
+
 let that: any
 @Component
 export default class AppView extends Vue {
@@ -53,8 +90,18 @@ export default class AppView extends Vue {
         that = this;
     }
 
-    onChange(name:string) {
+    onChange(name: string) {
         replacePage(name, {})
+    }
+
+    onClickHome() {
+        this.activeTabBar = "home"
+        replacePage("home", {})
+    }
+
+    onClickStatistics() {
+        this.activeTabBar = "statistics"
+        replacePage("statistics", {})
     }
 
     mounted() {
@@ -74,7 +121,7 @@ export default class AppView extends Vue {
         let headerHeight = h.clientHeight
         p.style.height = headerHeight + "px"
         m.style.position = "relative"
-        m.style.height = (vh - headerHeight - 50) + "px"
+        m.style.height = (vh - headerHeight - t.clientHeight) + "px"
         m.style.backgroundColor = "#f7f8fa"
         m.style.overflowY = "auto"
 
@@ -135,6 +182,7 @@ export default class AppView extends Vue {
 
 <style lang="scss">
 @import "~@/assets/custom-icon.css";
+@import "~@/style/common-style.scss";
 
 body {
     padding: 0;
