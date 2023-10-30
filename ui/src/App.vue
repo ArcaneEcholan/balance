@@ -17,7 +17,7 @@
             <router-view/>
         </div>
 
-        <div id="tabbar-area" style="position: relative; z-index: 1">
+        <div  id="tabbar-area" style="position: relative; z-index: 1;">
             <div class="flex">
                 <div @click="onClickHome" class="flex column flex-center flexg1">
                     <div>

@@ -1,34 +1,39 @@
 <template>
     <div>
-        <modal-presentation
-            style="background-color: #f7f8fa"
-            @closed="closed"
-            @close-100="close100"
-            @on-close="onclose"
-            ref="modal"
-        >
-            <template #default>
-                <div class="page">
-                    <div class=" ">
-                        <!--<div style="z-index: 10000000">{{ stackSize }}</div>-->
-                        <div class="google-gray-400 capitalize">
-                            <!--test-->
+        <!--<div style="position: relative; z-index: 1901;">-->
+            <modal-presentation
+                :z-index="'2001'"
+                style="background-color: #f7f8fa"
+                @closed="closed"
+                @close-100="close100"
+                @on-close="onclose"
+                ref="modal"
+            >
+                <template #default>
+                    <div class="page">
+                        <div class="">
+                            <!--<div style="z-index: 10000000">{{ stackSize }}</div>-->
+                            <div class="google-gray-400 capitalize">
+                                <!--test-->
+                            </div>
                         </div>
+                        <gap-component :value="'32px'"></gap-component>
+                        <div class="record-header">Edit Fields</div>
+                        <van-cell-group class="shadow overflow-hidden br8 ">
+                            <van-field v-model="categoryValue" type="string" label="category"/>
+                            <van-field v-model="amount" type="number" label="amount"/>
+                            <van-field v-model="datetime" type="text" label="datetime"/>
+                            <van-field v-model="count" type="digit" label="count"/>
+                            <van-field v-model="description" type="text" label="description"/>
+                        </van-cell-group>
+                        <gap-component></gap-component>
+                        <common-button :disabled="!submitEnable" @click="submit">
+                            <template #default>Submit</template>
+                        </common-button>
                     </div>
-                    <gap-component :value="'32px'"></gap-component>
-                    <div class="record-header">Edit Fields</div>
-                    <van-cell-group class="shadow overflow-hidden br8 ">
-                        <van-field v-model="categoryValue" type="string" label="category"/>
-                        <van-field v-model="amount" type="number" label="amount"/>
-                        <van-field v-model="datetime" type="text" label="datetime"/>
-                        <van-field v-model="count" type="digit" label="count"/>
-                        <van-field v-model="description" type="text" label="description"/>
-                    </van-cell-group>
-                    <gap-component></gap-component>
-                    <common-button :disabled="!submitEnable" @click="submit"><template #default>Submit</template></common-button>
-                </div>
-            </template>
-        </modal-presentation>
+                </template>
+            </modal-presentation>
+        <!--</div>-->
     </div>
 </template>
 
@@ -206,12 +211,15 @@ export default class EditRecordView extends Vue {
     closed() {
 
     }
+
     close100() {
         popPage()
     }
+
     close200() {
 
     }
+
     close300() {
 
     }

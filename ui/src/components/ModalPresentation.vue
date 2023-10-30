@@ -3,7 +3,10 @@
     <div
         class="slide-panel transition"
         :id="getContainerId()"
-        :style="`display: none; ${backgroundColor?'background-color: '+backgroundColor + ';':''}`"
+        :style="`display: none;
+        ${backgroundColor?('background-color: '+backgroundColor + ';'):''}
+        ${zIndex?('z-index: '+zIndex + ';'):''}
+        `"
     >
         <div style="height: 100%">
             <slot>content</slot>
@@ -23,6 +26,8 @@ export default class ModalPresentationView extends Vue {
 
     @Prop({default: null})
     backgroundColor!: string | null;
+    @Prop({default: null})
+    zIndex!: string | null;
 
     viewDebug = false;
 
