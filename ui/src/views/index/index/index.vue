@@ -1,52 +1,53 @@
 <template>
     <div class="page">
+        <div class="shadow br8 overflow-hidden">
+            <van-action-sheet :closeable="false" v-model="show" title="Add Records">
+                <div class="pdl8 pdr8">
+                    <transaction-type-component
+                        @on-click-one-type="onClickOneType"></transaction-type-component>
+                    <div class="record-header">Add Some Record</div>
+                    <add-transaction-editor-component
+                        ref="add-transaction-editor-component"></add-transaction-editor-component>
+                </div>
+            </van-action-sheet>
+        </div>
 
-        <!--edit stack-->
-        <div style="position: relative; z-index: 1901;">
+        <!--
+        Don't put the element inside z-index context, or the tab bar
+        in the App.vue will cover the pop-ups like action sheet or
+        swipe modal.
+
+        Apple does not respect the z-index context mechanism
+        -->
+        <!--<div style="position: relative; z-index: 1901;">-->
             <router-view>
             </router-view>
-        </div>
+        <!--</div>-->
 
-        <!--create a zindex context to separate basic page and modal, and avoid
-        components like v-loading(zindex 2000) step over to popped modal-->
-        <div style="position: relative; z-index: 1900;">
-
-            <div id="main-page-fix-header"
-                 style="position: fixed; top: 46px; left:0; right: 0; width: 100%;background-color: white;">
-                <div class="flex">
-                    <main-page-current-date-picker-component></main-page-current-date-picker-component>
-                    <ledger-switcher-component></ledger-switcher-component>
-                    <van-button plain type="info" @click="onclickAddRecord">+</van-button>
-
-                    <div class="shadow br8 overflow-hidden">
-                        <van-action-sheet :closeable="false" v-model="show" title="Add Records">
-                            <div class="pdl8 pdr8">
-                                <transaction-type-component
-                                    @on-click-one-type="onClickOneType"></transaction-type-component>
-                                <div class="record-header">Add Some Record</div>
-                                <add-transaction-editor-component
-                                    ref="add-transaction-editor-component"></add-transaction-editor-component>
-                            </div>
-                        </van-action-sheet>
-                    </div>
-                </div>
-                <!--region: amap-->
-                <!--<div class="record-header">Amap</div>-->
-
-                <!--<div style="position: relative" class="bg-white br8 shadow overflow-hidden">-->
-                <!--    <div id="amap" style="width: 100%; height: auto">-->
-                <!--    </div>-->
-                <!--    <div class="fake-marker"></div>-->
-                <!--</div>-->
-                <!--endregion-->
+        <!--<div style="position: relative; z-index: 1900;">-->
+        <div id="main-page-fix-header" style="position: relative; width: 100%;background-color: white;">
+            <div class="flex">
+                <main-page-current-date-picker-component></main-page-current-date-picker-component>
+                <ledger-switcher-component></ledger-switcher-component>
+                <van-button plain type="info" @click="onclickAddRecord">+</van-button>
             </div>
-            <div id="main-page-fix-header-placeholder"></div>
-            <gap-component :value="'8px'"></gap-component>
+            <!--region: amap-->
+            <!--<div class="record-header">Amap</div>-->
 
-            <transaction-list-component
-                ref="transaction-list-component"
-            ></transaction-list-component>
+            <!--<div style="position: relative" class="bg-white br8 shadow overflow-hidden">-->
+            <!--    <div id="amap" style="width: 100%; height: auto">-->
+            <!--    </div>-->
+            <!--    <div class="fake-marker"></div>-->
+            <!--</div>-->
+            <!--endregion-->
         </div>
+        <!--<div id="main-page-fix-header-placeholder"></div>-->
+        <gap-component :value="'8px'"></gap-component>
+
+        <transaction-list-component
+            ref="transaction-list-component"
+        ></transaction-list-component>
+        <!--</div>-->
     </div>
 
 </template>
@@ -319,8 +320,8 @@ export default class IndexView extends Vue {
         let b = document.getElementById("main-page-fix-header")!
         let bh = b.clientHeight
 
-        let c = document.getElementById("main-page-fix-header-placeholder")!
-        c.style.height = bh + "px";
+        // let c = document.getElementById("main-page-fix-header-placeholder")!
+        // c.style.height = bh + "px";
     }
 
     adjustAMapSize() {
