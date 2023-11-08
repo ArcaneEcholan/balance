@@ -103,6 +103,8 @@ export default class AddTransactionEditorComponent extends Vue {
                 }
             }
         ])
+        let ledgerName = eventBus.$emitWithReturnValue("on-get-current-ledger-name", null)
+        this.curLedger = {name: ledgerName}
     }
 
     onAddTrans() {

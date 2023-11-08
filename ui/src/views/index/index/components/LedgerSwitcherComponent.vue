@@ -22,7 +22,6 @@
 
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
-import {getRef} from "@/ts/vueUtils";
 import {pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
@@ -83,11 +82,6 @@ export default class LedgerSwitcherComponent extends Vue {
         this.toggleLedgerSelection()
 
         eventBus.$emit("on-cur-ledger-changed", ledger)
-
-        this.$emit("on-switch-ledger", ledger)
-
-        this.$emit("update:currentLedger", ledger)
-
     }
 
     onClickManageLedgerList() {
