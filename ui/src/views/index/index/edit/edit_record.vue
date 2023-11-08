@@ -2,11 +2,11 @@
     <div>
         <!--<div style="position: relative; z-index: 1901;">-->
             <modal-presentation
-                :z-index="'2001'"
                 style="background-color: #f7f8fa"
                 @closed="closed"
                 @close-100="close100"
                 @on-close="onclose"
+                :z-index="'1'"
                 ref="modal"
             >
                 <template #default>

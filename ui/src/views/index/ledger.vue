@@ -5,6 +5,7 @@
             @closed="closed"
             @close-100="close100"
             @on-close="onclose"
+            :z-index="'1'"
             ref="modal"
         >
             <template #default>
@@ -86,7 +87,7 @@ import ModalPresentationView from "@/components/ModalPresentation.vue";
 import {popPage} from "@/ts/pageStack";
 import {Notify} from "vant";
 import pageConfig from "@/ts/pageConfig";
-import {getHtmlElem, getRef, getVueEl} from "@/ts/vueUtils";
+import {getHtmlElem, getRef} from "@/ts/vueUtils";
 import eventBus from "@/ts/EventBus";
 import Client from "@/request/client";
 import CommonButton from "@/views/components/CommonButton.vue";
