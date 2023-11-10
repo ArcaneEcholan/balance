@@ -47,7 +47,7 @@ class StatisticsController {
         var thisMonthRankList = getThisMonthRankList(thisMonthTrans)
         var thisMonthTypeRankList = getThisMonthTypeRankList(thisMonthTrans)
 
-        var lastMontTrans = getLastMonthTrans(ledgerId, month);
+        var lastMontTrans = getLastMonthTrans(ledgerId, month)
 
         var lastMonthTotal = getLastMonthTotal(lastMontTrans)
 
@@ -71,7 +71,7 @@ class StatisticsController {
             r = "infinite"
         } else {
             percent = (thisMonthTotal - lastMonthTotal) / lastMonthTotal
-            r = percent.multiply(BigDecimal(100)).toString() + "%";
+            r = percent.multiply(BigDecimal(100)).toString() + "%"
         }
         return r
     }
@@ -79,13 +79,13 @@ class StatisticsController {
     private fun getThisMonthRankList(thisMonthTrans: List<TransactionVO>): List<Any> {
         class test {
             var id = 0
-            var type = ""
-            var amount = ""
-            var description = ""
-            var datetime = ""
+            var type: String? = ""
+            var amount: String = ""
+            var description: String? = ""
+            var datetime: String? = ""
             var count = 0
-            var total = ""
-            var percent = ""
+            var total: String = ""
+            var percent: String = ""
 
         }
 
@@ -115,7 +115,7 @@ class StatisticsController {
         }.filterNotNull().sortedByDescending { BigDecimal(it.total) }
 
         if (r.isEmpty()) {
-            return r;
+            return r
         }
         var f = r.first()
         var ft = f.total
@@ -204,7 +204,7 @@ class StatisticsController {
         }.toMutableList()
 
         if (r.isEmpty()) {
-            return r;
+            return r
         }
         var f = r.first()
         var ft = f.total
