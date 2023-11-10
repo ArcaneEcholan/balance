@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <van-button plain type="info" @click="show=true">{{currentLedger.name}}</van-button>
+            <van-button plain type="info" @click="show=true">{{ currentLedger.name }}</van-button>
         </div>
         <div class="shadow br8 overflow-hidden">
             <van-action-sheet :closeable="false" v-model="show" title="">
@@ -26,6 +26,7 @@ import {pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
 import CommonButton from "@/views/components/CommonButton.vue";
+import {provideListeners} from "@/page-eventbus-registration-mixin";
 
 @Component({
     components: {CommonButton}
@@ -36,27 +37,37 @@ export default class LedgerSwitcherComponent extends Vue {
     ledgersLoading = false
 
     created() {
-        eventBus.$on("on-get-current-ledger-name", (args) => {
-            return this.currentLedger.name
-        })
-
-        eventBus.$on('ledges-changes', (list) => {
-            this.ledgerList = list
-        })
-
-        eventBus.$on('ledger-deleted', (id) => {
-            this.ledgerList = this.ledgerList.filter((item: any) => {
-                return item.id !== id
-            })
-            if (this.currentLedger.id == id) {
-                if (this.ledgerList.length != 0) {
-                    this.currentLedger = this.ledgerList[0]
-                } else {
-                    // this is undefined behavior
-                    this.currentLedger = {id: null, name: "unknown"}
+        provideListeners(this, [
+            {
+                eventName: 'on-get-current-ledger-name',
+                handler: (args) => {
+                    return this.currentLedger.name
+                }
+            },
+            {
+                eventName: 'ledges-changes',
+                handler: (list) => {
+                    this.ledgerList = list
+                }
+            },
+            {
+                eventName: 'ledger-deleted',
+                handler: (id) => {
+                    this.ledgerList = this.ledgerList.filter((item: any) => {
+                        return item.id !== id
+                    })
+                    if (this.currentLedger.id == id) {
+                        if (this.ledgerList.length != 0) {
+                            this.currentLedger = this.ledgerList[0]
+                        } else {
+                            // this is undefined behavior
+                            this.currentLedger = {id: null, name: "unknown"}
+                        }
+                    }
                 }
             }
-        })
+        ])
+
 
         this.ledgersLoading = true
         Client.getLedgerList().then((resp: any) => {
@@ -78,6 +89,7 @@ export default class LedgerSwitcherComponent extends Vue {
     onClickSwitchLedger(ledger: any) {
 
         this.currentLedger = ledger
+        console.debug("current ledger changed to: ", ledger)
 
         this.toggleLedgerSelection()
 
@@ -90,7 +102,7 @@ export default class LedgerSwitcherComponent extends Vue {
     }
 
     toggleLedgerSelection() {
-        if(this.show == true) {
+        if (this.show == true) {
             this.show = false
         } else {
             this.show = false
