@@ -6,12 +6,10 @@ class StackItem {
 }
 
 class PageStack {
-    private stackSize: number = 0
 
     private stack: StackItem[] = []
 
     constructor() {
-        this.stackSize = 0;
     }
 
     pushPage(name: string, params: any) {
@@ -42,29 +40,7 @@ class PageStack {
         }
     }
 
-
-    push() {
-        this.stackSize++;
-    }
-
-    pop() {
-        if (this.stackSize <= 0) {
-            this.stackSize = 0;
-        } else {
-            this.stackSize--;
-        }
-    }
-
-    getStackSize() {
-        return this.stackSize;
-    }
-
-    isBottom() {
-        return this.stackSize === 0;
-    }
-
     clear() {
-        this.stackSize = 0;
         this.stack = []
     }
 
@@ -85,6 +61,10 @@ export function pushPage(name: string, params: any) {
 
     // stack plus 1
     pageStack.pushPage(name, params)
+    if (pageStack.size() > 1) {
+        document.body.classList.add("body-ns")
+    }
+
 
     console.debug(`current stack size: `, pageStack.size())
 }
@@ -94,6 +74,10 @@ export function popPage() {
 
     // stack minus 1
     pageStack.popPage()
+
+    if (pageStack.size() <= 1) {
+        document.body.classList.remove("body-ns")
+    }
 
     let top = pageStack.peek()
     if (top == null) {

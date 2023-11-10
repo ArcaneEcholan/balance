@@ -40,19 +40,19 @@ export default class LedgerSwitcherComponent extends Vue {
         provideListeners(this, [
             {
                 eventName: 'on-get-current-ledger-name',
-                handler: (args) => {
+                handler: () => {
                     return this.currentLedger.name
                 }
             },
             {
                 eventName: 'ledges-changes',
-                handler: (list) => {
+                handler: (list: any) => {
                     this.ledgerList = list
                 }
             },
             {
                 eventName: 'ledger-deleted',
-                handler: (id) => {
+                handler: (id: any) => {
                     this.ledgerList = this.ledgerList.filter((item: any) => {
                         return item.id !== id
                     })
