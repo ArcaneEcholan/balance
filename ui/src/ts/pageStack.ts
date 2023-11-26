@@ -48,6 +48,21 @@ class PageStack {
 
 let pageStack = new PageStack()
 
+function enable() {
+    document.body.style.overflow = 'auto';
+    document.body.style.position = 'relative';
+    // let scrollPosition = store.getters.scrollPosition
+    // document.body.style.top = `-${scrollPosition}px`;
+    // window.scrollTo(0, scrollPosition);
+}
+
+function disable() {
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('position');
+    document.body.style.removeProperty('top');
+    // store.commit('setScrollPosition', window.pageYOffset);
+}
+
 export function pushPage(name: string, params: any) {
     // null params breaks the router.push and router.replace
     if (params == null) {
@@ -61,8 +76,8 @@ export function pushPage(name: string, params: any) {
 
     // stack plus 1
     pageStack.pushPage(name, params)
-    if (pageStack.size() > 1) {
-        document.body.classList.add("body-ns")
+    if (pageStack.size() == 2) {
+        disable()
     }
 
 
@@ -76,7 +91,7 @@ export function popPage() {
     pageStack.popPage()
 
     if (pageStack.size() <= 1) {
-        document.body.classList.remove("body-ns")
+        enable()
     }
 
     let top = pageStack.peek()

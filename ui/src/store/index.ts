@@ -1,10 +1,13 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import development from './modules/development';
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-    state: {},
+    state: {
+        scrollPosition: 0,
+    },
     getters: {
         debugView: (state) => {
             // @ts-ignore
@@ -14,8 +17,16 @@ export default new Vuex.Store({
             // @ts-ignore
             return state.development.logEnabled;
         },
+        scrollPosition: (state) => {
+            // @ts-ignore
+            return state.scrollPosition;
+        }
     },
-    mutations: {},
+    mutations: {
+        setScrollPosition(state, scrollPosition) {
+            state.scrollPosition = scrollPosition;
+        }
+    },
     actions: {},
     modules: {
         development,

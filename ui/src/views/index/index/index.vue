@@ -65,6 +65,7 @@ import GapComponent from "@/views/components/GapComponent.vue";
 import AddTransactionEditorComponent from './components/AddTransactionEditorComponent.vue';
 import MainPageCurrentDatePickerComponent from "@/views/index/index/components/MainPageCurrentDatePickerComponent.vue";
 import CommonButton from "@/views/components/CommonButton.vue";
+import store from "@/store";
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -106,6 +107,9 @@ export default class IndexView extends Vue {
         this.show = true
     }
 
+  gets() {
+    return store.getters.scrollPosition
+  }
     show = false
     apiInvokingTimesSaver: any = null
 
