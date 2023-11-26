@@ -1,25 +1,19 @@
 <template>
-    <div class=''>
-        <div>
-            <div>
-                <van-button plain type="info" @click="show=true">{{this.getCurrentDate()}}</van-button>
-            </div>
-            <div class="shadow br8 overflow-hidden">
-                <van-action-sheet :closeable="false" v-model="show" title="">
-                    <van-datetime-picker
-                        @cancel="onCancel"
-                        @confirm="onPickDate"
-                        v-model="currentDate"
-                        title="Choose Year-Month"
-                        :min-date="minDate"
-                        :max-date="maxDate"
-                        :type="columnsType"
-                    >
-                        <template #default></template>
-                    </van-datetime-picker>
-                </van-action-sheet>
-            </div>
-        </div>
+    <div>
+        <span @click="show=true">{{ this.getCurrentDate() }}</span>
+        <van-action-sheet :closeable="false" v-model="show" title="">
+            <van-datetime-picker
+                @cancel="onCancel"
+                @confirm="onPickDate"
+                v-model="currentDate"
+                title="Choose Year-Month"
+                :min-date="minDate"
+                :max-date="maxDate"
+                :type="columnsType"
+            >
+                <template #default></template>
+            </van-datetime-picker>
+        </van-action-sheet>
     </div>
 </template>
 

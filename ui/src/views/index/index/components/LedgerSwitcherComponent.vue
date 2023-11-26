@@ -1,22 +1,23 @@
 <template>
-    <div>
-        <div>
-            <van-button plain type="info" @click="show=true">{{ currentLedger.name }}</van-button>
+    <div class="flex align-center">
+        <div @click="show=true">
+            <i class="icon ali-international-icon-log"></i>
         </div>
-        <div class="shadow br8 overflow-hidden">
-            <van-action-sheet :closeable="false" v-model="show" title="">
-                <van-cell-group>
-                    <van-cell @click="onClickSwitchLedger(ledger)" v-for="ledger in ledgerList"
-                              :title="ledger.name">
-                    </van-cell>
-                </van-cell-group>
-                <div style="padding: 5px 16px;">
-                    <common-button @click="onClickManageLedgerList">
-                        <template #default>ledgers</template>
-                    </common-button>
-                </div>
-            </van-action-sheet>
-        </div>
+        <!--<div>-->
+        <!--    <van-button plain type="info" @click="show=true">{{ currentLedger.name }}</van-button>-->
+        <!--</div>-->
+        <van-action-sheet :closeable="false" v-model="show" title="">
+            <van-cell-group>
+                <van-cell @click="onClickSwitchLedger(ledger)" v-for="ledger in ledgerList"
+                          :title="ledger.name">
+                </van-cell>
+            </van-cell-group>
+            <div style="padding: 5px 16px;">
+                <common-button @click="onClickManageLedgerList">
+                    <template #default>ledgers</template>
+                </common-button>
+            </div>
+        </van-action-sheet>
     </div>
 </template>
 
@@ -73,6 +74,8 @@ export default class LedgerSwitcherComponent extends Vue {
         Client.getLedgerList().then((resp: any) => {
             this.ledgersLoading = false
             this.ledgerList = resp.data
+            this.currentLedger = this.ledgerList[0]
+            eventBus.$emit('on-cur-ledger-changed', Object.assign({},this.currentLedger))
             eventBus.$emit('ledges-changes', this.ledgerList)
         }).catch((err: any) => {
             this.ledgersLoading = false
@@ -117,4 +120,8 @@ export default class LedgerSwitcherComponent extends Vue {
 </script>
 <style lang='scss' scoped>
 @import "~@/style/common-style.scss";
+
+.icon {
+    font-size: 20px;
+}
 </style>

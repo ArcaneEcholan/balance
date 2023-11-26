@@ -3,26 +3,34 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import './permission'; // permission control
+import 'vant/lib/index.css';
+
+import {
+    ActionSheet,
+    Button,
+    Cell,
+    CellGroup,
+    DatetimePicker,
+    DropdownItem,
+    DropdownMenu,
+    Field,
+    Icon,
+    List,
+    Loading,
+    NavBar,
+    Notify,
+    Popup,
+    SwipeCell,
+    Tabbar,
+    TabbarItem,
+    Tag
+} from 'vant';
+import PageEventbusRegistrationMixin from "@/page-eventbus-registration-mixin";
+import "@/assets/icon-fonts/iconfont.css"
 
 Vue.config.productionTip = false;
 
-import 'vant/lib/index.css';
 
-import { Loading } from 'vant';
-import { Tabbar, TabbarItem } from 'vant';
-import {Cell, Field, CellGroup} from 'vant';
-import {Popup} from 'vant';
-import {Button} from 'vant';
-import {Notify} from 'vant';
-import { NavBar } from 'vant';
-import {Icon} from "vant";
-import { List } from 'vant';
-import { Tag } from 'vant';
-import { DropdownMenu, DropdownItem } from 'vant'
-import { SwipeCell } from 'vant';
-import { ActionSheet } from 'vant';
-import { DatetimePicker } from 'vant';
-import eventBus from "@/ts/EventBus";
 Vue.use(DatetimePicker);
 Vue.use(Loading);
 Vue.use(Tabbar);
@@ -43,8 +51,8 @@ Vue.use(ActionSheet);
 
 Vue.use(SwipeCell);
 
-import PageEventbusRegistrationMixin from "@/page-eventbus-registration-mixin";
 Vue.mixin(PageEventbusRegistrationMixin)
+
 
 // Vue.prototype.$customFuncs = {
 //     getRef,

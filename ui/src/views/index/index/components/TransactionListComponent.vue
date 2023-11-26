@@ -1,5 +1,5 @@
 <template>
-    <div style="" class="shadow br8 overflow-hidden">
+    <div style="" class=" br8 overflow-hidden">
         <div class="record-header" v-show="transactionList.length > 0">This month</div>
 
         <!--list-->

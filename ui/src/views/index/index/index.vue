@@ -1,17 +1,14 @@
 <template>
     <div class="page">
-        <div class="shadow br8 overflow-hidden">
-            <van-action-sheet :closeable="false" v-model="show" title="Add Records">
-                <div class="pdl8 pdr8">
-                    <transaction-type-component
-                        @on-click-one-type="onClickOneType"></transaction-type-component>
-                    <div class="record-header">Add Some Record</div>
-                    <add-transaction-editor-component
-                        ref="add-transaction-editor-component"></add-transaction-editor-component>
-                </div>
-            </van-action-sheet>
-        </div>
-
+        <van-action-sheet :closeable="false" v-model="show" title="Add Records">
+            <div class="pdl8 pdr8">
+                <transaction-type-component
+                    @on-click-one-type="onClickOneType"></transaction-type-component>
+                <div class="record-header">Add Some Record</div>
+                <add-transaction-editor-component
+                    ref="add-transaction-editor-component"></add-transaction-editor-component>
+            </div>
+        </van-action-sheet>
         <!--
         Don't put the element inside z-index context, or the tab bar
         in the App.vue will cover the pop-ups like action sheet or
@@ -19,35 +16,38 @@
 
         Apple does not respect the z-index context mechanism
         -->
-        <!--<div style="position: relative; z-index: 1901;">-->
+        <div style="position:relative; z-index: 101">
             <router-view>
             </router-view>
-        <!--</div>-->
-
-        <!--<div style="position: relative; z-index: 1900;">-->
-        <div id="main-page-fix-header" style="position: relative; width: 100%;background-color: white;">
-            <div class="flex">
-                <main-page-current-date-picker-component></main-page-current-date-picker-component>
-                <ledger-switcher-component></ledger-switcher-component>
-                <van-button plain type="info" @click="onclickAddRecord">+</van-button>
-            </div>
-            <!--region: amap-->
-            <!--<div class="record-header">Amap</div>-->
-
-            <!--<div style="position: relative" class="bg-white br8 shadow overflow-hidden">-->
-            <!--    <div id="amap" style="width: 100%; height: auto">-->
-            <!--    </div>-->
-            <!--    <div class="fake-marker"></div>-->
-            <!--</div>-->
-            <!--endregion-->
         </div>
-        <!--<div id="main-page-fix-header-placeholder"></div>-->
+
+        <div id="header">
+            <div class="flex center">
+                <div class="current-ledger">{{ curLedger.name }}</div>
+            </div>
+            <main-page-current-date-picker-component></main-page-current-date-picker-component>
+            <div id="main-page-fix-header">
+                <div class="flex justify-between align-center">
+                    <div class="mg20">
+                        <ledger-switcher-component></ledger-switcher-component>
+                    </div>
+                    <div class="mg20">
+                        <div @click="onclickAddRecord">
+                            <i class="icon ali-international-icon-plus"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="header-gradual-color-bg"
+        ></div>
+        <div style="height: 100px;"></div>
+
         <gap-component :value="'8px'"></gap-component>
 
         <transaction-list-component
             ref="transaction-list-component"
         ></transaction-list-component>
-        <!--</div>-->
     </div>
 
 </template>
@@ -66,6 +66,7 @@ import AddTransactionEditorComponent from './components/AddTransactionEditorComp
 import MainPageCurrentDatePickerComponent from "@/views/index/index/components/MainPageCurrentDatePickerComponent.vue";
 import CommonButton from "@/views/components/CommonButton.vue";
 import store from "@/store";
+import {provideListeners} from "@/page-eventbus-registration-mixin";
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -107,9 +108,12 @@ export default class IndexView extends Vue {
         this.show = true
     }
 
-  gets() {
-    return store.getters.scrollPosition
-  }
+    curLedger = ""
+
+    gets() {
+        return store.getters.scrollPosition
+    }
+
     show = false
     apiInvokingTimesSaver: any = null
 
@@ -126,6 +130,14 @@ export default class IndexView extends Vue {
     }
 
     created() {
+        provideListeners(this, [
+            {
+                eventName: "on-cur-ledger-changed",
+                handler: (ledger: any) => {
+                    this.curLedger = ledger
+                }
+            },
+        ])
         this.loadAmap()
     }
 
@@ -320,9 +332,9 @@ export default class IndexView extends Vue {
         // a.style.padding = "4px";
         // this.adjustAMapSize()
 
-
-        let b = document.getElementById("main-page-fix-header")!
-        let bh = b.clientHeight
+        //
+        // let b = document.getElementById("main-page-fix-header")!
+        // let bh = b.clientHeight
 
         // let c = document.getElementById("main-page-fix-header-placeholder")!
         // c.style.height = bh + "px";
@@ -344,6 +356,49 @@ export default class IndexView extends Vue {
 @import "~@/style/common-style.scss";
 @import "~@/assets/custom-icon.css";
 
+.icon {
+    font-size: 20px;
+}
+
+$header-bgc: #FCF4D4;
+#header {
+    //background-color: #3574F0;
+    background-color: $header-bgc;
+
+    padding: 16px 8px 0 8px;
+    position: fixed;
+    z-index: 100;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+
+
+    #main-page-fix-header {
+        position: relative;
+        top: 32px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+
+        background-color: white;
+        border-radius: 5px;
+        padding: 0 16px;
+    }
+
+    .current-ledger {
+        font-size: 24px;
+    }
+
+
+}
+
+#header-gradual-color-bg {
+    top: 120px;
+    position: fixed;
+    height: 30px;
+    left: 0px;
+    right: 0px;
+    background: linear-gradient(to bottom, $header-bgc, #ffffff);
+}
+
 .fake-marker {
     display: block;
     position: absolute;
@@ -361,8 +416,8 @@ export default class IndexView extends Vue {
 .page {
     box-sizing: border-box;
     //padding: 0 8px 0 8px;
-    padding: 8px;
-    background-color: #f7f8fa;
+    padding: 16px;
+    background-color: #ffffff;
 }
 
 .record-header {
@@ -371,4 +426,5 @@ export default class IndexView extends Vue {
     font-size: 14px;
     line-height: 16px;
 }
+
 </style>

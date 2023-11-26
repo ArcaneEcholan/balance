@@ -1,14 +1,11 @@
 <template>
     <div id="app">
-        <!--<nav>-->
-        <!--    &lt;!&ndash;<router-link to="/test">Test</router-link>&ndash;&gt;-->
-        <!--</nav>-->
         <div id="header-area" class="fixed-header" style="">
-            <van-nav-bar :title="title" left-text="Back" left-arrow>
-                <template #right>
-                    <van-icon name="search"/>
-                </template>
-            </van-nav-bar>
+            <!--<van-nav-bar :title="title" left-text="Back" left-arrow>-->
+            <!--    <template #right>-->
+            <!--        <van-icon name="search"/>-->
+            <!--    </template>-->
+            <!--</van-nav-bar>-->
         </div>
 
         <div id="padding-area"></div>
@@ -19,35 +16,29 @@
         <div id="pad" class="pad"></div>
         <div id="tabbar-area">
             <div class="flex">
-                <div @click="onClickHome" class="flex column flex-center flexg1">
+                <div :style="`${activeTabBar == 'home'?'color: #1989fa;': ''}`"
+                     class="flex column flex-center flexg1"
+                     @click="onClickHome"
+                >
                     <div>
-                        <span v-if="activeTabBar == 'home'" class="van-blue-svg-color">
-                           <i style="width: 22px; height: 22px;" class="home-svg"></i>
-                        </span>
-                        <span v-else>
-                            <i style="width: 22px; height: 22px;" class="home-svg"></i>
+                        <span>
+                            <i class="icon ali-international-icon-home1"></i>
                         </span>
                     </div>
-                    <div v-if="activeTabBar == 'home'" style="color: #1989fa;">
-                        <span class="fs12" style="line-height: 1">home</span>
-                    </div>
-                    <div v-else>
+                    <div>
                         <span class="fs12" style="line-height: 1">home</span>
                     </div>
                 </div>
-                <div @click="onClickStatistics" class="flex column flex-center flexg1">
+                <div :style="`${activeTabBar == 'statistics'?'color: #1989fa;': ''}`"
+                     class="flex column flex-center flexg1"
+                     @click="onClickStatistics"
+                >
                     <div>
-                          <span v-if="activeTabBar == 'statistics'" class="van-blue-svg-color">
-                            <i style="width: 22px; height: 22px;" class="pie-chart-svg"></i>
-                        </span>
-                        <span v-else>
-                            <i style="width: 22px; height: 22px;" class="pie-chart-svg"></i>
+                       <span>
+                            <i class="icon ali-international-icon-pie-chart"></i>
                         </span>
                     </div>
-                    <div v-if="activeTabBar == 'statistics'" style="color: #1989fa;">
-                        <span class="fs12" style="line-height: 1">statistics</span>
-                    </div>
-                    <div v-else>
+                    <div>
                         <span class="fs12" style="line-height: 1">statistics</span>
                     </div>
                 </div>
@@ -71,6 +62,12 @@ export default class AppView extends Vue {
     fingerPositionX = 0
 
     activeTabBar = "home"
+    // can be reflected in the view
+    pc = pageConfig
+
+    get title() {
+        return this.pc.getTitle()
+    }
 
     created() {
         that = this;
@@ -89,6 +86,8 @@ export default class AppView extends Vue {
         this.activeTabBar = "statistics"
         replacePage("statistics", {})
     }
+
+    // this listener should be put here instead of in the touchstart listener
 
     mounted() {
         this.registerListenersForHandlingEdgeSwipe()
@@ -142,7 +141,8 @@ export default class AppView extends Vue {
         });
     }
 
-    // this listener should be put here instead of in the touchstart listener
+    // make sure pageConfig is in vue reactive system, so the change of it
+
     // to avoid the listener being created every time touchstart is triggered
     touchMoveListener = (e: any) => {
         // use that instead of this, because "this" is not the vue instance,
@@ -166,14 +166,6 @@ export default class AppView extends Vue {
             }
         }
     }
-
-    // make sure pageConfig is in vue reactive system, so the change of it
-    // can be reflected in the view
-    pc = pageConfig
-
-    get title() {
-        return this.pc.getTitle()
-    }
 }
 
 </script>
@@ -185,14 +177,6 @@ export default class AppView extends Vue {
 body {
     padding: 0;
     margin: 0;
-}
-
-.body-ns {
-    position: fixed;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
 }
 
 .fixed-header {
@@ -219,5 +203,14 @@ nav {
             color: #42b983;
         }
     }
+}
+
+#tabbar-area {
+    border-top: 1px solid #EBECF0;
+    padding: 8px 0;
+}
+
+.icon {
+    font-size: 20px !important;
 }
 </style>
