@@ -1,0 +1,740 @@
+<template>
+  <div>
+    <van-action-sheet :closeable="false" v-model="chooseTypePanelShow">
+      <div class="action-sheet-title">
+        Choose A Type
+      </div>
+      <div class="action-sheet-body">
+        <transaction-type-component @on-click-one-type="onClickOneType"></transaction-type-component>
+      </div>
+    </van-action-sheet>
+
+    <div class="flex column">
+      <div class="flex">
+        <div class="flexg1 flex center">Type</div>
+        <div class="flexg2 flex center">Amount</div>
+        <div class="flexg2 flex center">Count</div>
+        <div class="flexg2 flex center">Desc</div>
+      </div>
+
+      <div id="new-records-area" class="shadow br8 overflow-hidden">
+        <div :key="recordRow.id" :id="formNewRecordRowId(recordRow)" v-for="recordRow in newRecordRows"
+             class="new-record-row">
+          <van-swipe-cell>
+            <div class="flex">
+              <clickable class="cell flexg1 flex center"
+                         style="word-break: break-word; background-color: white;">
+                <div @click="onclickPickTypeBtn(recordRow)">
+                  <div v-if=" recordRow.type == null || recordRow.type === ''">
+                    <van-icon class="fs24 " name="question-o"/>
+                  </div>
+                  <div style="font-size: 14px;" v-else>
+                    {{ recordRow.type }}
+                  </div>
+                </div>
+              </clickable>
+
+              <div @click="onTouchCell(recordRow, 'amount')" :ref="`${recordRow.id}-amount`"
+                   class="flexg2 cell">
+                <van-field readonly v-model="recordRow.amount"></van-field>
+              </div>
+              <div @click="onTouchCell(recordRow, 'count')" :ref="`${recordRow.id}-count`"
+                   class="flexg2 cell">
+                <van-field readonly v-model="recordRow.count"></van-field>
+              </div>
+              <div @click="onTouchCell(recordRow, 'desc')" :ref="`${recordRow.id}-desc`"
+                   class="flexg2 cell last">
+                <van-field placeholder="comment" v-model="recordRow.desc"></van-field>
+              </div>
+            </div>
+
+            <template #right>
+              <van-button @click="deleteNewRecord(recordRow)" square text="Delete" type="danger"
+                          class="delete-button"/>
+            </template>
+          </van-swipe-cell>
+        </div>
+      </div>
+    </div>
+    <gap-component></gap-component>
+    <div class="flex pd5" style="border-top: 1px solid #EBECF0;">
+      <solid-icon
+          :clickable="true"
+          icon-class="ali-international-icon-add-1"
+          @click="addRecordRow">
+      </solid-icon>
+    </div>
+    <key-board-component @key-touched="touchKeyBoardEnd" >
+    </key-board-component>
+    <gap-component :value="'8px'"></gap-component>
+  </div>
+
+</template>
+
+<script lang='ts'>
+
+import {Component, Vue} from 'vue-property-decorator';
+import VanCursorEditorComponent from "@/views/components/VanCursorEditor.vue";
+import {findWordInLine, replace, timeout} from "@/ts/utils";
+import GapComponent from "@/views/components/GapComponent.vue";
+import {Notify} from "vant";
+import Client from "@/request/client";
+import eventBus from "@/ts/EventBus";
+import CommonButton from "@/views/components/CommonButton.vue";
+import {provideListeners} from "@/page-eventbus-registration-mixin";
+import TransactionTypeComponent from "@/views/index/index/components/TransactionTypeComponent.vue";
+import Clickable from "@/views/components/Clickable.vue";
+import SolidIcon from "@/views/components/SolidIcon.vue";
+import KeyBoardComponent from "@/views/index/index/components/KeyBoardComponent.vue";
+
+class FormItemField {
+  value: string | null = null;
+  key: string | null = null;
+  isValid: string | null = null;
+}
+
+class FormItem {
+  categoryValue: FormItemField | null = null;
+  amount: FormItemField | null = null;
+  count: FormItemField | null = null;
+  description: FormItemField | null = null;
+}
+
+@Component({
+  components: {
+    KeyBoardComponent,
+    SolidIcon,
+    Clickable,
+    CommonButton,
+    VanCursorEditorComponent,
+    GapComponent,
+    TransactionTypeComponent
+  }
+})
+export default class AddTransactionEditorComponent extends Vue {
+
+  onTouchCell(recordRow: any, attrName: string) {
+    let oldRecordRef = this.cursor.recordRef
+    let oldAttrName = this.cursor.attrName
+    this.cursor.recordRef = recordRow
+    this.cursor.attrName = attrName
+    this.$nextTick(() => {
+      this.focusOnNewRecordCell(oldRecordRef, oldAttrName, recordRow, attrName)
+    })
+  }
+
+  chooseTypePanelShow = false
+
+  onClickOneType(type: string) {
+    this.chooseTypeRecordRow["type"] = type
+    this.chooseTypePanelShow = false
+  }
+
+  formNewRecordRowId(record: any) {
+    return `new-record-row-${record.id}`
+  }
+
+  getANewRecordRowDiv(record: any) {
+    let div = document.getElementById(this.formNewRecordRowId(record))
+    if (div == null) {
+      throw new Error("div == null")
+    }
+    return div
+  }
+
+  getNewRecordsAreaDiv() {
+    let area = document.getElementById("new-records-area")
+    if (area == null) {
+      throw new Error("area == null")
+    }
+    return area;
+  }
+
+  increaseElemHeight(element: HTMLElement, heightDelt: number) {
+    element.style.height = element.offsetHeight + heightDelt + "px"
+  }
+
+  setElemHeight(element: HTMLElement, height: number) {
+    element.style.height = height + "px"
+  }
+
+  squashDivToExtremelyShort(element: HTMLElement) {
+    this.setElemHeight(element, 0.01)
+  }
+
+  deleteNewRecord(record: any) {
+    let div = this.getANewRecordRowDiv(record)
+    this.squashDivToExtremelyShort(div)
+
+    let area = this.getNewRecordsAreaDiv()
+    this.increaseElemHeight(area, -54)
+
+    timeout(500)
+        .then(() => {
+          let curIndex = this.newRecordRows.findIndex(it => it === this.cursor.recordRef)
+          let index = this.newRecordRows.findIndex(it => it === record)
+          if (index === -1) {
+            throw new Error("index === -1")
+          }
+          this.newRecordRows.splice(index, 1)
+
+          if (this.newRecordRows.length === 0) {
+            this.cursor.recordRef = null
+            this.cursor.attrName = ""
+          } else {
+            if (curIndex === index) {
+              if (index === this.newRecordRows.length) {
+                this.cursor.recordRef = this.newRecordRows[index - 1]
+              } else {
+                this.cursor.recordRef = this.newRecordRows[index]
+              }
+              this.$nextTick(() => {
+                this.focusOnNewRecordCell(null, "", this.cursor.recordRef, this.cursor.attrName)
+              })
+            }
+          }
+        })
+  }
+
+  cursor: any = {
+    recordRef: null,
+    attrName: "",
+  }
+  attrOrder: any[] = [
+    "amount", "count", "desc",
+  ]
+
+  focusPrevious() {
+    if (this.newRecordRows.length === 0) {
+      return;
+    }
+    let curattr = this.cursor.attrName
+    let curRecordRef = this.cursor.recordRef
+    let curRecordIndex = this.newRecordRows.findIndex(it => it === curRecordRef)
+
+    let nextattrIndex = 0
+    let nextattrName = ""
+    {
+      let curattrIndex = this.attrOrder.indexOf(curattr)
+      {
+        if (curattrIndex == -1) {
+          curattrIndex = 0;
+        }
+      }
+
+      if (curattrIndex == 0) {
+        if (curRecordIndex === 0) {
+          nextattrIndex = 0
+        } else {
+          nextattrIndex = this.attrOrder.length - 1
+        }
+      } else {
+        nextattrIndex = curattrIndex - 1
+      }
+      nextattrName = this.attrOrder[nextattrIndex]
+      this.cursor.attrName = nextattrName
+    }
+    if (nextattrIndex === this.attrOrder.length - 1) {
+      if (curRecordIndex == -1) {
+        throw new Error("curRecordIndex == -1")
+      }
+      let nextRecordRef
+      if (curRecordIndex == 0) {
+        nextRecordRef = curRecordRef
+      } else {
+        nextRecordRef = this.newRecordRows[curRecordIndex - 1]
+      }
+
+      this.cursor.recordRef = nextRecordRef
+    } else {
+      this.cursor.recordRef = curRecordRef
+    }
+
+    let nextRecordRef = this.cursor.recordRef
+
+    this.focusOnNewRecordCell(curRecordRef, curattr, nextRecordRef, nextattrName)
+  }
+
+  focusOnNewRecordCell(previousRef: any, previousAttrName: string, recordRef: any, attrName: string) {
+    this.newRecordRows.forEach(it => {
+      this.attrOrder.forEach(attr => {
+        // @ts-ignore
+        let attrElem = this.$refs[`${it.id}-${attr}`][0]
+        attrElem.classList.remove("active-new-record-cell")
+      })
+    })
+    if (recordRef != null) {
+      // @ts-ignore
+      let nextattrElem = this.$refs[`${recordRef.id}-${attrName}`][0]
+      nextattrElem.classList.add("active-new-record-cell")
+    }
+  }
+
+  focusNext() {
+    if (this.newRecordRows.length === 0) {
+      return;
+    }
+
+    let curattr = this.cursor.attrName
+    let curRecordRef = this.cursor.recordRef
+    let curRecordIndex = this.newRecordRows.findIndex(it => it === curRecordRef)
+
+    let nextattrIndex = 0
+    let nextattrName = ""
+    {
+      let curattrIndex = this.attrOrder.indexOf(curattr)
+      {
+        if (curattrIndex == -1) {
+          curattrIndex = 0;
+        }
+      }
+
+      if (curattrIndex == this.attrOrder.length - 1) {
+        if (curRecordIndex === this.newRecordRows.length - 1) {
+          nextattrIndex = this.attrOrder.length - 1
+        } else {
+          nextattrIndex = 0
+        }
+      } else {
+        nextattrIndex = curattrIndex + 1
+      }
+      nextattrName = this.attrOrder[nextattrIndex]
+      this.cursor.attrName = nextattrName
+    }
+    if (nextattrIndex === 0) {
+      if (curRecordIndex == -1) {
+        throw new Error("curRecordIndex == -1")
+      }
+      let nextRecordRef
+      if (curRecordIndex == this.newRecordRows.length - 1) {
+        nextRecordRef = curRecordRef
+      } else {
+        nextRecordRef = this.newRecordRows[curRecordIndex + 1]
+      }
+
+      this.cursor.recordRef = nextRecordRef
+    } else {
+      this.cursor.recordRef = curRecordRef
+    }
+
+    let nextRecordRef = this.cursor.recordRef
+    this.focusOnNewRecordCell(curRecordRef, curattr, nextRecordRef, nextattrName)
+  }
+
+  focusOnNextRow() {
+    if (this.newRecordRows.length === 0) {
+      return;
+    }
+    let curRecordRef = this.cursor.recordRef
+    let curAttrName = this.cursor.attrName
+    let curRecordIndex = this.newRecordRows.findIndex(it => it === curRecordRef)
+    if (curRecordIndex === this.newRecordRows.length - 1) {
+      return;
+    }
+    let nextRecordRef = this.newRecordRows[curRecordIndex + 1]
+    this.cursor.recordRef = nextRecordRef
+    if (this.cursor.attrName == null || this.cursor.attrName == "") {
+      this.cursor.attrName = this.attrOrder[0]
+    }
+    this.focusOnNewRecordCell(curRecordRef, curAttrName, this.cursor.recordRef, this.cursor.attrName)
+  }
+
+  focusOnPreviousRow() {
+    if (this.newRecordRows.length === 0) {
+      return;
+    }
+    let curRecordRef = this.cursor.recordRef
+    let curAttrName = this.cursor.attrName
+    let curRecordIndex = this.newRecordRows.findIndex(it => it === curRecordRef)
+    if (curRecordIndex === 0) {
+      return;
+    }
+    let nextRecordRef = this.newRecordRows[curRecordIndex - 1]
+    this.cursor.recordRef = nextRecordRef
+    if (this.cursor.attrName == null || this.cursor.attrName == "") {
+      this.cursor.attrName = this.attrOrder[0]
+    }
+    this.focusOnNewRecordCell(curRecordRef, curAttrName, this.cursor.recordRef, this.cursor.attrName)
+  }
+
+  newRecordRows: any[] = []
+  chooseTypeRecordRow: any = {}
+
+  onclickPickTypeBtn(recordRow: any) {
+    this.chooseTypePanelShow = true
+    this.chooseTypeRecordRow = recordRow
+  }
+
+  counter = 0
+
+  addRecordRow() {
+    let a = {
+      id: this.counter++,
+      type: "",
+      amount: "",
+      count: 1,
+      desc: "",
+    }
+    this.newRecordRows.push(a)
+    if (this.newRecordRows.length === 1) {
+      this.cursor.recordRef = a
+      this.cursor.attrName = "amount"
+      this.$nextTick(() => {
+        this.focusOnNewRecordCell(null, "", a, "amount")
+      })
+    }
+    let area = document.getElementById("new-records-area")
+    if (area == null) {
+      throw new Error("area == null")
+    }
+    area.style.height = area.offsetHeight + 54 + "px"
+  }
+
+  updated() {
+
+  }
+
+  geoLocation: any = {}
+
+  rawFormatString: string | null = null;
+
+  parsedForms: FormItem[] = []
+
+  curLedger: any = {name: "default"}
+
+  created() {
+    provideListeners(this, [
+      {
+        eventName: "on-click-one-type",
+        handler: (type: string) => {
+          this.replaceFirstWord(type)
+        }
+      },
+      {
+        eventName: "on-cur-ledger-changed",
+        handler: (ledger: any) => {
+          this.curLedger = ledger
+        }
+      },
+      {
+        eventName: "on-cur-location-changed",
+        handler: (loc: any) => {
+          this.geoLocation = loc
+        }
+      }
+    ])
+    let ledgerName = eventBus.$emitWithReturnValue("on-get-current-ledger-name", null)
+    this.curLedger = {name: ledgerName}
+  }
+
+
+  touchKeyBoardEnd(keyObj: any) {
+    let cursor = this.cursor
+    let recordRef = cursor.recordRef
+    let attrName = cursor.attrName
+    if (recordRef == null) {
+      return;
+    }
+
+    let keyType = keyObj.label
+    switch (keyType) {
+      case "number": {
+        let curValue = recordRef[attrName]
+        if (curValue == null) {
+          curValue = ""
+        }
+        curValue += keyObj.value
+        recordRef[attrName] = curValue
+        return;
+      }
+
+      case "dot": {
+        let curValue = recordRef[attrName]
+        if (curValue == null) {
+          curValue = ""
+        }
+        if (curValue.indexOf(".") !== -1) {
+          return;
+        }
+        curValue += keyObj.value
+        recordRef[attrName] = curValue
+        return;
+      }
+      case "delete" : {
+        let curValue = recordRef[attrName]
+        if (curValue == null) {
+          curValue = ""
+        }
+        if (curValue.length === 0) {
+          return;
+        }
+        curValue = curValue.substring(0, curValue.length - 1)
+        recordRef[attrName] = curValue
+        return;
+      }
+      case "arrow-up":
+        this.focusOnPreviousRow()
+        return;
+      case "arrow-down":
+        this.focusOnNextRow()
+        return;
+      case "arrow-left":
+        this.focusPrevious()
+        return;
+      case "arrow-right":
+        this.focusNext()
+        return;
+      case "confirm":
+        this.onAddTrans()
+        return;
+    }
+  }
+
+  mounted() {
+
+  }
+
+  onAddTrans() {
+    try {
+      this.checkAddTransData()
+      this.addTransactionsByLedgerName(this.curLedger.name, this.newRecordRows);
+    } catch (e: any) {
+      Notify({
+        message: e.message,
+        type: 'danger'
+      })
+    }
+
+
+  }
+
+  checkAddTransData() {
+    this.doCheckAddTransData()
+  }
+
+  doCheckAddTransData() {
+    let errorType = ""
+    if (this.newRecordRows.length == 0) {
+      errorType = "No data to save"
+      throw new Error(errorType)
+    }
+    let error = false
+    let parseForms = this.newRecordRows
+    parseForms.forEach((item: any) => {
+      if (error) {
+        throw new Error(errorType)
+      }
+      let categoryValue = item.type ?? ""
+      let amount = item.amount
+      let count = item.count
+      let description = item.desc
+
+      // ensure no null
+      if (amount == null || amount == "" || count == null || count == "") {
+        error = true
+        errorType = "Information not complete"
+        throw new Error(errorType)
+      }
+
+      let countValid = this.isPositiveInteger(Number(count));
+      let amountValid = this.isFloat(Number(amount));
+      let amountDecimalPlaces = this.countDecimalPlaces(amount);
+      if (amountDecimalPlaces > 2) {
+        amountValid = false
+      }
+
+      if (!countValid || !amountValid) {
+        error = true
+        errorType = "Information format invalid"
+        throw new Error(errorType)
+      }
+    })
+    // @ts-ignore
+    if (error === true) {
+      Notify(
+          {
+            message: errorType,
+            type: 'danger'
+          }
+      )
+      throw new Error(errorType)
+    }
+  }
+
+
+  isPositiveInteger(number: number): boolean {
+    return Number.isInteger(number) && number > 0;
+  }
+
+  isFloat(number: number) {
+    return Number(number) === number && !Number.isInteger(number) || Number.isInteger(number);
+  }
+
+  countDecimalPlaces(number: string) {
+    if (number === '') {
+      return 0; // Not a valid float string
+    }
+
+    const parts = number.split('.');
+
+    if (parts.length === 1) {
+      return 0; // No decimal point found
+    }
+
+    return parts[1].length; // Return the length of the decimal part
+  }
+
+  addTransactionsByLedgerName(ledgerName: string, trans: any[]) {
+    let request = this.assembleAddTransactionRequest(trans)
+
+    Client.saveTransactionsByLedgerName(ledgerName, request).then((resp) => {
+      Notify({
+        message: 'save successfully',
+        type: 'success'
+      })
+      eventBus.$emit("refresh-transaction-list", null)
+      this.newRecordRows = []
+    }).catch(resp => {
+      console.log(resp)
+    })
+  }
+
+  assembleAddTransactionRequest(trans: any[]): any[] {
+    let request = trans.map((tran) => {
+      let requestTran = {
+        categoryValue: tran.type,
+        amount: tran.amount,
+        count: tran.count,
+        description: tran.desc,
+        location: this.geoLocation,
+      };
+
+      return requestTran;
+    });
+    return request
+  }
+
+  parseInputStringToObjects() {
+    if (this.rawFormatString == null) {
+      return;
+    }
+    // food 44.00 kfc
+    // fruit 33.00 watermalon
+    let wordsOrder = ['categoryValue', 'amount', 'count', 'description'];
+
+    var lines = this.rawFormatString.split('\n');
+
+    let objs = lines
+        .filter((line) => !/^\s*$/.test(line))
+        .map((line) => line.trim())
+        .map((line) => {
+          let words = line.split(' ').filter((word) => word !== '');
+
+          let obj = wordsOrder.reduce(
+              (obj, cur, index) =>
+                  Object.assign(obj, {[cur]: words[index]}),
+              {},
+          );
+
+          return obj;
+        }).map((obj: any) => {
+          let objWithViewStatus = {};
+          const keys = Object.keys(obj);
+          return keys.reduce((objWithViewStatus, key) => {
+            return Object.assign(objWithViewStatus, {
+              [key]: {
+                value: obj[key],
+                isValid: false,
+              },
+            });
+          }, objWithViewStatus);
+        });
+    this.parsedForms = objs as FormItem[];
+  }
+
+  replaceFirstWord(type: string) {
+    let curStringAtInput = this.rawFormatString ?? ""
+    let a = this.$refs.recordInput as VanCursorEditorComponent
+    let rowNumber = a.cursorPosition.cursorRow
+    let wordRange = findWordInLine(curStringAtInput, rowNumber, 1)
+
+    if (wordRange == null) {
+      return;
+    }
+
+    curStringAtInput = replace(curStringAtInput, wordRange.start, wordRange.end, type)
+    this.rawFormatString = curStringAtInput
+
+    this.parseInputStringToObjects()
+
+    this.updateTextAreaInputCursorPosition(wordRange.start)
+  }
+
+
+  updateTextAreaInputCursorPosition(start: number) {
+    let vantinput = (this.$refs.recordInput as VanCursorEditorComponent).$el
+
+    let input = vantinput.querySelector('textarea')
+    input!.selectionStart = start
+  }
+
+
+}
+</script>
+<style lang='scss' scoped>
+@import "~@/style/common-style.scss";
+@import "~@/style/style-specification.scss";
+
+.record-header {
+  padding: 16px 16px 8px;
+  color: #969799;
+  font-size: 14px;
+  line-height: 16px;
+}
+
+@keyframes upDown {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+
+#new-records-area {
+  height: 0.1px;
+  transition: all 0.5s;
+
+  .new-record-row {
+    animation: upDown 0.5s;
+    height: 54px;
+    transition: height 0.5s;
+    overflow: hidden;
+
+    .cell {
+      border-bottom: 3px solid #ffffff;
+      margin: -0.5px;
+      border-right: 2px solid #EBECF0;
+    }
+
+    .cell.last {
+      border-right: none;
+    }
+
+    .cell.active-new-record-cell {
+      border-bottom: 3px solid #3369D6;
+    }
+  }
+}
+
+.van-swipe-cell__right {
+  button {
+    height: 100%;
+  }
+}
+
+
+</style>
+

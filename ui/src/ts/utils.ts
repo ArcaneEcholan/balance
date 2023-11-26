@@ -138,3 +138,8 @@ export function findWordInLine(target: string, lineNumber: number, count: number
     const end = start + words[count - 1].length; // End position is the start position plus the word length
     return { start, end };
 }
+
+
+export function timeout(timeout: number): Promise<any> {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
