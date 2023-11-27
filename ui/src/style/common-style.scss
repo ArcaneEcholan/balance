@@ -371,6 +371,11 @@ $google-gray-400: #bdbdbd;
     padding-bottom: 20px;
 }
 
+.pd20 {
+    padding: 20px;
+}
+
+
 .pdl15 {
     padding-left: 15px;
 }
@@ -646,4 +651,9 @@ $google-gray-400: #bdbdbd;
 
 :export {
     color_googleGray200: $google-gray-200;
+}
+
+
+.textcenter {
+    text-align: center;
 }
