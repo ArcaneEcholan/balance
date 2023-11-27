@@ -25,13 +25,13 @@
                                 {{ recordRow.type }}
                             </div>
                         </div>
-                        <div :ref="`${recordRow.id}-amount`" class="flexg2 cell">
+                        <div @click="onTouchCell(recordRow, 'amount')" :ref="`${recordRow.id}-amount`" class="flexg2 cell">
                             <van-field readonly v-model="recordRow.amount"></van-field>
                         </div>
-                        <div :ref="`${recordRow.id}-count`" class="flexg2 cell">
+                        <div @click="onTouchCell(recordRow, 'count')" :ref="`${recordRow.id}-count`" class="flexg2 cell">
                             <van-field readonly v-model="recordRow.count"></van-field>
                         </div>
-                        <div :ref="`${recordRow.id}-desc`" class="flexg2 cell">
+                        <div @click="onTouchCell(recordRow, 'desc')" :ref="`${recordRow.id}-desc`" class="flexg2 cell">
                             <van-field placeholder="comment" v-model="recordRow.desc"></van-field>
                         </div>
                     </div>
@@ -171,6 +171,15 @@ class FormItem {
 
 @Component({components: {CommonButton, VanCursorEditorComponent, GapComponent, TransactionTypeComponent}})
 export default class AddTransactionEditorComponent extends Vue {
+    onTouchCell(recordRow: any, attrName: string) {
+        let oldRecordRef = this.cursor.recordRef
+        let oldAttrName = this.cursor.attrName
+        this.cursor.recordRef = recordRow
+        this.cursor.attrName = attrName
+        this.$nextTick(() => {
+            this.focusOnNewRecordCell(oldRecordRef, oldAttrName, recordRow, attrName)
+        })
+    }
     chooseTypePanelShow = false
 
     onClickOneType(type: string) {

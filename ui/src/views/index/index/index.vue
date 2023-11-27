@@ -3,7 +3,7 @@
         <van-action-sheet :closeable="false" v-model="show" title="Add Records">
             <!--<div class="record-header">Add Some Record</div>-->
             <add-transaction-editor-component
-                    ref="add-transaction-editor-component"></add-transaction-editor-component>
+                ref="add-transaction-editor-component"></add-transaction-editor-component>
         </van-action-sheet>
         <!--
         Don't put the element inside z-index context, or the tab bar
@@ -100,6 +100,9 @@ Component.registerHooks([
 
 })
 export default class IndexView extends Vue {
+
+
+
     onclickAddRecord() {
         this.show = true
     }
