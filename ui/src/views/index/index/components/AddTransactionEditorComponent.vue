@@ -16,8 +16,8 @@
       </div>
       <div class="flex new-record-row" v-for="recordRow in newRecordRows" style="border: 1px solid black">
         <div class="flexg1 cell"><div @click="onclickPickTypeBtn">pick</div></div>
-        <div class="flexg2 cell"><van-field v-model="recordRow.amount"></van-field></div>
-        <div class="flexg2 cell"><van-field v-model="recordRow.count"></van-field></div>
+        <div class="flexg2 cell"><van-field readonly v-model="recordRow.amount"></van-field></div>
+        <div class="flexg2 cell"><van-field readonly v-model="recordRow.count"></van-field></div>
         <div class="flexg2 cell"><van-field placeholder="comment" v-model="recordRow.desc"></van-field></div>
       </div>
       <div @click="addRecordRow">+</div>
