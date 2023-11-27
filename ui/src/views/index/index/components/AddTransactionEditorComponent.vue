@@ -216,7 +216,6 @@ export default class AddTransactionEditorComponent extends Vue {
         }
     }
 
-    addRecordsCoordinates: any[] = []
     cursor: any = {
         recordRef: null,
         attrName: "",
@@ -277,21 +276,19 @@ export default class AddTransactionEditorComponent extends Vue {
     }
 
     focusOnNewRecordCell(previousRef: any, previousAttrName: string, recordRef: any, attrName: string) {
-
-        if (previousRef != null) {
-            // @ts-ignore
-            let curattrElem = this.$refs[`${previousRef.id}-${previousAttrName}`][0]
-            curattrElem.classList.remove("active-new-record-cell")
-        }
+        this.newRecordRows.forEach(it => {
+            this.attrOrder.forEach(attr => {
+                // @ts-ignore
+                let attrElem = this.$refs[`${it.id}-${attr}`][0]
+                attrElem.classList.remove("active-new-record-cell")
+            })
+        })
         if (recordRef != null) {
             // @ts-ignore
             let nextattrElem = this.$refs[`${recordRef.id}-${attrName}`][0]
-            let nextattrInput = (nextattrElem as any).querySelector('input')
             nextattrElem.classList.add("active-new-record-cell")
         }
-
     }
-
 
     focusNext() {
         if (this.newRecordRows.length === 0) {
