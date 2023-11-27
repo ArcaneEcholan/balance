@@ -13,10 +13,13 @@
             </div>
 
 
+            <div class="shadow br8 overflow-hidden" >
             <div v-for="recordRow in newRecordRows">
                 <van-swipe-cell>
                     <div class="flex new-record-row">
-                        <div class="flexg1 cell flex center clickable icon" style="word-break: break-word"
+                        <div class="flexg1 cell flex center clickable icon" style="word-break: break-word;
+                                    background-color: white;
+"
                              @click="onclickPickTypeBtn(recordRow)">
                             <div v-if=" recordRow.type == null || recordRow.type === ''">
                                 <van-icon class="fs24 " name="question-o"/>
@@ -25,13 +28,16 @@
                                 {{ recordRow.type }}
                             </div>
                         </div>
-                        <div @click="onTouchCell(recordRow, 'amount')" :ref="`${recordRow.id}-amount`" class="flexg2 cell">
+                        <div @click="onTouchCell(recordRow, 'amount')" :ref="`${recordRow.id}-amount`"
+                             class="flexg2 cell">
                             <van-field readonly v-model="recordRow.amount"></van-field>
                         </div>
-                        <div @click="onTouchCell(recordRow, 'count')" :ref="`${recordRow.id}-count`" class="flexg2 cell">
+                        <div @click="onTouchCell(recordRow, 'count')" :ref="`${recordRow.id}-count`"
+                             class="flexg2 cell">
                             <van-field readonly v-model="recordRow.count"></van-field>
                         </div>
-                        <div @click="onTouchCell(recordRow, 'desc')" :ref="`${recordRow.id}-desc`" class="flexg2 cell">
+                        <div @click="onTouchCell(recordRow, 'desc')" :ref="`${recordRow.id}-desc`"
+                             class="flexg2 cell last">
                             <van-field placeholder="comment" v-model="recordRow.desc"></van-field>
                         </div>
                     </div>
@@ -45,7 +51,7 @@
 
 
         </div>
-
+        </div>
         <gap-component></gap-component>
         <div class="flex pd5" style="border-top: 1px solid #EBECF0;">
             <div @click="addRecordRow"
@@ -180,6 +186,7 @@ export default class AddTransactionEditorComponent extends Vue {
             this.focusOnNewRecordCell(oldRecordRef, oldAttrName, recordRow, attrName)
         })
     }
+
     chooseTypePanelShow = false
 
     onClickOneType(type: string) {
@@ -700,6 +707,7 @@ export default class AddTransactionEditorComponent extends Vue {
 }
 
 .keyboard {
+    background-color: #ffffff;
     border-collapse: collapse;
 
     .cell {
@@ -718,10 +726,19 @@ export default class AddTransactionEditorComponent extends Vue {
 
 }
 
+.van-cell.van-field {
+    //background-color: #F7F8FA;
+}
 .new-record-row {
+    overflow: hidden;
     .cell {
         border-bottom: 3px solid #ffffff;
         margin: -0.5px;
+        border-right: 2px solid #EBECF0;
+    }
+
+    .cell.last {
+        border-right: none;
     }
 
     .cell.active-new-record-cell {

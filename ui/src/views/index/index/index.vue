@@ -1,9 +1,10 @@
 <template>
     <div class="page">
         <van-action-sheet :closeable="false" v-model="show" title="Add Records">
-            <!--<div class="record-header">Add Some Record</div>-->
-            <add-transaction-editor-component
-                ref="add-transaction-editor-component"></add-transaction-editor-component>
+            <div class="page">  <!--<div class="record-header">Add Some Record</div>-->
+                <add-transaction-editor-component
+                    ref="add-transaction-editor-component"></add-transaction-editor-component></div>
+
         </van-action-sheet>
         <!--
         Don't put the element inside z-index context, or the tab bar
@@ -416,7 +417,7 @@ $header-bgc: #FCF4D4;
     box-sizing: border-box;
     //padding: 0 8px 0 8px;
     padding: 16px;
-    background-color: #ffffff;
+    background-color: #F7F8FA;
 }
 
 .record-header {
