@@ -1,8 +1,6 @@
 <template>
     <div class="page">
         <van-action-sheet :closeable="false" v-model="show" title="Add Records">
-            <transaction-type-component
-                    @on-click-one-type="onClickOneType"></transaction-type-component>
             <div class="record-header">Add Some Record</div>
             <add-transaction-editor-component
                     ref="add-transaction-editor-component"></add-transaction-editor-component>

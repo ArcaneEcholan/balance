@@ -34,7 +34,7 @@ export default class TransTypeComponent extends Vue {
     }
 
     onClickOneType(type: string) {
-        eventBus.$emit("on-click-one-type", type)
+        this.$emit("on-click-one-type", type)
     }
 
 }

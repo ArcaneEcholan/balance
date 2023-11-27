@@ -1,14 +1,10 @@
 <template>
     <div>
-        <van-cursor-editor-component
-            ref="recordInput"
-            :value.sync="rawFormatString"
-            @input="parseInputStringToObjects"
-        >
-        </van-cursor-editor-component>
+        <van-action-sheet :closeable="false" v-model="chooseTypePanelShow" title="choose a type">
+            <transaction-type-component
+                @on-click-one-type="onClickOneType"></transaction-type-component>
+        </van-action-sheet>
 
-        curref: {{ cursor.recordRef }}
-        curattr: {{ cursor.attrName }}
         <div class="flex column">
             <div class="flex">
                 <div class="flexg1">type</div>
@@ -21,8 +17,13 @@
             <div v-for="recordRow in newRecordRows" class="border">
                 <van-swipe-cell>
                     <div class="flex new-record-row">
-                        <div class="flexg1 cell">
-                            <div @click="onclickPickTypeBtn">pick</div>
+                        <div class="flexg1 cell flex center" style="word-break: break-word"
+                             @click="onclickPickTypeBtn(recordRow)">
+                            <div>
+                                {{
+                                    recordRow.type == null || recordRow.type === '' ? ' choose a type' : recordRow.type
+                                }}
+                            </div>
                         </div>
                         <div :ref="`${recordRow.id}-amount`" class="flexg2 cell">
                             <van-field readonly v-model="recordRow.amount"></van-field>
@@ -145,6 +146,7 @@ import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
 import CommonButton from "@/views/components/CommonButton.vue";
 import {provideListeners} from "@/page-eventbus-registration-mixin";
+import TransactionTypeComponent from "@/views/index/index/components/TransactionTypeComponent.vue";
 
 class FormItemField {
     value: string | null = null;
@@ -159,8 +161,14 @@ class FormItem {
     description: FormItemField | null = null;
 }
 
-@Component({components: {CommonButton, VanCursorEditorComponent, GapComponent}})
+@Component({components: {CommonButton, VanCursorEditorComponent, GapComponent, TransactionTypeComponent}})
 export default class AddTransactionEditorComponent extends Vue {
+    chooseTypePanelShow = false
+
+    onClickOneType(type: string) {
+        this.chooseTypeRecordRow["type"] = type
+        this.chooseTypePanelShow = false
+    }
 
     deleteNewRecord(record: any) {
         let index = this.newRecordRows.findIndex(it => it === record)
@@ -347,9 +355,11 @@ export default class AddTransactionEditorComponent extends Vue {
     }
 
     newRecordRows: any[] = []
+    chooseTypeRecordRow: any = {}
 
-    onclickPickTypeBtn() {
-
+    onclickPickTypeBtn(recordRow: any) {
+        this.chooseTypePanelShow = true
+        this.chooseTypeRecordRow = recordRow
     }
 
     counter = 0
@@ -411,6 +421,10 @@ export default class AddTransactionEditorComponent extends Vue {
             c.addEventListener("touchstart", (e: any) => {
                 c.classList.add("active")
 
+            })
+            c.addEventListener("touchend", (e: any) => {
+                c.classList.remove("active")
+
                 let cursor = this.cursor
                 let recordRef = cursor.recordRef
                 let attrName = cursor.attrName
@@ -448,12 +462,6 @@ export default class AddTransactionEditorComponent extends Vue {
                     curValue = curValue.substring(0, curValue.length - 1)
                     recordRef[attrName] = curValue
                 }
-
-            })
-            c.addEventListener("touchend", (e: any) => {
-                c.classList.remove("active")
-            })
-            c.addEventListener("click", (e: any) => {
 
             })
         }
@@ -669,7 +677,7 @@ export default class AddTransactionEditorComponent extends Vue {
 }
 
 .active {
-    background-color: #f5f5f5;
+    background-color: #A8ADBD;
 }
 
 .clickable {
