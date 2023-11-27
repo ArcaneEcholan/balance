@@ -5,7 +5,7 @@
         Choose A Type
       </div>
       <div class="action-sheet-body">
-          <transaction-type-component @on-click-one-type="onClickOneType"></transaction-type-component>
+        <transaction-type-component @on-click-one-type="onClickOneType"></transaction-type-component>
       </div>
     </van-action-sheet>
 
@@ -16,7 +16,6 @@
         <div class="flexg2 flex center">Count</div>
         <div class="flexg2 flex center">Desc</div>
       </div>
-
 
       <div class="shadow br8 overflow-hidden">
         <div v-for="recordRow in newRecordRows">
@@ -60,13 +59,11 @@
     </div>
     <gap-component></gap-component>
     <div class="flex pd5" style="border-top: 1px solid #EBECF0;">
-      <div @click="addRecordRow"
-           class="flex center"
-           style="
-            padding: 6px;
-            color: #ffffff;background-color: #588CF3; border-radius: 10px;">
-        <i class="ali-international-icon-add-1 fs14 bold"></i>
-      </div>
+      <solid-icon
+          :clickable="true"
+          icon-class="ali-international-icon-add-1"
+          @click="addRecordRow">
+      </solid-icon>
     </div>
     <div class="keyboard" style="height: 200px; width: 100%">
       <div class="flex" style="height: 100%;">
@@ -133,6 +130,7 @@ import CommonButton from "@/views/components/CommonButton.vue";
 import {provideListeners} from "@/page-eventbus-registration-mixin";
 import TransactionTypeComponent from "@/views/index/index/components/TransactionTypeComponent.vue";
 import Clickable from "@/views/components/Clickable.vue";
+import SolidIcon from "@/views/components/SolidIcon.vue";
 
 class FormItemField {
   value: string | null = null;
@@ -147,7 +145,7 @@ class FormItem {
   description: FormItemField | null = null;
 }
 
-@Component({components: {Clickable, CommonButton, VanCursorEditorComponent, GapComponent, TransactionTypeComponent}})
+@Component({components: {SolidIcon, Clickable, CommonButton, VanCursorEditorComponent, GapComponent, TransactionTypeComponent}})
 export default class AddTransactionEditorComponent extends Vue {
   onTouchCell(recordRow: any, attrName: string) {
     let oldRecordRef = this.cursor.recordRef
