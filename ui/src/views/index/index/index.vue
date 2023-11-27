@@ -1,7 +1,7 @@
 <template>
     <div class="page">
         <van-action-sheet :closeable="false" v-model="show" title="Add Records">
-            <div class="record-header">Add Some Record</div>
+            <!--<div class="record-header">Add Some Record</div>-->
             <add-transaction-editor-component
                     ref="add-transaction-editor-component"></add-transaction-editor-component>
         </van-action-sheet>

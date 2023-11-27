@@ -1,28 +1,28 @@
 <template>
     <div>
         <van-action-sheet :closeable="false" v-model="chooseTypePanelShow" title="choose a type">
-            <transaction-type-component
-                @on-click-one-type="onClickOneType"></transaction-type-component>
+            <transaction-type-component @on-click-one-type="onClickOneType"></transaction-type-component>
         </van-action-sheet>
 
         <div class="flex column">
             <div class="flex">
-                <div class="flexg1">type</div>
-                <div class="flexg2">amount</div>
-                <div class="flexg2">count</div>
-                <div class="flexg2">desc</div>
+                <div class="flexg1 flex center">Type</div>
+                <div class="flexg2 flex center">Amount</div>
+                <div class="flexg2 flex center">Count</div>
+                <div class="flexg2 flex center">Desc</div>
             </div>
 
 
-            <div v-for="recordRow in newRecordRows" class="border">
+            <div v-for="recordRow in newRecordRows">
                 <van-swipe-cell>
                     <div class="flex new-record-row">
-                        <div class="flexg1 cell flex center" style="word-break: break-word"
+                        <div class="flexg1 cell flex center clickable icon" style="word-break: break-word"
                              @click="onclickPickTypeBtn(recordRow)">
-                            <div>
-                                {{
-                                    recordRow.type == null || recordRow.type === '' ? ' choose a type' : recordRow.type
-                                }}
+                            <div v-if=" recordRow.type == null || recordRow.type === ''">
+                                <van-icon class="fs24 " name="question-o"/>
+                            </div>
+                            <div style="font-size: 14px;" v-else>
+                                {{ recordRow.type }}
                             </div>
                         </div>
                         <div :ref="`${recordRow.id}-amount`" class="flexg2 cell">
@@ -425,7 +425,21 @@ export default class AddTransactionEditorComponent extends Vue {
         this.curLedger = {name: ledgerName}
     }
 
+    updated() {
+        let css = document.querySelectorAll(".icon.clickable")
+
+        for (let c of css) {
+            c.addEventListener("touchstart", (e: any) => {
+                c.classList.add("active")
+            })
+            c.addEventListener("touchend", (e: any) => {
+                c.classList.remove("active")
+            })
+        }
+    }
+
     mounted() {
+
         let cs = document.querySelectorAll(".keyboard .cell")
         for (let c of cs) {
             c.addEventListener("touchstart", (e: any) => {
@@ -690,18 +704,19 @@ export default class AddTransactionEditorComponent extends Vue {
     background-color: #A8ADBD;
 }
 
-.clickable {
+
+.icon {
 
 }
 
 .new-record-row {
     .cell {
-        border: 1px solid black;
+        border-bottom: 3px solid #ffffff;
         margin: -0.5px;
     }
 
     .cell.active-new-record-cell {
-        border: 2px solid red;
+        border-bottom: 3px solid #3369D6;
     }
 }
 
