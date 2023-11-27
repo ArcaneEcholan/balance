@@ -44,10 +44,18 @@
             </div>
 
 
-            <div @click="addRecordRow">+</div>
         </div>
 
         <gap-component></gap-component>
+        <div class="flex pd5" style="border-top: 1px solid #EBECF0;">
+            <div @click="addRecordRow"
+                 class="flex center"
+                 style="
+            padding: 6px;
+            color: #ffffff;background-color: #588CF3; border-radius: 10px;">
+                <i class="ali-international-icon-add-1 fs14 bold"></i>
+            </div>
+        </div>
         <div class="keyboard" style="height: 200px; width: 100%">
             <div class="flex" style="height: 100%;">
                 <div class="flexg3 flex column">
@@ -186,7 +194,9 @@ export default class AddTransactionEditorComponent extends Vue {
                 this.cursor.recordRef = this.newRecordRows[index]
             }
 
-            this.focusOnNewRecordCell(null, "", this.cursor.recordRef, this.cursor.attrName)
+            this.$nextTick(() => {
+                this.focusOnNewRecordCell(null, "", this.cursor.recordRef, this.cursor.attrName)
+            })
         }
     }
 

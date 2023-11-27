@@ -1,10 +1,11 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3570946 */
-  src: url('iconfont.woff2?t=1700982938822') format('woff2'),
-       url('iconfont.woff?t=1700982938822') format('woff'),
-       url('iconfont.ttf?t=1700982938822') format('truetype'),
-       url('iconfont.svg?t=1700982938822#iconfont') format('svg');
+  src: url('iconfont.woff2?t=1701068166906') format('woff2'),
+       url('iconfont.woff?t=1701068166906') format('woff'),
+       url('iconfont.ttf?t=1701068166906') format('truetype'),
+       url('iconfont.svg?t=1701068166906#iconfont') format('svg');
 }
+
 [class^="ali-international-icon-"], [class*=" ali-international-icon-"] {
     font-family: "iconfont" !important;
     font-size: 16px;
@@ -12,7 +13,13 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+.ali-international-icon-add-1:before {
+  content: "\e887";
+}
 
+.ali-international-icon-minus-1-copy:before {
+  content: "\ecd5";
+}
 
 .ali-international-icon-plus:before {
   content: "\e627";
