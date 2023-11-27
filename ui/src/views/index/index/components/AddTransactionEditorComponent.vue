@@ -1,6 +1,5 @@
 <template>
     <div>
-        <van-button @click="test1111">asdf</van-button>
         <van-action-sheet :closeable="false" v-model="chooseTypePanelShow">
             <div class="action-sheet-title">
                 Choose A Type
@@ -18,7 +17,11 @@
                 <div class="flexg2 flex center">Desc</div>
             </div>
 
-            <div class="shadow br8 overflow-hidden">
+            <!--0.1height is for animation, since if the init offsetheight is 0, when height expands, animation
+             does not take effect-->
+            <div id="new-records-area" class="shadow br8 overflow-hidden" style="
+                        transition: height 0.5s ease;height: 0.1px;
+">
                 <div :key="recordRow.id" :id="`new-record-row-${recordRow.id}`" v-for="recordRow in newRecordRows"
                      class="new-record-row slide-in">
                     <van-swipe-cell>
@@ -176,18 +179,19 @@ export default class AddTransactionEditorComponent extends Vue {
         this.chooseTypePanelShow = false
     }
 
-    test1111() {
-        this.deleteNewRecord(this.newRecordRows[0])
-    }
-
     deleteNewRecord(record: any) {
-        let divid = `new-record-row-${record.id}`
-        let div = document.getElementById(divid)
-        if (div == null) {
-            throw new Error("div == null")
+        // let divid = `new-record-row-${record.id}`
+        // let div = document.getElementById(divid)
+        // if (div == null) {
+        //     throw new Error("div == null")
+        // }
+        // div.classList.remove("slide-in")
+        // div.classList.add("slide-out")
+        let area = document.getElementById("new-records-area")
+        if (area == null) {
+            throw new Error("area == null")
         }
-        div.classList.remove("slide-in")
-        div.classList.add("slide-out")
+        area.style.height = area.offsetHeight - 54 + "px"
         setTimeout(() => {
             let curIndex = this.newRecordRows.findIndex(it => it === this.cursor.recordRef)
             let index = this.newRecordRows.findIndex(it => it === record)
@@ -211,7 +215,7 @@ export default class AddTransactionEditorComponent extends Vue {
                     })
                 }
             }
-        }, 500)
+        }, 300)
     }
 
     cursor: any = {
@@ -386,6 +390,11 @@ export default class AddTransactionEditorComponent extends Vue {
     counter = 0
 
     addRecordRow() {
+        let area = document.getElementById("new-records-area")
+        if (area == null) {
+            throw new Error("area == null")
+        }
+        area.style.height = area.offsetHeight + 54 + "px"
         let a = {
             id: this.counter++,
             type: "",
