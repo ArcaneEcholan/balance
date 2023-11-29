@@ -1,49 +1,29 @@
 <template>
-    <div>
-        <!--<div style="position: relative; z-index: 1901;">-->
-            <modal-presentation
-                style="background-color: #f7f8fa"
-                @closed="closed"
-                @close-100="close100"
-                @on-close="onclose"
-                :z-index="'1'"
-                ref="modal"
-            >
-                <template #default>
-                    <div class="page">
-                        <div class="">
-                            <!--<div style="z-index: 10000000">{{ stackSize }}</div>-->
-                            <div class="google-gray-400 capitalize">
-                                <!--test-->
-                            </div>
-                        </div>
-                        <gap-component :value="'32px'"></gap-component>
-                        <div class="record-header">Edit Fields</div>
-                        <van-cell-group class="shadow overflow-hidden br8 ">
-                            <van-field v-model="categoryValue" type="string" label="category"/>
-                            <van-field v-model="amount" type="number" label="amount"/>
-                            <van-field v-model="datetime" type="text" label="datetime"/>
-                            <van-field v-model="count" type="digit" label="count"/>
-                            <van-field v-model="description" type="text" label="description"/>
-                        </van-cell-group>
-                        <gap-component></gap-component>
-                        <common-button :disabled="!submitEnable" @click="submit">
-                            <template #default>Submit</template>
-                        </common-button>
-                    </div>
-                </template>
-            </modal-presentation>
-        <!--</div>-->
-    </div>
+    <modal-presentation @close-300="onclose">
+        <div class="page">
+            <gap-component :value="'32px'"></gap-component>
+            <div class="record-header">Edit Fields</div>
+            <van-cell-group class="shadow overflow-hidden br8 ">
+                <van-field v-model="categoryValue" type="string" label="category"/>
+                <van-field v-model="amount" type="number" label="amount"/>
+                <van-field v-model="datetime" type="text" label="datetime"/>
+                <van-field v-model="count" type="digit" label="count"/>
+                <van-field v-model="description" type="text" label="description"/>
+            </van-cell-group>
+            <gap-component></gap-component>
+            <common-button :disabled="!submitEnable" @click="submit">
+                <template #default>Submit</template>
+            </common-button>
+        </div>
+    </modal-presentation>
 </template>
 
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentationView from "@/components/ModalPresentation.vue";
-import {popPage} from "@/ts/pageStack";
 import {Notify} from "vant";
 import Client from "@/request/client";
-import {countDecimalPlaces, isFloat, isPositiveInteger} from '@/ts/utils';
+import {countDecimalPlaces, isFloat, isPositiveInteger, unmountComponent} from '@/ts/utils';
 import eventBus from "@/ts/EventBus";
 import pageConfig from "@/ts/pageConfig";
 import CommonButton from "@/views/components/CommonButton.vue";
@@ -56,12 +36,6 @@ class FormItem {
     description: string | null = null;
 }
 
-// Register the router hooks with their names
-// Component.registerHooks([
-//     "beforeRouteEnter",
-//     "beforeRouteLeave",
-//     "beforeRouteUpdate"
-// ]);
 @Component({
     components: {
         GapComponent,
@@ -70,13 +44,64 @@ class FormItem {
     }
 })
 export default class EditRecordView extends Vue {
-    varTable: any = {}
+
+    beforeDestroy() {
+        console.log("destroyed")
+    }
+    onclose() {
+        unmountComponent(this, 500)
+    }
 
     categoryValue: string | null = null
 
-    submit() {
-        this.submitEnable = false
+    amountFractionNumberValid() {
+        let i = isFloat(Number(this.amount));
+        let amountValid = true
+        if (this.amount == null) {
+            return false;
+        }
+        let amountDecimalPlaces = countDecimalPlaces(this.amount);
+        if (amountDecimalPlaces > 2 || !i) {
+            amountValid = false
+        }
+        return amountValid
+    }
 
+    typeValid() {
+        let categoryValid = true
+        let categoryValue = this.categoryValue
+        if (categoryValue == null || categoryValue.trim() == "") {
+            categoryValid = false
+        }
+        return categoryValue
+    }
+
+    checkValidationOfData() {
+
+        if (this.amount == null || this.count == null) {
+            Notify({
+                type: "danger",
+                message: "Information incomplete"
+            })
+            this.submitEnable = true
+            throw new Error("Information format invalid")
+        }
+
+
+        let countValid = isPositiveInteger(Number(this.count));
+        let amountValid = this.amountFractionNumberValid()
+        let categoryValid = this.typeValid()
+
+        if (!countValid ||
+            !amountValid ||
+            !categoryValid) {
+            this.submitEnable = true
+            throw new Error("Information format invalid")
+        }
+
+    }
+
+    normalizeDateTime() {
         let datetime = this.datetime
 
         if (datetime != null) {
@@ -92,51 +117,30 @@ export default class EditRecordView extends Vue {
                 return
             }
         }
+        this.datetime = datetime
+
+    }
+
+    submit() {
+        this.submitEnable = false
+
+        this.normalizeDateTime()
         let description = this.description
 
-        let amount = this.amount
-        let count = this.count
-
-        // ensure no null
-        if (amount == null || count == null) {
-            Notify({
-                type: "danger",
-                message: "Information incomplete"
-            })
-            this.submitEnable = true
-            return
-        }
-
-
-        let categoryValid = true
-        let categoryValue = this.categoryValue
-        if (categoryValue == null || categoryValue.trim() == "") {
-            categoryValid = false
-        }
-
-        let countValid = isPositiveInteger(Number(count));
-        let amountValid = isFloat(Number(amount));
-        let amountDecimalPlaces = countDecimalPlaces(amount);
-        if (amountDecimalPlaces > 2) {
-            amountValid = false
-        }
-
-
-        if (!countValid || !amountValid ||
-            !categoryValid) {
+        try {
+            this.checkValidationOfData()
+        } catch (e) {
             Notify({
                 type: "danger",
                 message: "Information format invalid"
             })
-            this.submitEnable = true
-            return
         }
 
 
         // format check pass
         Client.updateTransaction(this.recordId,
-            categoryValue!,
-            amount, datetime, count, description)
+            this.categoryValue!,
+            this.amount!, this.datetime, this.count!, description)
             .then((resp: any) => {
                 let newTrans = resp.data
                 this.categoryValue = newTrans.categoryValue
@@ -169,63 +173,14 @@ export default class EditRecordView extends Vue {
 
     modal!: ModalPresentationView
 
-    created() {
-    }
-
     mounted() {
-        this.modal = this.$refs.modal as ModalPresentationView;
-        setTimeout(() => {
-            this.modal.openModal()
-        }, 1)
-
-        this.recordId = this.$route.params.id
-        this.amount = this.$route.params.amount
-        this.datetime = this.$route.params.datetime
-        this.count = this.$route.params.count
-        this.categoryValue = this.$route.params.categoryValue
-        this.description = this.$route.params.description
-        //
-        // setTimeout(() => {
-        //     let recordId: string | number | null = this.$route.query.recordId as number | string | null
-        //     this.recordId = recordId
-        //     if (recordId != null) {
-        //         Client.getTransaction(recordId as number).then(resp => {
-        //             this.amount = resp.data.amount
-        //             this.datetime = resp.data.datetime
-        //             this.count = resp.data.count
-        //             this.categoryValue = resp.data.categoryValue
-        //             this.description = resp.data.description
-        //         })
-        //         return
-        //     }
-        //
-        //     Notify("page status invalid")
-        //     setTimeout(() => {
-        //         Notify.clear()
-        //         this.$router.push("/")
-        //     }, 1000)
-        // }, 500)
-
-    }
-
-    closed() {
-
-    }
-
-    close100() {
-        popPage()
-    }
-
-    close200() {
-
-    }
-
-    close300() {
-
-    }
-
-    onclose() {
-        pageConfig.setTitle("Balance")
+        // @ts-ignore
+        this.recordId = this.$mountProp.id// @ts-ignore
+        this.amount = this.$mountProp.amount// @ts-ignore
+        this.datetime = this.$mountProp.datetime// @ts-ignore
+        this.count = this.$mountProp.count// @ts-ignore
+        this.categoryValue = this.$mountProp.categoryValue// @ts-ignore
+        this.description = this.$mountProp.description
     }
 }
 </script>
@@ -235,6 +190,7 @@ export default class EditRecordView extends Vue {
 .page {
     padding: 8px;
     background-color: #f7f8fa;
+    height: 100%;
 }
 
 .record-header {

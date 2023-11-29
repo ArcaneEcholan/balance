@@ -1,12 +1,8 @@
 <template>
-    <!-- this is the modal -->
     <div
         class="slide-panel transition"
-        :id="getContainerId()"
-        :style="`display: none;
-        ${backgroundColor?('background-color: '+backgroundColor + ';'):''}
-        ${zIndex?('z-index: '+zIndex + ';'):''}
-        `"
+        :id="modalElemUid"
+        :style="` ${zIndex?('z-index: '+zIndex + ';'):''} `"
     >
         <div style="height: 100%">
             <slot>content</slot>
@@ -16,105 +12,28 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
+
 @Component
 export default class ModalPresentationView extends Vue {
     modal!: HTMLElement;
     modalWidth = 0;
     swipePercentage = 0.3;
-    uuid!: string;
+    modalElemUid: string = uuidv4();
 
-    @Prop({default: null})
-    backgroundColor!: string | null;
     @Prop({default: null})
     zIndex!: string | null;
 
-    viewDebug = false;
-
-    /**
-     * convenient function for closing modal style "right"
-     */
-    closeModal() {
-        this.modal.style.right = `${-this.modalWidth}px`;
-        this.$emit('on-close', this);
-        setTimeout(() => {
-            this.$emit('close-300', this);
-        }, 300);
-        setTimeout(() => {
-            this.$emit('close-200', this);
-        }, 200);
-        setTimeout(() => {
-            this.$emit('close-100', this);
-        }, 100);
-        setTimeout(() => {
-            this.$emit('closed', this);
-        }, 500);
-    }
-
-    getContainerId() {
-        return this.uuid;
-    }
-
-    /**
-     * convenient function for opening modal style "right"
-     */
-    openModal() {
-        this.modal.style.right = `0`;
-        setTimeout(() => {
-            this.$emit('open', this);
-        }, 500);
-    }
-
-    /**
-     * convenient function for getting modal style "right"
-     *
-     */
-    modalStyleRight() {
-        return Number(
-            this.modal.style.right.substring(
-                0,
-                this.modal.style.right.length - 2,
-            ),
-        );
-    }
-
-    /**
-     * convenient function for setting modal style "right"
-     */
-    setModalStyleRight(value: number) {
-        this.modal.style.right = `${value}px`;
-    }
-
-    /**
-     * Determine what should the modal do after user finish swiping, close or  * restore.
-     *
-     * If the modal is half body into the right side, close, otherwise restore.
-     *
-     * Invoked when user finish swipe(finger leave the screen).
-     *
-     */
-    shouldModalClose() {
-        let modalRightValue = Math.abs(this.modalStyleRight());
-        if (modalRightValue > this.modalWidth / 2) {
-            return true;
-        }
-        return false;
-    }
-
-    created() {
-        this.uuid = uuidv4();
-        console.debug(`new modal uuid: ${this.uuid}`);
-    }
-
     mounted() {
-        let pageWidth = window.innerWidth;
-        let containerId = this.getContainerId();
-        this.modal = document.getElementById(containerId) as HTMLElement;
+        this.registerSwipeRelatedEventHandler()
+        this.openModal()
+    }
+
+    registerSwipeRelatedEventHandler() {
+        this.modal = document.getElementById(this.modalElemUid) as HTMLElement;
 
         // Init width of the modal to page width
-        this.modalWidth = pageWidth;
-
-        console.debug(`modal width: ${this.modalWidth}`);
+        this.modalWidth = window.innerWidth;
 
         // we give the modal a init size
         this.modal.style.right = -this.modalWidth + 'px'; // let it hide into the right side of the screen
@@ -125,10 +44,7 @@ export default class ModalPresentationView extends Vue {
         // and after setting the style, we restore the display of the modal
         this.modal.style.display = 'block';
 
-        // region: convenient function for manipulating modal
-        // endregion
         const swipeAreaWidth = window.innerWidth * this.swipePercentage;
-        console.debug('swipe area: ' + swipeAreaWidth);
 
         // this is the width of the area where user swipes over the screen, direction is from left to right
         let userSwipePathWidth = 0;
@@ -139,7 +55,6 @@ export default class ModalPresentationView extends Vue {
         // indicate if there is a swipe action
         let isThereASwipe = false;
 
-        // this is the time span limit of the swipe action, if the span is less than this value, we close the modal no matter where the modal is
         let closeModalSwipeSpanLimitation = 500;
 
         // this is the start time of the swipe action
@@ -173,27 +88,25 @@ export default class ModalPresentationView extends Vue {
         this.modal.addEventListener('touchmove', (e) => {
             // this is very important, if we don't stop propagation, the touch event will be passed to the element below when there are nested modal
             e.stopPropagation();
-
             // prevent
             e.preventDefault();
-            if (isThereASwipe) {
-                const touch = e.changedTouches[0];
 
-                // this is where the user's finger is, in this case, represents where the user's finger is moving to
-                const touchClientX = touch.clientX;
+            if (!isThereASwipe) {
+                return;
+            }
 
-                userSwipePathWidth = touchClientX - swipeStartPoint;
+            // this is where the user's finger is, in this case, represents where the user's finger is moving to
+            const touchClientX = e.changedTouches[0].clientX;
 
-                // prevent user to swipe the panel into the left side of the screen
-                if (userSwipePathWidth >= 0) {
-                    console.debug('touch move');
-                    console.debug('swipe width: ' + userSwipePathWidth);
+            userSwipePathWidth = touchClientX - swipeStartPoint;
 
-                    // how long should modal move from the beginning is the same as how long user's finger moves. For example if user swipe 20px, modal should move 20px from the beginning
-                    let newModalRight = 0 - userSwipePathWidth;
-                    console.debug('new modal right: ' + newModalRight);
-                    this.setModalStyleRight(newModalRight);
-                }
+            // prevent user to swipe the panel into the left side of the screen
+            if (userSwipePathWidth >= 0) {
+                console.debug('swipe width: ' + userSwipePathWidth);
+
+                // how long should modal move from the beginning is the same as how long user's finger moves. For example if user swipe 20px, modal should move 20px from the beginning
+                console.debug('new modal right: ' + -userSwipePathWidth);
+                this.setModalStyleRight(-userSwipePathWidth);
             }
         });
 
@@ -208,9 +121,8 @@ export default class ModalPresentationView extends Vue {
 
                 // if the span user swipes is less than a certain time span limit, close the modal no matter where the modal is
                 if (
-                    swipeEndTime - swipeStartTime <=
-                    closeModalSwipeSpanLimitation &&
-                    userSwipePathWidth > 0
+                    swipeEndTime - swipeStartTime <= closeModalSwipeSpanLimitation
+                    && userSwipePathWidth > 0
                 ) {
                     this.closeModal();
                     return;
@@ -225,26 +137,86 @@ export default class ModalPresentationView extends Vue {
                 isThereASwipe = false;
             }
         });
+
     }
+
+
+    openModal() {
+        setTimeout(() => {
+            this.modal.style.right = `0`;
+        }, 0);
+    }
+
+    /**
+     * convenient function for getting modal style "right"
+     *
+     */
+    modalStyleRight() {
+        return Number(
+            this.modal.style.right.substring(
+                0,
+                this.modal.style.right.length - 2,
+            ),
+        );
+    }
+
+    beforeDestroy() {
+        this.closeModal()
+    }
+
+    /**
+     * convenient function for setting modal style "right"
+     */
+    setModalStyleRight(value: number) {
+        this.modal.style.right = `${value}px`;
+    }
+
+    /**
+     * Determine what should the modal do after user finish swiping, close or  * restore.
+     *
+     * If the modal is half body into the right side, close, otherwise restore.
+     *
+     * Invoked when user finish swipe(finger leave the screen).
+     *
+     */
+    shouldModalClose() {
+        let modalRightValue = Math.abs(this.modalStyleRight());
+        return modalRightValue > this.modalWidth / 2;
+    }
+
+
+    closeModal() {
+        this.modal.style.right = `${-this.modalWidth}px`;
+        this.$emit('on-close', this);
+        setTimeout(() => {
+            this.$emit('close-100', this);
+        }, 100);
+        setTimeout(() => {
+            this.$emit('close-200', this);
+        }, 200);
+        setTimeout(() => {
+            this.$emit('close-300', this);
+        }, 300);
+        setTimeout(() => {
+            this.$emit('closed', this);
+        }, 500);
+    }
+
 }
 </script>
 <style>
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    overflow-x: hidden;
-}
 
 .slide-panel {
+    display: none;
     position: fixed;
     top: 0;
     height: 100%;
     background-color: #fff;
 }
 
-.slide-panel.transition {
+.transition {
     transition: right 0.5s cubic-bezier(0, 1, 0, 1);
 }
+
 </style>

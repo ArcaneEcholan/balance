@@ -1,3 +1,6 @@
+import EditRecordView from "@/views/index/index/edit/edit_record.vue";
+import {Component} from "vue-property-decorator";
+
 export function get_display_file_size(bytes: number) {
     const g = bytes / 1024.0 / 1024.0 / 1024.0;
     if (g >= 1) {
@@ -142,4 +145,40 @@ export function findWordInLine(target: string, lineNumber: number, count: number
 
 export function timeout(timeout: number): Promise<any> {
     return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
+
+const { v4: uuidv4 } = require('uuid');
+
+export function generateMountPointUid() {
+    return `mount-point-${uuidv4()}`;
+}
+
+export function generateModalUid() {
+    return `modal-${uuidv4()}`;
+}
+
+export function mountComponent(mountPointUid: string, comp: any ,mountProp: any) {
+    let mountPoint = document.getElementById(mountPointUid) as HTMLElement;
+    if (mountPoint == null) {
+        throw new Error(`mount point ${mountPointUid} not found`);
+    }
+    let component = (new comp());
+    component.$mountProp = mountProp
+
+    // the sub mount point must be mounted before the component
+    // is mounted, otherwise when the mounted life cycle hook is invoked,
+    // the dom elements of the component will not be available
+    let mountPointSubPoint = document.createElement('div');
+    mountPoint.appendChild(mountPointSubPoint);
+
+    component.$mount(mountPointSubPoint);
+    console.log('after $mount');
+}
+
+export function unmountComponent(vue: any, animationTimeMilli: number) {
+    vue.$destroy();
+    setTimeout(() => {
+        vue.$el.parentNode!.removeChild(vue.$el);
+    }, animationTimeMilli);
 }

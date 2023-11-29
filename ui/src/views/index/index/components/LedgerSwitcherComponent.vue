@@ -23,7 +23,6 @@
 
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
-import {pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
 import CommonButton from "@/views/components/CommonButton.vue";
@@ -101,7 +100,10 @@ export default class LedgerSwitcherComponent extends Vue {
 
     onClickManageLedgerList() {
         this.toggleLedgerSelection()
-        this.present(`manage_ledger`, {})
+        eventBus.$emit('on-click-manage-ledger', {
+
+        })
+        // this.present(`manage_ledger`, {})
     }
 
     toggleLedgerSelection() {
@@ -112,10 +114,6 @@ export default class LedgerSwitcherComponent extends Vue {
         }
     }
 
-    present(viewName: string, data: any) {
-        pushPage(viewName, data)
-        // pushPageWithName(viewName, data)
-    }
 }
 </script>
 <style lang='scss' scoped>

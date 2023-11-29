@@ -1,90 +1,78 @@
 <template>
-    <div>
-        <modal-presentation
-            style="background-color: #f7f8fa"
-            @closed="closed"
-            @close-100="close100"
-            @on-close="onclose"
-            :z-index="'1'"
-            ref="modal"
-        >
-            <template #default>
-                <div ref="page-main-frame" style="position: relative; height: 100%;">
-
-                    <div class="page" style="overflow-y: scroll;" ref="page-main-area">
-                        <van-action-sheet v-model="show" title="Title">
-                            <div class="page">
-                                <gap-component :value="'32px'"></gap-component>
-                                <div class="record-header">Edit Fields</div>
-                                <van-cell-group class="shadow overflow-hidden br8 ">
-                                    <van-field v-model="editLedgerName" type="text" label="name"/>
-                                </van-cell-group>
-                                <gap-component></gap-component>
-                                <common-button @click="submitEditLedger"
-                                               :disabled="editLedgerLoading">
-                                    <template #default>Submit</template>
-                                </common-button>
-                            </div>
-                        </van-action-sheet>
-
-                        <van-action-sheet v-model="addLedgerShow" title="Title">
-                            <div class="page">
-                                <gap-component :value="'32px'"></gap-component>
-                                <div class="record-header">Add Fields</div>
-                                <van-cell-group class="shadow overflow-hidden br8 ">
-                                    <van-field v-model="addLedgerName" type="text" label="name"/>
-                                </van-cell-group>
-                                <gap-component></gap-component>
-                                <common-button @click="submitAddLedger"
-                                               :disabled="addLedgerLoading">
-                                    <template #default>Submit</template>
-                                </common-button>
-                            </div>
-                        </van-action-sheet>
-
-                        <div class="pdb16 pdt16"></div>
-                        <div class="record-header">Ledgers</div>
-                        <van-cell-group class="shadow overflow-hidden br8">
-                            <van-swipe-cell v-for="ledger in ledgers">
-                                <van-cell :border="false" :title="ledger.name"/>
-                                <template #right>
-                                    <van-button square type="primary" text="Edit"
-                                                @click="onClickEdit(ledger.id, ledger.name)"/>
-                                    <van-button square type="danger" text="Delete"
-                                                @click="onClickDelete(ledger.id, ledger.name)"/>
-                                </template>
-                            </van-swipe-cell>
+    <modal-presentation @close-300="onclose">
+        <div ref="page-main-frame" style="position: relative; height: 100%;">
+            <div class="page" style="overflow-y: scroll;" ref="page-main-area">
+                <van-action-sheet v-model="show" title="Title">
+                    <div class="page">
+                        <gap-component :value="'32px'"></gap-component>
+                        <div class="record-header">Edit Fields</div>
+                        <van-cell-group class="shadow overflow-hidden br8 ">
+                            <van-field v-model="editLedgerName" type="text" label="name"/>
                         </van-cell-group>
-
+                        <gap-component></gap-component>
+                        <common-button @click="submitEditLedger"
+                                       :disabled="editLedgerLoading">
+                            <template #default>Submit</template>
+                        </common-button>
                     </div>
+                </van-action-sheet>
+
+                <van-action-sheet v-model="addLedgerShow" title="Title">
+                    <div class="page">
+                        <gap-component :value="'32px'"></gap-component>
+                        <div class="record-header">Add Fields</div>
+                        <van-cell-group class="shadow overflow-hidden br8 ">
+                            <van-field v-model="addLedgerName" type="text" label="name"/>
+                        </van-cell-group>
+                        <gap-component></gap-component>
+                        <common-button @click="submitAddLedger"
+                                       :disabled="addLedgerLoading">
+                            <template #default>Submit</template>
+                        </common-button>
+                    </div>
+                </van-action-sheet>
+
+                <div class="pdb16 pdt16"></div>
+                <div class="record-header">Ledgers</div>
+                <van-cell-group class="shadow overflow-hidden br8">
+                    <van-swipe-cell v-for="ledger in ledgers">
+                        <van-cell :border="false" :title="ledger.name"/>
+                        <template #right>
+                            <van-button square type="primary" text="Edit"
+                                        @click="onClickEdit(ledger.id, ledger.name)"/>
+                            <van-button square type="danger" text="Delete"
+                                        @click="onClickDelete(ledger.id, ledger.name)"/>
+                        </template>
+                    </van-swipe-cell>
+                </van-cell-group>
+
+            </div>
 
 
-                    <div
-                        ref="bottom-tool-bar"
-                        style="position: absolute; bottom: 0;left: 0; right: 0; background-color: white; border-top: 1px solid #ebedf0; width: 100%">
+            <div
+                ref="bottom-tool-bar"
+                style="position: absolute; bottom: 0;left: 0; right: 0; background-color: white; border-top: 1px solid #ebedf0; width: 100%">
 
 
-                        <van-button style="
+                <van-button style="
                         background-color: #1989fa;
                         color: white; border: 1px solid #1989fa; border-radius: 5px;"
-                                    plain
-                                    @click="submitEditLedger"
-                                    :disabled="editLedgerLoading"
-                                    ref="add-ledger-btn"
-                        >
-                            <van-icon name="plus"></van-icon>
-                        </van-button>
-                    </div>
-                </div>
-            </template>
-        </modal-presentation>
-    </div>
+                            plain
+                            @click="submitEditLedger"
+                            :disabled="editLedgerLoading"
+                            ref="add-ledger-btn"
+                >
+                    <van-icon name="plus"></van-icon>
+                </van-button>
+            </div>
+        </div>
+
+    </modal-presentation>
 </template>
 
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentationView from "@/components/ModalPresentation.vue";
-import {popPage} from "@/ts/pageStack";
 import {Notify} from "vant";
 import pageConfig from "@/ts/pageConfig";
 import {getHtmlElem, getRef} from "@/ts/vueUtils";
@@ -92,6 +80,7 @@ import eventBus from "@/ts/EventBus";
 import Client from "@/request/client";
 import CommonButton from "@/views/components/CommonButton.vue";
 import GapComponent from "@/views/components/GapComponent.vue";
+import {unmountComponent} from "@/ts/utils";
 
 class FormItem {
     categoryValue: string | null = null;
@@ -100,12 +89,6 @@ class FormItem {
     description: string | null = null;
 }
 
-// Register the router hooks with their names
-// Component.registerHooks([
-//     "beforeRouteEnter",
-//     "beforeRouteLeave",
-//     "beforeRouteUpdate"
-// ]);
 @Component({
     components: {
         GapComponent,
@@ -114,6 +97,14 @@ class FormItem {
     }
 })
 export default class ManageLedgerView extends Vue {
+    beforeDestroy() {
+        console.log("destroyed")
+    }
+
+    onclose() {
+        unmountComponent(this, 500)
+    }
+
     ledgers: any = []
     varTable: any = {}
     show = false
@@ -204,32 +195,10 @@ export default class ManageLedgerView extends Vue {
         }, 500)
     }
 
-
-    recordId: number | string | null = null
-
-    submitEnable: boolean = true
-
-    amount: string | null = null
-    datetime: string | null = null
-    count: string | null = null
-    description: string | null = null
-
-
-    modal!: ModalPresentationView
-
     ledgersLoading = false
 
     created() {
-        this.recordId = this.$route.params.id
-        this.amount = this.$route.params.amount
-        this.datetime = this.$route.params.datetime
-        this.count = this.$route.params.count
-        this.categoryValue = this.$route.params.categoryValue
-        this.description = this.$route.params.description
-
-
         this.ledgersLoading = true
-
         Client.getLedgerList().then((resp) => {
             this.ledgersLoading = false
             this.ledgers = resp.data
@@ -237,18 +206,12 @@ export default class ManageLedgerView extends Vue {
         }).catch(() => {
             this.ledgersLoading = false
         })
-
     }
 
 
     pageRatio = 95
 
     mounted() {
-        this.modal = getRef(this, "modal") as ModalPresentationView;
-        setTimeout(() => {
-            this.modal.openModal()
-        }, 1)
-
         this.adjustPageHeight()
     }
 
@@ -295,13 +258,6 @@ export default class ManageLedgerView extends Vue {
 
     }
 
-    close100() {
-        popPage()
-    }
-
-    onclose() {
-        pageConfig.setTitle("Balance")
-    }
 }
 </script>
 <style lang='scss' scoped>

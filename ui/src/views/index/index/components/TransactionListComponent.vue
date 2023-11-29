@@ -38,7 +38,6 @@
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
 import {convertToShortDateTime} from "@/ts/utils";
-import {pushPage} from "@/ts/pageStack";
 import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
 import {Notify} from "vant";
@@ -148,7 +147,7 @@ export default class TransactionListComponent extends Vue {
             return
         }
 
-        pushPage(`edit_transaction`, {
+        eventBus.$emit('on-click-record-item', {
             id: foundTrans.id,
             amount: foundTrans.amount,
             datetime: foundTrans.datetime,
@@ -156,6 +155,15 @@ export default class TransactionListComponent extends Vue {
             categoryValue: foundTrans.categoryValue,
             description: foundTrans.description
         })
+        //
+        // pushPage(`edit_transaction`, {
+        //     id: foundTrans.id,
+        //     amount: foundTrans.amount,
+        //     datetime: foundTrans.datetime,
+        //     count: foundTrans.count,
+        //     categoryValue: foundTrans.categoryValue,
+        //     description: foundTrans.description
+        // })
     }
 }
 </script>

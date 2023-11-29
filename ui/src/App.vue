@@ -51,7 +51,6 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import pageConfig from "@/ts/pageConfig";
-import {replacePage} from "@/ts/pageStack";
 
 let that: any
 @Component
@@ -73,18 +72,14 @@ export default class AppView extends Vue {
         that = this;
     }
 
-    onChange(name: string) {
-        replacePage(name, {})
-    }
-
     onClickHome() {
         this.activeTabBar = "home"
-        replacePage("home", {})
+        this.$router.push({name: "home"})
     }
 
     onClickStatistics() {
         this.activeTabBar = "statistics"
-        replacePage("statistics", {})
+        this.$router.push({name: "statistics"})
     }
 
     // this listener should be put here instead of in the touchstart listener
