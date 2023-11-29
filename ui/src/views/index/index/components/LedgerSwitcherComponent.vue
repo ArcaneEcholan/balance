@@ -3,19 +3,21 @@
         <div @click="show=true">
             <i class="icon ali-international-icon-log"></i>
         </div>
-        <!--<div>-->
-        <!--    <van-button plain type="info" @click="show=true">{{ currentLedger.name }}</van-button>-->
-        <!--</div>-->
         <van-action-sheet :closeable="false" v-model="show" title="">
-            <van-cell-group>
-                <van-cell @click="onClickSwitchLedger(ledger)" v-for="ledger in ledgerList"
-                          :title="ledger.name">
-                </van-cell>
-            </van-cell-group>
-            <div style="padding: 5px 16px;">
-                <common-button @click="onClickManageLedgerList">
-                    <template #default>ledgers</template>
-                </common-button>
+            <div class="">
+                <div class="action-sheet-title">Pick A Ledger</div>
+                <div class="action-sheet-body">
+                    <van-cell-group class=" shadow br15 overflow-hidden">
+                        <van-cell @click="onClickSwitchLedger(ledger)" v-for="ledger in ledgerList"
+                                  :title="ledger.name">
+                        </van-cell>
+                    </van-cell-group>
+                    <gap-component :value="'30px'"> </gap-component>
+                    <div class="flex center">
+                        <button class="confirm-btn" @click="onClickManageLedgerList">ledgers</button>
+                    </div>
+                    <gap-component :value="'30px'"> </gap-component>
+                </div>
             </div>
         </van-action-sheet>
     </div>
@@ -27,9 +29,10 @@ import Client from "@/request/client";
 import eventBus from "@/ts/EventBus";
 import CommonButton from "@/views/components/CommonButton.vue";
 import {provideListeners} from "@/page-eventbus-registration-mixin";
+import GapComponent from "@/views/components/GapComponent.vue";
 
 @Component({
-    components: {CommonButton}
+    components: {GapComponent, CommonButton}
 })
 export default class LedgerSwitcherComponent extends Vue {
     show = false
@@ -74,7 +77,7 @@ export default class LedgerSwitcherComponent extends Vue {
             this.ledgersLoading = false
             this.ledgerList = resp.data
             this.currentLedger = this.ledgerList[0]
-            eventBus.$emit('on-cur-ledger-changed', Object.assign({},this.currentLedger))
+            eventBus.$emit('on-cur-ledger-changed', Object.assign({}, this.currentLedger))
             eventBus.$emit('ledges-changes', this.ledgerList)
         }).catch((err: any) => {
             this.ledgersLoading = false
@@ -99,27 +102,35 @@ export default class LedgerSwitcherComponent extends Vue {
     }
 
     onClickManageLedgerList() {
+        eventBus.$emit("on-click-manage-ledger", {})
         this.toggleLedgerSelection()
-        eventBus.$emit('on-click-manage-ledger', {
-
-        })
-        // this.present(`manage_ledger`, {})
     }
 
     toggleLedgerSelection() {
-        if (this.show == true) {
-            this.show = false
-        } else {
-            this.show = false
-        }
+        this.show = !this.show
     }
 
 }
 </script>
 <style lang='scss' scoped>
 @import "~@/style/common-style.scss";
+@import "~@/style/style-specification";
 
 .icon {
     font-size: 20px;
+}
+
+.confirm-btn{
+    background: none;
+    border: none;
+    outline: none;
+    box-shadow: none;
+
+    border-radius: 10px;
+    padding: 10px 18px;
+    background-color: #3574F0;
+
+    font-weight: 600;
+    color: white;
 }
 </style>

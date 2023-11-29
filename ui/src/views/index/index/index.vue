@@ -12,8 +12,6 @@
             </div>
         </van-action-sheet>
 
-
-
         <div id="header">
             <div class="flex center">
                 <div class="current-ledger">{{ curLedger.name }}</div>
@@ -415,13 +413,6 @@ $header-bgc: #FCF4D4;
     transform: translate(-50%, -100%);
     background: url("~@/assets/mark_bs.png");
     background-size: cover;
-}
-
-.page {
-    box-sizing: border-box;
-    //padding: 0 8px 0 8px;
-    padding: 16px;
-    background-color: #F7F8FA;
 }
 
 .record-header {

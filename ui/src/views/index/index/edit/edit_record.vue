@@ -1,7 +1,8 @@
 <template>
     <modal-presentation @close-300="onclose">
         <div class="page">
-            <gap-component :value="'32px'"></gap-component>
+            <div class="modal-title">Edit Record</div>
+            <gap-component :value="'55px'"></gap-component>
             <div class="record-header">Edit Fields</div>
             <van-cell-group class="shadow overflow-hidden br8 ">
                 <van-field v-model="categoryValue" type="string" label="category"/>
@@ -48,6 +49,7 @@ export default class EditRecordView extends Vue {
     beforeDestroy() {
         console.log("destroyed")
     }
+
     onclose() {
         unmountComponent(this, 500)
     }
@@ -186,6 +188,7 @@ export default class EditRecordView extends Vue {
 </script>
 <style lang='scss' scoped>
 @import "~@/style/common-style.scss";
+@import "~@/style/style-specification";
 
 .page {
     padding: 8px;

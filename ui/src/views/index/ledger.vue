@@ -1,38 +1,36 @@
 <template>
     <modal-presentation @close-300="onclose">
+        <van-action-sheet v-model="show" title="Title">
+            <div class="page">
+                <div class="record-header">Edit Fields</div>
+                <van-cell-group class="shadow overflow-hidden br8 ">
+                    <van-field v-model="editLedgerName" type="text" label="name"/>
+                </van-cell-group>
+                <gap-component></gap-component>
+                <common-button @click="submitEditLedger"
+                               :disabled="editLedgerLoading">
+                    <template #default>Submit</template>
+                </common-button>
+            </div>
+        </van-action-sheet>
+        <van-action-sheet v-model="addLedgerShow" title="Title">
+            <div class="page">
+                <gap-component :value="'32px'"></gap-component>
+                <div class="record-header">Add Fields</div>
+                <van-cell-group class="shadow overflow-hidden br8 ">
+                    <van-field v-model="addLedgerName" type="text" label="name"/>
+                </van-cell-group>
+                <gap-component></gap-component>
+                <common-button @click="submitAddLedger"
+                               :disabled="addLedgerLoading">
+                    <template #default>Submit</template>
+                </common-button>
+            </div>
+        </van-action-sheet>
         <div ref="page-main-frame" style="position: relative; height: 100%;">
             <div class="page" style="overflow-y: scroll;" ref="page-main-area">
-                <van-action-sheet v-model="show" title="Title">
-                    <div class="page">
-                        <gap-component :value="'32px'"></gap-component>
-                        <div class="record-header">Edit Fields</div>
-                        <van-cell-group class="shadow overflow-hidden br8 ">
-                            <van-field v-model="editLedgerName" type="text" label="name"/>
-                        </van-cell-group>
-                        <gap-component></gap-component>
-                        <common-button @click="submitEditLedger"
-                                       :disabled="editLedgerLoading">
-                            <template #default>Submit</template>
-                        </common-button>
-                    </div>
-                </van-action-sheet>
-
-                <van-action-sheet v-model="addLedgerShow" title="Title">
-                    <div class="page">
-                        <gap-component :value="'32px'"></gap-component>
-                        <div class="record-header">Add Fields</div>
-                        <van-cell-group class="shadow overflow-hidden br8 ">
-                            <van-field v-model="addLedgerName" type="text" label="name"/>
-                        </van-cell-group>
-                        <gap-component></gap-component>
-                        <common-button @click="submitAddLedger"
-                                       :disabled="addLedgerLoading">
-                            <template #default>Submit</template>
-                        </common-button>
-                    </div>
-                </van-action-sheet>
-
-                <div class="pdb16 pdt16"></div>
+                <div class="modal-title">Ledger Management</div>
+                <gap-component :value="'55px'"></gap-component>
                 <div class="record-header">Ledgers</div>
                 <van-cell-group class="shadow overflow-hidden br8">
                     <van-swipe-cell v-for="ledger in ledgers">
@@ -262,7 +260,7 @@ export default class ManageLedgerView extends Vue {
 </script>
 <style lang='scss' scoped>
 @import "~@/style/common-style.scss";
-
+@import "~@/style/style-specification";
 .page {
     padding: 0 8px 0 8px;
     background-color: #f7f8fa;
