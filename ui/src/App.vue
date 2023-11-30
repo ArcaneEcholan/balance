@@ -1,6 +1,6 @@
 <template>
-    <div id="app">
-        <div id="header-area" class="fixed-header" style="">
+    <div id="app" class="tran">
+        <div id="header-area" class="fixed-header">
             <!--<van-nav-bar :title="title" left-text="Back" left-arrow>-->
             <!--    <template #right>-->
             <!--        <van-icon name="search"/>-->
@@ -14,7 +14,7 @@
             <router-view/>
         </div>
         <div id="pad" class="pad"></div>
-        <div id="tabbar-area">
+        <div id="tabbar-area" class="tran">
             <div class="flex">
                 <div :style="`${activeTabBar == 'home'?'color: #1989fa;': ''}`"
                      class="flex column flex-center flexg1"
@@ -111,8 +111,8 @@ export default class AppView extends Vue {
         let tabBarArea = document.getElementById("tabbar-area")!
         let tabBarStyle = tabBarArea.style
         tabBarStyle.position = "fixed"
-        tabBarStyle.left = "0";
         tabBarStyle.bottom = "0";
+        tabBarStyle.right = "0.1px"
         tabBarStyle.width = "100%";
         // tabBarStyle.zIndex = "3";
         tabBarStyle.backgroundColor = "white"
@@ -185,6 +185,19 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
+
+
+    position: relative;
+    right: 0.1px;
+    width: 100%;
+    height: 100%;
+}
+
+#app.tran {
+    transition: right 0.5s cubic-bezier(0, 1, 0, 1);
+}
+#tabbar-area.tran {
+    transition: right 0.5s cubic-bezier(0, 1, 0, 1);
 }
 
 nav {

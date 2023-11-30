@@ -12,11 +12,12 @@
             </div>
         </van-action-sheet>
 
-        <div id="header">
+        <div id="records-index-header">
             <div class="flex center">
                 <div class="current-ledger">{{ curLedger.name }}</div>
             </div>
             <main-page-current-date-picker-component></main-page-current-date-picker-component>
+            <div id="records-index-header-gradual-color-bg"></div>
             <div id="main-page-fix-header">
                 <div class="flex justify-between align-center">
                     <div class="mg20">
@@ -30,9 +31,7 @@
                 </div>
             </div>
         </div>
-        <div id="header-gradual-color-bg"
-        ></div>
-        <div style="height: 100px;"></div>
+
 
         <gap-component :value="'8px'"></gap-component>
 
@@ -86,6 +85,7 @@ export default class IndexView extends Vue {
     mountEditRecordComponent(arg: any) {
         mountComponent(this.mountPointUid, EditRecordView, arg);
     }
+
     mountLedgerManagementLedger(arg: any) {
         mountComponent(this.mountPointUid2, ManageLedgerView, arg);
     }
@@ -318,12 +318,12 @@ export default class IndexView extends Vue {
                         this.mountEditRecordComponent(arg)
                     }
                 },
-            {
-                eventName: 'on-click-manage-ledger',
-                handler: (arg: any) => {
-                    this.mountLedgerManagementLedger(arg)
+                {
+                    eventName: 'on-click-manage-ledger',
+                    handler: (arg: any) => {
+                        this.mountLedgerManagementLedger(arg)
+                    }
                 }
-            }
             ]
         )
 
@@ -363,21 +363,24 @@ export default class IndexView extends Vue {
 }
 
 $header-bgc: #FCF4D4;
-#header {
+#records-index-header {
     //background-color: #3574F0;
     background-color: $header-bgc;
 
+    box-sizing: border-box;
     padding: 16px 8px 0 8px;
     position: fixed;
     z-index: 100;
     top: 0px;
-    left: 0px;
     right: 0px;
+    width: 100%;
 
 
     #main-page-fix-header {
-        position: relative;
-        top: 32px;
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        top: 76px;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 
         background-color: white;
@@ -385,21 +388,24 @@ $header-bgc: #FCF4D4;
         padding: 0 16px;
     }
 
+    #records-index-header-gradual-color-bg {
+        left: -8px;
+        position: relative;
+        width: 200%;
+        height: 50px;
+        background: linear-gradient(to bottom, $header-bgc, #F7F8FA);
+    }
+
     .current-ledger {
         font-size: 24px;
     }
-
-
 }
 
-#header-gradual-color-bg {
-    top: 120px;
-    position: fixed;
-    height: 30px;
-    left: 0px;
-    right: 0px;
-    background: linear-gradient(to bottom, $header-bgc, #ffffff);
+
+#records-index-header.tran {
+    transition: right 0.5s cubic-bezier(0, 1, 0, 1);
 }
+
 
 .fake-marker {
     display: block;

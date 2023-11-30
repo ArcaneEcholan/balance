@@ -14,6 +14,7 @@
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {v4 as uuidv4} from 'uuid';
 
+
 @Component
 export default class ModalPresentationView extends Vue {
     modal!: HTMLElement;
@@ -75,6 +76,17 @@ export default class ModalPresentationView extends Vue {
                 swipeStartTime = new Date().getTime();
                 // remove the transition of modal, because we need the modal to follow the user's finger without latency
                 this.modal.classList.remove('transition');
+                {
+                    let modal = document.getElementById('app')!;
+                    modal.classList.remove('tran')
+
+
+                    modal = document.getElementById('tabbar-area')!;
+                    modal.classList.remove('tran')
+
+                    modal = document.getElementById('records-index-header')!;
+                    modal.classList.remove('tran')
+                }
 
                 // record the swipe start point
                 swipeStartPoint = touchClientX;
@@ -84,6 +96,10 @@ export default class ModalPresentationView extends Vue {
                 console.debug('touch start');
             }
         });
+
+        function setPageRight(num: number) {
+
+        }
 
         this.modal.addEventListener('touchmove', (e) => {
             // this is very important, if we don't stop propagation, the touch event will be passed to the element below when there are nested modal
@@ -106,6 +122,32 @@ export default class ModalPresentationView extends Vue {
 
                 // how long should modal move from the beginning is the same as how long user's finger moves. For example if user swipe 20px, modal should move 20px from the beginning
                 console.debug('new modal right: ' + -userSwipePathWidth);
+
+
+                {
+                    let modal = document.getElementById('app')!;
+                    let r = 1 - userSwipePathWidth / this.modalWidth
+                    let right = modal.style.right;
+                    right = right.replace('px', '');
+                    modal.style.right = r * 100 + 'px';
+
+
+                    modal = document.getElementById('tabbar-area')!;
+                    r = 1 - userSwipePathWidth / this.modalWidth
+                    right = modal.style.right;
+                    right = right.replace('px', '');
+                    modal.style.right = r * 100 + 'px';
+
+
+
+                    modal = document.getElementById('records-index-header')!;
+                    r = 1 - userSwipePathWidth / this.modalWidth
+                    right = modal.style.right;
+                    right = right.replace('px', '');
+                    modal.style.right = r * 100 + 'px';
+                }
+
+
                 this.setModalStyleRight(-userSwipePathWidth);
             }
         });
@@ -117,6 +159,18 @@ export default class ModalPresentationView extends Vue {
             if (isThereASwipe) {
                 // restore the transition of modal
                 this.modal.classList.add('transition');
+                {
+                    let modal = document.getElementById('app')!;
+                    modal.classList.add('tran')
+
+                    modal = document.getElementById('tabbar-area')!;
+                    modal.classList.add('tran')
+
+                    modal = document.getElementById('records-index-header')!;
+                    modal.classList.add('tran')
+                }
+
+
                 swipeEndTime = new Date().getTime();
 
                 // if the span user swipes is less than a certain time span limit, close the modal no matter where the modal is
@@ -140,9 +194,31 @@ export default class ModalPresentationView extends Vue {
 
     }
 
+    increPageRight(num: number) {
+
+    }
 
     openModal() {
         setTimeout(() => {
+
+
+            let modal = document.getElementById('app')!;
+            let right = modal.style.right;
+            right = right.replace('px', '');
+            modal.style.right = 100 + 'px';
+
+
+             modal = document.getElementById('tabbar-area')!;
+             right = modal.style.right;
+            right = right.replace('px', '');
+            modal.style.right = 100 + 'px';
+
+
+            modal = document.getElementById('records-index-header')!;
+            right = modal.style.right;
+            right = right.replace('px', '');
+            modal.style.right = 100 + 'px';
+
             this.modal.style.right = `0`;
         }, 0);
     }
@@ -186,6 +262,19 @@ export default class ModalPresentationView extends Vue {
 
 
     closeModal() {
+
+        {
+            let modal = document.getElementById('app')!;
+            modal.style.right = 0 + 'px';
+
+            modal = document.getElementById('tabbar-area')!;
+            modal.style.right = 0 + 'px';
+
+            modal = document.getElementById('records-index-header')!;
+            modal.style.right = 0 + 'px';
+
+        }
+
         this.modal.style.right = `${-this.modalWidth}px`;
         this.$emit('on-close', this);
         setTimeout(() => {
