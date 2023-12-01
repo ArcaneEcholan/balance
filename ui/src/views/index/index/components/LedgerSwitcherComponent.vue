@@ -14,7 +14,7 @@
                     </van-cell-group>
                     <gap-component :value="'30px'"> </gap-component>
                     <div class="flex center">
-                        <button class="confirm-btn" @click="onClickManageLedgerList">ledgers</button>
+                        <custom-button  @click="onClickManageLedgerList">ledgers</custom-button>
                     </div>
                     <gap-component :value="'30px'"> </gap-component>
                 </div>
@@ -30,9 +30,10 @@ import eventBus from "@/ts/EventBus";
 import CommonButton from "@/views/components/CommonButton.vue";
 import {provideListeners} from "@/page-eventbus-registration-mixin";
 import GapComponent from "@/views/components/GapComponent.vue";
+import CustomButton from "@/components/CustomButton.vue";
 
 @Component({
-    components: {GapComponent, CommonButton}
+    components: {CustomButton, GapComponent, CommonButton}
 })
 export default class LedgerSwitcherComponent extends Vue {
     show = false
@@ -120,17 +121,5 @@ export default class LedgerSwitcherComponent extends Vue {
     font-size: 20px;
 }
 
-.confirm-btn{
-    background: none;
-    border: none;
-    outline: none;
-    box-shadow: none;
 
-    border-radius: 10px;
-    padding: 10px 18px;
-    background-color: #3574F0;
-
-    font-weight: 600;
-    color: white;
-}
 </style>

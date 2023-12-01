@@ -11,7 +11,7 @@
 import {Component, Prop, Vue} from 'vue-property-decorator';
 
 @Component({})
-export default class CommonButtonComponent extends Vue {
+export default class CustomButtonComponent extends Vue {
 
 
     @Prop({default: false})
