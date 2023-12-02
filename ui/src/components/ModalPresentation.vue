@@ -43,7 +43,7 @@ export default class ModalPresentationView extends Vue {
         // this might be confusing, together with the style of (#slidePanel) display: none;
         // the action of setting width and right will cause a quick flashing of the modal, so before setting the style, the modal has to be invisible
         // and after setting the style, we restore the display of the modal
-        this.modal.style.display = 'block';
+        // this.modal.style.display = 'block';
 
         const swipeAreaWidth = window.innerWidth * this.swipePercentage;
 
@@ -96,10 +96,6 @@ export default class ModalPresentationView extends Vue {
                 console.debug('touch start');
             }
         });
-
-        function setPageRight(num: number) {
-
-        }
 
         this.modal.addEventListener('touchmove', (e) => {
             // this is very important, if we don't stop propagation, the touch event will be passed to the element below when there are nested modal
@@ -297,7 +293,6 @@ export default class ModalPresentationView extends Vue {
 
 
 .slide-panel {
-    display: none;
     position: fixed;
     top: 0;
     height: 100%;
