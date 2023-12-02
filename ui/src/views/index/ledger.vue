@@ -1,5 +1,12 @@
 <template>
-    <modal-presentation @close-300="onclose">
+    <modal-presentation
+        @on-close="close"
+        @after-swipe="afterSwipe"
+        @swiping="swiping"
+        @on-open="modalOpen"
+        @before-swipe="beforeSwipe"
+        @closed="onclose"
+    >
         <van-action-sheet v-model="show">
             <div class="page">
                 <div class="record-header">Edit Fields</div>
@@ -50,7 +57,7 @@
                 <div class="record-header">Ledgers</div>
                 <van-cell-group class="shadow br15 overflow-hidden">
                     <van-swipe-cell v-for="ledger in ledgers">
-                        <van-cell :border="false" :title="ledger.name" />
+                        <van-cell :border="false" :title="ledger.name"/>
                         <template #right>
                             <van-button
                                 square
@@ -85,15 +92,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentationView from '@/components/ModalPresentation.vue';
-import { Notify } from 'vant';
-import { getHtmlElem } from '@/ts/vueUtils';
+import {Notify} from 'vant';
+import {getHtmlElem} from '@/ts/vueUtils';
 import eventBus from '@/ts/EventBus';
 import Client from '@/request/client';
 import CommonButton from '@/views/components/CommonButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
-import { unmountComponent } from '@/ts/utils';
+import {unmountComponent} from '@/ts/utils';
 import SolidIcon from '@/views/components/SolidIcon.vue';
 
 @Component({
@@ -104,13 +111,77 @@ import SolidIcon from '@/views/components/SolidIcon.vue';
         ModalPresentation: ModalPresentationView,
     },
 })
-export default class ManageLedgerView extends Vue {
+export default class ManageLedgerView extends Vue { close() {
+    let modal = document.getElementById('app')!;
+    modal.style.right = 0 + 'px';
+
+    modal = document.getElementById('tabbar-area')!;
+    modal.style.right = 0 + 'px';
+
+    modal = document.getElementById('records-index-header')!;
+    modal.style.right = 0 + 'px';
+}
+    afterSwipe() {
+        let modal = document.getElementById('app')!;
+        modal.classList.add('tran')
+
+        modal = document.getElementById('tabbar-area')!;
+        modal.classList.add('tran')
+
+        modal = document.getElementById('records-index-header')!;
+        modal.classList.add('tran')
+    }
+    swiping(args: any) {
+        let swipingPathPercent = args.swipingPathPercent
+        let r = 1 - swipingPathPercent
+        let modal = document.getElementById('app')!;
+        modal.style.right = r * 100 + 'px';
+
+
+        modal = document.getElementById('tabbar-area')!;
+        modal.style.right = r * 100 + 'px';
+
+
+        modal = document.getElementById('records-index-header')!;
+        modal.style.right = r * 100 + 'px';
+    }
+
+    beforeSwipe() {
+        let elem = document.getElementById('app')!;
+        elem.classList.remove('tran')
+
+        elem = document.getElementById('tabbar-area')!;
+        elem.classList.remove('tran')
+
+        elem = document.getElementById('records-index-header')!;
+        elem.classList.remove('tran')
+    }
+
+    modalOpen() {
+        let elem = document.getElementById('app')!;
+        let right = elem.style.right;
+        right = right.replace('px', '');
+        elem.style.right = 100 + 'px';
+
+
+        elem = document.getElementById('tabbar-area')!;
+        right = elem.style.right;
+        right = right.replace('px', '');
+        elem.style.right = 100 + 'px';
+
+
+        elem = document.getElementById('records-index-header')!;
+        right = elem.style.right;
+        right = right.replace('px', '');
+        elem.style.right = 100 + 'px';
+    }
+
     beforeDestroy() {
         console.log('destroyed');
     }
 
     onclose() {
-        unmountComponent(this, 500);
+        unmountComponent(this, 0);
     }
 
     ledgers: any = [];
@@ -220,6 +291,7 @@ export default class ManageLedgerView extends Vue {
                 this.ledgersLoading = false;
             });
     }
+
     pageMainFrameHeight = 0;
     pageMainAreaHeight = 0;
     pageRatio = 95;
@@ -276,7 +348,8 @@ export default class ManageLedgerView extends Vue {
         this.addLedgerShow = true;
     }
 
-    closed() {}
+    closed() {
+    }
 }
 </script>
 <style lang="scss" scoped>

@@ -1,5 +1,12 @@
 <template>
-    <modal-presentation @close-300="onclose">
+    <modal-presentation
+        @on-close="close"
+        @after-swipe="afterSwipe"
+        @swiping="swiping"
+        @on-open="modalOpen"
+        @before-swipe="beforeSwipe"
+        @closed="onclose"
+    >
         <div class="page">
             <div class="modal-title">Edit Record</div>
             <gap-component :value="'55px'"></gap-component>
@@ -30,13 +37,6 @@ import pageConfig from "@/ts/pageConfig";
 import CommonButton from "@/views/components/CommonButton.vue";
 import GapComponent from "@/views/components/GapComponent.vue";
 
-class FormItem {
-    categoryValue: string | null = null;
-    amount: number | null = null;
-    count: number | null = null;
-    description: string | null = null;
-}
-
 @Component({
     components: {
         GapComponent,
@@ -45,13 +45,77 @@ class FormItem {
     }
 })
 export default class EditRecordView extends Vue {
+    close() {
+        let modal = document.getElementById('app')!;
+        modal.style.right = 0 + 'px';
+
+        modal = document.getElementById('tabbar-area')!;
+        modal.style.right = 0 + 'px';
+
+        modal = document.getElementById('records-index-header')!;
+        modal.style.right = 0 + 'px';
+    }
+    afterSwipe() {
+        let modal = document.getElementById('app')!;
+        modal.classList.add('tran')
+
+        modal = document.getElementById('tabbar-area')!;
+        modal.classList.add('tran')
+
+        modal = document.getElementById('records-index-header')!;
+        modal.classList.add('tran')
+    }
+    swiping(args: any) {
+        let swipingPathPercent = args.swipingPathPercent
+        let r = 1 - swipingPathPercent
+        let modal = document.getElementById('app')!;
+        modal.style.right = r * 100 + 'px';
+
+
+        modal = document.getElementById('tabbar-area')!;
+        modal.style.right = r * 100 + 'px';
+
+
+        modal = document.getElementById('records-index-header')!;
+        modal.style.right = r * 100 + 'px';
+    }
+
+    beforeSwipe() {
+        let elem = document.getElementById('app')!;
+        elem.classList.remove('tran')
+
+        elem = document.getElementById('tabbar-area')!;
+        elem.classList.remove('tran')
+
+        elem = document.getElementById('records-index-header')!;
+        elem.classList.remove('tran')
+    }
+
+    modalOpen() {
+        let elem = document.getElementById('app')!;
+        let right = elem.style.right;
+        right = right.replace('px', '');
+        elem.style.right = 100 + 'px';
+
+
+        elem = document.getElementById('tabbar-area')!;
+        right = elem.style.right;
+        right = right.replace('px', '');
+        elem.style.right = 100 + 'px';
+
+
+        elem = document.getElementById('records-index-header')!;
+        right = elem.style.right;
+        right = right.replace('px', '');
+        elem.style.right = 100 + 'px';
+    }
 
     beforeDestroy() {
         console.log("destroyed")
     }
 
     onclose() {
-        unmountComponent(this, 500)
+        unmountComponent(this, 0);
     }
 
     categoryValue: string | null = null

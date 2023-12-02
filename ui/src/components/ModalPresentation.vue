@@ -40,11 +40,6 @@ export default class ModalPresentationView extends Vue {
         this.modal.style.right = -this.modalWidth + 'px'; // let it hide into the right side of the screen
         this.modal.style.width = this.modalWidth + 'px'; // give it a width
 
-        // this might be confusing, together with the style of (#slidePanel) display: none;
-        // the action of setting width and right will cause a quick flashing of the modal, so before setting the style, the modal has to be invisible
-        // and after setting the style, we restore the display of the modal
-        // this.modal.style.display = 'block';
-
         const swipeAreaWidth = window.innerWidth * this.swipePercentage;
 
         // this is the width of the area where user swipes over the screen, direction is from left to right
@@ -74,18 +69,10 @@ export default class ModalPresentationView extends Vue {
             // if and only if the user's finger is in the swipe area, we start to record the swipe action
             if (touchClientX <= swipeAreaWidth) {
                 swipeStartTime = new Date().getTime();
-                // remove the transition of modal, because we need the modal to follow the user's finger without latency
-                this.modal.classList.remove('transition');
+                // remove the transition of modal, because we need the modal to stay tight with the user's finger without latency
                 {
-                    let modal = document.getElementById('app')!;
-                    modal.classList.remove('tran')
-
-
-                    modal = document.getElementById('tabbar-area')!;
-                    modal.classList.remove('tran')
-
-                    modal = document.getElementById('records-index-header')!;
-                    modal.classList.remove('tran')
+                    this.$emit('before-swipe', this);
+                    this.modal.classList.remove('transition');
                 }
 
                 // record the swipe start point
@@ -119,30 +106,9 @@ export default class ModalPresentationView extends Vue {
                 // how long should modal move from the beginning is the same as how long user's finger moves. For example if user swipe 20px, modal should move 20px from the beginning
                 console.debug('new modal right: ' + -userSwipePathWidth);
 
-
-                {
-                    let modal = document.getElementById('app')!;
-                    let r = 1 - userSwipePathWidth / this.modalWidth
-                    let right = modal.style.right;
-                    right = right.replace('px', '');
-                    modal.style.right = r * 100 + 'px';
-
-
-                    modal = document.getElementById('tabbar-area')!;
-                    r = 1 - userSwipePathWidth / this.modalWidth
-                    right = modal.style.right;
-                    right = right.replace('px', '');
-                    modal.style.right = r * 100 + 'px';
-
-
-
-                    modal = document.getElementById('records-index-header')!;
-                    r = 1 - userSwipePathWidth / this.modalWidth
-                    right = modal.style.right;
-                    right = right.replace('px', '');
-                    modal.style.right = r * 100 + 'px';
-                }
-
+                this.$emit('swiping', {
+                    swipingPathPercent:userSwipePathWidth / this.modalWidth
+                });
 
                 this.setModalStyleRight(-userSwipePathWidth);
             }
@@ -156,16 +122,8 @@ export default class ModalPresentationView extends Vue {
                 // restore the transition of modal
                 this.modal.classList.add('transition');
                 {
-                    let modal = document.getElementById('app')!;
-                    modal.classList.add('tran')
-
-                    modal = document.getElementById('tabbar-area')!;
-                    modal.classList.add('tran')
-
-                    modal = document.getElementById('records-index-header')!;
-                    modal.classList.add('tran')
+                    this.$emit("after-swipe")
                 }
-
 
                 swipeEndTime = new Date().getTime();
 
@@ -196,25 +154,7 @@ export default class ModalPresentationView extends Vue {
 
     openModal() {
         setTimeout(() => {
-
-
-            let modal = document.getElementById('app')!;
-            let right = modal.style.right;
-            right = right.replace('px', '');
-            modal.style.right = 100 + 'px';
-
-
-             modal = document.getElementById('tabbar-area')!;
-             right = modal.style.right;
-            right = right.replace('px', '');
-            modal.style.right = 100 + 'px';
-
-
-            modal = document.getElementById('records-index-header')!;
-            right = modal.style.right;
-            right = right.replace('px', '');
-            modal.style.right = 100 + 'px';
-
+            this.$emit('on-open');
             this.modal.style.right = `0`;
         }, 0);
     }
@@ -258,21 +198,9 @@ export default class ModalPresentationView extends Vue {
 
 
     closeModal() {
-
-        {
-            let modal = document.getElementById('app')!;
-            modal.style.right = 0 + 'px';
-
-            modal = document.getElementById('tabbar-area')!;
-            modal.style.right = 0 + 'px';
-
-            modal = document.getElementById('records-index-header')!;
-            modal.style.right = 0 + 'px';
-
-        }
+        this.$emit("on-close")
 
         this.modal.style.right = `${-this.modalWidth}px`;
-        this.$emit('on-close', this);
         setTimeout(() => {
             this.$emit('close-100', this);
         }, 100);
