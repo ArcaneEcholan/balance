@@ -7,7 +7,7 @@
 
         <div id="tabbar-area" class="tran">
             <div class="flex">
-                <div :style="`${activeTabBar == 'home'?'color: #1989fa;': ''}`"
+                <div :style="`${activeTabBar == getI18nValue('home')?'color: #1989fa;': ''}`"
                      class="flex column flex-center flexg1"
                      @click="onClickHome"
                 >
@@ -17,10 +17,10 @@
                         </span>
                     </div>
                     <div>
-                        <span class="fs12" style="line-height: 1">home</span>
+                        <span class="fs12" style="line-height: 1">{{getI18nValue('home')}}</span>
                     </div>
                 </div>
-                <div :style="`${activeTabBar == 'statistics'?'color: #1989fa;': ''}`"
+                <div :style="`${activeTabBar == getI18nValue('statistics')?'color: #1989fa;': ''}`"
                      class="flex column flex-center flexg1"
                      @click="onClickStatistics"
                 >
@@ -30,7 +30,7 @@
                         </span>
                     </div>
                     <div>
-                        <span class="fs12" style="line-height: 1">statistics</span>
+                        <span class="fs12" style="line-height: 1">{{getI18nValue('statistics')}}</span>
                     </div>
                 </div>
             </div>
@@ -40,12 +40,15 @@
 
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
+import {getI18nValue} from "@/ts/utils";
 
-@Component({})
+@Component({
+    methods: {getI18nValue}
+})
 export default class IndexIndexView extends Vue {
 
 
-    activeTabBar = "home"
+    activeTabBar =  getI18nValue("home")
 
     mounted() {
         let tabBarArea = document.getElementById("tabbar-area")!
@@ -57,13 +60,13 @@ export default class IndexIndexView extends Vue {
         tabBarStyle.backgroundColor = "white"
     }
     onClickHome() {
-        this.activeTabBar = "home"
+        this.activeTabBar = getI18nValue("home")
         this.$router.push({name: "home"})
     }
 
     onClickStatistics() {
-        this.activeTabBar = "statistics"
-        this.$router.push({name: "statistics"})
+        this.activeTabBar = getI18nValue("statistics")
+        this.$router.push({name:  "statistics"})
     }
 
 }

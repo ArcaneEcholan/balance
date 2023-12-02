@@ -4,7 +4,7 @@
             <i class="icon ali-international-icon-log"></i>
         </div>
         <van-action-sheet :closeable="false" v-model="show" title="">
-            <div class="action-sheet-title">Pick A Ledger</div>
+            <div class="action-sheet-title">{{$t('pick_a_ledger')}}</div>
             <div class="action-sheet-body">
                 <van-cell-group class="shadow br15 overflow-hidden">
                     <van-cell
@@ -16,7 +16,7 @@
                 <gap-component :value="'30px'"></gap-component>
                 <div class="flex center">
                     <custom-button @click="onClickManageLedgerList">
-                        ledgers
+                        {{$t('all_ledgers')}}
                     </custom-button>
                 </div>
                 <gap-component :value="'30px'"></gap-component>
@@ -33,8 +33,10 @@ import CommonButton from '@/views/components/CommonButton.vue';
 import { provideListeners } from '@/page-eventbus-registration-mixin';
 import GapComponent from '@/views/components/GapComponent.vue';
 import CustomButton from '@/components/CustomButton.vue';
+import {getI18nValue} from "../../../../ts/utils";
 
 @Component({
+    methods: {getI18nValue},
     components: { CustomButton, GapComponent, CommonButton },
 })
 export default class LedgerSwitcherComponent extends Vue {

@@ -52,7 +52,7 @@
           ref="page-main-area"
           style="padding-bottom: 66px; overflow: auto"
       >
-        <div class="modal-title">Ledger Management</div>
+        <div class="modal-title">{{$t('ledger_management')}}</div>
         <gap-component :value="'55px'"></gap-component>
         <div class="record-header">Ledgers</div>
         <van-cell-group class="shadow br15 overflow-hidden">
@@ -62,13 +62,13 @@
               <van-button
                   square
                   type="primary"
-                  text="Edit"
+                  :text="$t('edit')"
                   @click="onClickEdit(ledger.id, ledger.name)"
               />
               <van-button
                   square
                   type="danger"
-                  text="Delete"
+                  :text="$t('delete')"
                   @click="onClickDelete(ledger.id, ledger.name)"
               />
             </template>

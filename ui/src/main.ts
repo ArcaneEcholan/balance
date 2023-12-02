@@ -28,6 +28,8 @@ import {
 import PageEventbusRegistrationMixin from "@/page-eventbus-registration-mixin";
 import "@/assets/icon-fonts/iconfont.css"
 
+import i18n from "@/ts/lang";
+
 Vue.config.productionTip = false;
 
 
@@ -62,5 +64,7 @@ Vue.mixin(PageEventbusRegistrationMixin)
 new Vue({
     router,
     store,
+    // @ts-ignore
+    i18n,
     render: (h) => h(App),
 }).$mount('#app');

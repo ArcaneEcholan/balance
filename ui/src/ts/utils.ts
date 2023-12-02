@@ -1,6 +1,7 @@
 import EditRecordView from "@/views/index/index/modals/edit_record.vue";
 import {Component} from "vue-property-decorator";
 import store from "@/store";
+import i18n from "@/ts/lang";
 
 export function get_display_file_size(bytes: number) {
     const g = bytes / 1024.0 / 1024.0 / 1024.0;
@@ -165,7 +166,8 @@ export function mountComponent(mountPointUid: string, comp: any ,mountProp: any)
         throw new Error(`mount point ${mountPointUid} not found`);
     }
     let component = (new comp({
-        $mountProp : mountProp
+        $mountProp : mountProp,
+        i18n
     }));
 
     // the sub mount point must be mounted before the component
@@ -199,4 +201,9 @@ export function disableBodyScroll() {
     document.body.style.position = 'fixed';
     document.body.style.top = `-${currentPageScrollPosition}px`;
     document.body.style.width = '100%';
+}
+
+
+export function getI18nValue(key: string) {
+    return i18n.t(key).toString();
 }
