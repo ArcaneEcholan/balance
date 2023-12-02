@@ -4,20 +4,18 @@
             <i class="icon ali-international-icon-log"></i>
         </div>
         <van-action-sheet :closeable="false" v-model="show" title="">
-            <div class="">
-                <div class="action-sheet-title">Pick A Ledger</div>
-                <div class="action-sheet-body">
-                    <van-cell-group class=" shadow br15 overflow-hidden">
-                        <van-cell @click="onClickSwitchLedger(ledger)" v-for="ledger in ledgerList"
-                                  :title="ledger.name">
-                        </van-cell>
-                    </van-cell-group>
-                    <gap-component :value="'30px'"> </gap-component>
-                    <div class="flex center">
-                        <custom-button  @click="onClickManageLedgerList">ledgers</custom-button>
-                    </div>
-                    <gap-component :value="'30px'"> </gap-component>
+            <div class="action-sheet-title">Pick A Ledger</div>
+            <div class="action-sheet-body">
+                <van-cell-group class=" shadow br15 overflow-hidden">
+                    <van-cell @click="onClickSwitchLedger(ledger)" v-for="ledger in ledgerList"
+                              :title="ledger.name">
+                    </van-cell>
+                </van-cell-group>
+                <gap-component :value="'30px'"> </gap-component>
+                <div class="flex center">
+                    <custom-button  @click="onClickManageLedgerList">ledgers</custom-button>
                 </div>
+                <gap-component :value="'30px'"> </gap-component>
             </div>
         </van-action-sheet>
     </div>

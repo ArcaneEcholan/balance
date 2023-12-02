@@ -14,6 +14,11 @@ input {
 }
 
 .action-sheet-title {
+    z-index: 100;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
     background-color: white;
     padding: 12px;
     font-weight: 600;
@@ -30,8 +35,10 @@ input {
 }
 
 .action-sheet-body {
-    box-sizing: border-box;
     padding: $common-page-padding;
+    padding-top: 58px;
+    box-sizing: border-box;
+
     background-color: #f7f8fa;
     height: 100%;
 }

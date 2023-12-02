@@ -105,7 +105,7 @@ export default class ModalPresentationView extends Vue {
             // this is very important, if we don't stop propagation, the touch event will be passed to the element below when there are nested modal
             e.stopPropagation();
             // prevent
-            e.preventDefault();
+            // e.preventDefault();
 
             if (!isThereASwipe) {
                 return;

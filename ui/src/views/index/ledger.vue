@@ -29,12 +29,15 @@
     </van-action-sheet>
 
 
-    <div ref="page-main-frame" style="overflow: scroll; height: 100%;">
-      <div class="page" ref="page-main-area" style="padding-bottom: 50px; overflow: scroll;" >
+    <div ref="page-main-frame" style="height: 100%;">
+
+      <div class="page" ref="page-main-area" style="padding-bottom: 50px; overflow: auto;" >
         <div class="modal-title">Ledger Management</div>
         <gap-component :value="'55px'"></gap-component>
         <div class="record-header">Ledgers</div>
-        <van-cell-group class="shadow overflow-hidden br8">
+          {{`${pageMainFrameHeight}px`}}
+          {{`${pageMainAreaHeight}px`}}
+        <van-cell-group class="shadow br8">
           <van-swipe-cell v-for="ledger in ledgers">
             <van-cell :border="false" :title="ledger.name"/>
             <template #right>
@@ -95,6 +98,9 @@ export default class ManageLedgerView extends Vue {
   onclose() {
     unmountComponent(this, 500)
   }
+
+
+
 
   ledgers: any = []
   varTable: any = {}
@@ -217,8 +223,16 @@ export default class ManageLedgerView extends Vue {
         },    {
           name: 'tt'
         },    {
-          name: 'tt'
-        },    {
+              name: 'tt'
+          },     {
+              name: 'tt'
+          },     {
+              name: 'tt'
+          },     {
+              name: 'tt'
+          },     {
+              name: 'tt'
+          },    {
           name: 'tt'
         },    {
           name: 'tt'
@@ -235,11 +249,16 @@ export default class ManageLedgerView extends Vue {
       this.ledgersLoading = false
     })
   }
-
-
+    pageMainFrameHeight = 0
+    pageMainAreaHeight = 0
   pageRatio = 95
 
   mounted() {
+      let mainframe = getHtmlElem(this, "page-main-frame")
+
+      let pageMainArea = getHtmlElem(this, "page-main-area")
+      this.pageMainAreaHeight = pageMainArea.clientHeight
+      this.pageMainFrameHeight = mainframe.clientHeight
     // this.adjustPageHeight()
   }
 
