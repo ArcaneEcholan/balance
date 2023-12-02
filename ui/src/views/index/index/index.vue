@@ -372,6 +372,7 @@ export default class IndexView extends Vue {
 </script>
 <style lang="scss" scoped>
 @import '~@/style/common-style.scss';
+@import '~@/style/style-specification.scss';
 @import '~@/assets/custom-icon.css';
 
 .icon {
