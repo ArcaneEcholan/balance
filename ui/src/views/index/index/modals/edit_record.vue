@@ -1,11 +1,11 @@
 <template>
   <modal-presentation
-      @on-close="close"
-      @after-swipe="afterSwipe"
-      @swiping="swiping"
-      @on-open="modalOpen"
-      @before-swipe="beforeSwipe"
+      @on-open="modalLifeCycleHooks.onOpen"
+      @on-close="modalLifeCycleHooks.onClose"
       @closed="closed"
+      @before-swipe="modalLifeCycleHooks.beforeSwipe"
+      @swiping="modalLifeCycleHooks.swiping"
+      @after-swipe="modalLifeCycleHooks.afterSwipe"
   >
     <div class="page" id="aaa" style="overflow: auto;">
       <div class="modal-title">Edit Record</div>
@@ -56,77 +56,8 @@ let that: any;
   }
 })
 export default class EditRecordView extends Vue {
-  close() {
+  modalLifeCycleHooks: any
 
-    enableBodyScroll()
-    let modal = document.getElementById('page-main-area')!;
-    modal.style.right = 0 + 'px';
-
-    modal = document.getElementById('tabbar-area')!;
-    modal.style.right = 0 + 'px';
-
-    modal = document.getElementById('records-index-header')!;
-    modal.style.right = 0 + 'px';
-  }
-
-  afterSwipe() {
-    let modal = document.getElementById('page-main-area')!;
-    modal.classList.add('tran')
-
-    modal = document.getElementById('tabbar-area')!;
-    modal.classList.add('tran')
-
-    modal = document.getElementById('records-index-header')!;
-    modal.classList.add('tran')
-  }
-
-  swiping(args: any) {
-    let swipingPathPercent = args.swipingPathPercent
-    let r = 1 - swipingPathPercent
-    let modal = document.getElementById('page-main-area')!;
-    modal.style.right = r * 100 + 'px';
-
-
-    modal = document.getElementById('tabbar-area')!;
-    modal.style.right = r * 100 + 'px';
-
-
-    modal = document.getElementById('records-index-header')!;
-    modal.style.right = r * 100 + 'px';
-  }
-
-  beforeSwipe() {
-    let elem = document.getElementById('page-main-area')!;
-    elem.classList.remove('tran')
-
-    elem = document.getElementById('tabbar-area')!;
-    elem.classList.remove('tran')
-
-    elem = document.getElementById('records-index-header')!;
-    elem.classList.remove('tran')
-  }
-
-  modalOpen() {
-
-    disableBodyScroll()
-
-    let elem = document.getElementById('page-main-area')!;
-    let right = elem.style.right;
-    right = right.replace('px', '');
-    elem.style.right = 100 + 'px';
-
-
-    elem = document.getElementById('tabbar-area')!;
-    right = elem.style.right;
-    right = right.replace('px', '');
-    elem.style.right = 100 + 'px';
-
-
-    elem = document.getElementById('records-index-header')!;
-    right = elem.style.right;
-    right = right.replace('px', '');
-    elem.style.right = 100 + 'px';
-  }
 
   beforeDestroy() {
     console.log("destroyed")
@@ -257,14 +188,23 @@ export default class EditRecordView extends Vue {
 
   modal!: ModalPresentationView
 
-  mounted() {
+  created() {
     // @ts-ignore
-    this.recordId = this.$mountProp.id// @ts-ignore
-    this.amount = this.$mountProp.amount// @ts-ignore
-    this.datetime = this.$mountProp.datetime// @ts-ignore
-    this.count = this.$mountProp.count// @ts-ignore
-    this.categoryValue = this.$mountProp.categoryValue// @ts-ignore
-    this.description = this.$mountProp.description
+    this.recordId = this.$options.$mountProp.id// @ts-ignore
+    this.amount = this.$options.$mountProp.amount// @ts-ignore
+    this.datetime = this.$options.$mountProp.datetime// @ts-ignore
+    this.count = this.$options.$mountProp.count// @ts-ignore
+    this.categoryValue = this.$options.$mountProp.categoryValue// @ts-ignore
+    this.description = this.$options.$mountProp.description
+
+
+    this.modalLifeCycleHooks = {// @ts-ignore
+      onOpen: this.$options.$mountProp.modalLifeCycleHooks.onOpen,// @ts-ignore
+      beforeSwipe: this.$options.$mountProp.modalLifeCycleHooks.beforeSwipe,// @ts-ignore
+      swiping: this.$options.$mountProp.modalLifeCycleHooks.swiping,// @ts-ignore
+      afterSwipe: this.$options.$mountProp.modalLifeCycleHooks.afterSwipe,// @ts-ignore
+      onClose: this.$options.$mountProp.modalLifeCycleHooks.onClose
+    }
   }
 }
 </script>

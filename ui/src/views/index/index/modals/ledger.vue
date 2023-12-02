@@ -1,11 +1,11 @@
 <template>
   <modal-presentation
-      @on-close="close"
-      @after-swipe="afterSwipe"
-      @swiping="swiping"
-      @on-open="modalOpen"
-      @before-swipe="beforeSwipe"
-      @closed="onclose"
+      @on-open="modalLifeCycleHooks.onOpen"
+      @on-close="modalLifeCycleHooks.onClose"
+      @closed="closed"
+      @before-swipe="modalLifeCycleHooks.beforeSwipe"
+      @swiping="modalLifeCycleHooks.swiping"
+      @after-swipe="modalLifeCycleHooks.afterSwipe"
   >
     <van-action-sheet v-model="show">
       <div class="page">
@@ -187,7 +187,6 @@ export default class ManageLedgerView extends Vue {
   }
 
   onclose() {
-    unmountComponent(this, 0);
   }
 
   ledgers: any = [];
@@ -284,8 +283,25 @@ export default class ManageLedgerView extends Vue {
   }
 
   ledgersLoading = false;
-
+  modalLifeCycleHooks: any
   created() {
+    // @ts-ignore
+    this.recordId = this.$options.$mountProp.id// @ts-ignore
+    this.amount = this.$options.$mountProp.amount// @ts-ignore
+    this.datetime = this.$options.$mountProp.datetime// @ts-ignore
+    this.count = this.$options.$mountProp.count// @ts-ignore
+    this.categoryValue = this.$options.$mountProp.categoryValue// @ts-ignore
+    this.description = this.$options.$mountProp.description
+
+
+    this.modalLifeCycleHooks = {// @ts-ignore
+      onOpen: this.$options.$mountProp.modalLifeCycleHooks.onOpen,// @ts-ignore
+      beforeSwipe: this.$options.$mountProp.modalLifeCycleHooks.beforeSwipe,// @ts-ignore
+      swiping: this.$options.$mountProp.modalLifeCycleHooks.swiping,// @ts-ignore
+      afterSwipe: this.$options.$mountProp.modalLifeCycleHooks.afterSwipe,// @ts-ignore
+      onClose: this.$options.$mountProp.modalLifeCycleHooks.onClose
+    }
+
     this.ledgersLoading = true;
     Client.getLedgerList()
         .then((resp) => {
@@ -317,11 +333,12 @@ export default class ManageLedgerView extends Vue {
   }
 
   closed() {
+    unmountComponent(this, 0);
   }
 }
 </script>
 <style lang="scss" scoped>
-@import '~@/style/common-style.scss';
+@import '~@/style/common-style';
 @import '~@/style/style-specification';
 
 //.page {

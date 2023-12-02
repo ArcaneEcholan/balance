@@ -1,4 +1,4 @@
-import EditRecordView from "@/views/index/index/edit/edit_record.vue";
+import EditRecordView from "@/views/index/index/modals/edit_record.vue";
 import {Component} from "vue-property-decorator";
 import store from "@/store";
 
@@ -164,8 +164,9 @@ export function mountComponent(mountPointUid: string, comp: any ,mountProp: any)
     if (mountPoint == null) {
         throw new Error(`mount point ${mountPointUid} not found`);
     }
-    let component = (new comp());
-    component.$mountProp = mountProp
+    let component = (new comp({
+        $mountProp : mountProp
+    }));
 
     // the sub mount point must be mounted before the component
     // is mounted, otherwise when the mounted life cycle hook is invoked,
