@@ -33,6 +33,7 @@
                 </div>
             </div>
         </div>
+
         <gap-component :value="'140px'"></gap-component>
 
         <transaction-list-component
@@ -42,10 +43,10 @@
 </template>
 <script lang="ts">
 import AMapLoader from '@amap/amap-jsapi-loader';
-import { Component, Vue } from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import request from '@/request';
-import { Notify } from 'vant';
-import { getRef } from '@/ts/vueUtils';
+import {Notify} from 'vant';
+import {getRef} from '@/ts/vueUtils';
 
 import TransactionListComponent from '@/views/index/index/components/TransactionListComponent.vue';
 import LedgerSwitcherComponent from '@/views/index/index/components/LedgerSwitcherComponent.vue';
@@ -55,9 +56,9 @@ import AddRecordSheet from './components/AddRecordSheetComponent.vue';
 import MainPageCurrentDatePickerComponent from '@/views/index/index/components/MainPageCurrentDatePickerComponent.vue';
 import CommonButton from '@/views/components/CommonButton.vue';
 import store from '@/store';
-import { provideListeners } from '@/page-eventbus-registration-mixin';
+import {provideListeners} from '@/page-eventbus-registration-mixin';
 import AddRecordSheetComponent from '@/views/index/index/components/AddRecordSheetComponent.vue';
-import { generateMountPointUid, mountComponent } from '@/ts/utils';
+import {generateMountPointUid, mountComponent} from '@/ts/utils';
 import EditRecordView from '@/views/index/index/edit/edit_record.vue';
 import ManageLedgerView from '@/views/index/ledger.vue';
 
@@ -80,6 +81,7 @@ import ManageLedgerView from '@/views/index/ledger.vue';
 export default class IndexView extends Vue {
     mountPointUid = generateMountPointUid();
     mountPointUid2 = generateMountPointUid();
+
 
     mountEditRecordComponent(arg: any) {
         mountComponent(this.mountPointUid, EditRecordView, arg);
@@ -163,7 +165,7 @@ export default class IndexView extends Vue {
 
     registerAmapMoveEvent() {
         this.amap.on('mapmove', () => {
-            let { lat, lng } = this.amap.getCenter();
+            let {lat, lng} = this.amap.getCenter();
             this.updateCor(lat, lng);
             clearTimeout(this.apiInvokingTimesSaver);
             this.apiInvokingTimesSaver = setTimeout(() => {
@@ -343,20 +345,6 @@ export default class IndexView extends Vue {
                 },
             },
         ]);
-
-        // let a = getRef(this, "refresh-btn")
-        // a.style.height = "auto";
-        // a.style.width = "auto";
-        //
-        // a.style.padding = "4px";
-        // this.adjustAMapSize()
-
-        //
-        // let b = document.getElementById("main-page-fix-header")!
-        // let bh = b.clientHeight
-
-        // let c = document.getElementById("main-page-fix-header-placeholder")!
-        // c.style.height = bh + "px";
     }
 
     adjustAMapSize() {
@@ -391,6 +379,7 @@ $header-bgc: #fcf4d4;
     top: 0px;
     right: 0px;
     width: 100%;
+
     #main-page-fix-header {
         position: absolute;
         left: 8px;
@@ -415,9 +404,11 @@ $header-bgc: #fcf4d4;
         font-size: 24px;
     }
 }
+
 #records-index-header.tran {
     transition: right 0.5s cubic-bezier(0, 1, 0, 1);
 }
+
 .fake-marker {
     display: block;
     position: absolute;

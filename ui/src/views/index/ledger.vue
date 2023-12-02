@@ -112,7 +112,7 @@ import SolidIcon from '@/views/components/SolidIcon.vue';
     },
 })
 export default class ManageLedgerView extends Vue { close() {
-    let modal = document.getElementById('app')!;
+    let modal = document.getElementById('page-main-area')!;
     modal.style.right = 0 + 'px';
 
     modal = document.getElementById('tabbar-area')!;
@@ -122,7 +122,7 @@ export default class ManageLedgerView extends Vue { close() {
     modal.style.right = 0 + 'px';
 }
     afterSwipe() {
-        let modal = document.getElementById('app')!;
+        let modal = document.getElementById('page-main-area')!;
         modal.classList.add('tran')
 
         modal = document.getElementById('tabbar-area')!;
@@ -134,7 +134,7 @@ export default class ManageLedgerView extends Vue { close() {
     swiping(args: any) {
         let swipingPathPercent = args.swipingPathPercent
         let r = 1 - swipingPathPercent
-        let modal = document.getElementById('app')!;
+        let modal = document.getElementById('page-main-area')!;
         modal.style.right = r * 100 + 'px';
 
 
@@ -147,7 +147,7 @@ export default class ManageLedgerView extends Vue { close() {
     }
 
     beforeSwipe() {
-        let elem = document.getElementById('app')!;
+        let elem = document.getElementById('page-main-area')!;
         elem.classList.remove('tran')
 
         elem = document.getElementById('tabbar-area')!;
@@ -158,7 +158,7 @@ export default class ManageLedgerView extends Vue { close() {
     }
 
     modalOpen() {
-        let elem = document.getElementById('app')!;
+        let elem = document.getElementById('page-main-area')!;
         let right = elem.style.right;
         right = right.replace('px', '');
         elem.style.right = 100 + 'px';
