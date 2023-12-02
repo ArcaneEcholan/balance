@@ -1,5 +1,7 @@
 <template>
-    <button class="confirm-btn" @click="onclick">ledgers</button>
+    <button class="confirm-btn" @click="onclick">
+        <slot></slot>
+    </button>
 </template>
 
 <script lang='ts'>

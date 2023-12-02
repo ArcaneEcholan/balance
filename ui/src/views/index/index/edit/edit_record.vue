@@ -11,17 +11,21 @@
             <div class="modal-title">Edit Record</div>
             <gap-component :value="'55px'"></gap-component>
             <div class="record-header">Edit Fields</div>
-            <van-cell-group class="shadow overflow-hidden br8 ">
-                <van-field v-model="categoryValue" type="string" label="category"/>
-                <van-field v-model="amount" type="number" label="amount"/>
-                <van-field v-model="datetime" type="text" label="datetime"/>
-                <van-field v-model="count" type="digit" label="count"/>
-                <van-field v-model="description" type="text" label="description"/>
-            </van-cell-group>
-            <gap-component></gap-component>
-            <common-button :disabled="!submitEnable" @click="submit">
+            <panel>
+                <van-cell-group>
+                    <van-field v-model="categoryValue" type="string" label="category"/>
+                    <van-field v-model="amount" type="number" label="amount"/>
+                    <van-field v-model="datetime" type="text" label="datetime"/>
+                    <van-field v-model="count" type="digit" label="count"/>
+                    <van-field v-model="description" type="text" label="description"/>
+                </van-cell-group>
+            </panel>
+
+
+            <gap-component value="30px"></gap-component>
+            <custom-button :disabled="!submitEnable" @click="submit">
                 <template #default>Submit</template>
-            </common-button>
+            </custom-button>
         </div>
     </modal-presentation>
 </template>
@@ -33,14 +37,15 @@ import {Notify} from "vant";
 import Client from "@/request/client";
 import {countDecimalPlaces, isFloat, isPositiveInteger, unmountComponent} from '@/ts/utils';
 import eventBus from "@/ts/EventBus";
-import pageConfig from "@/ts/pageConfig";
-import CommonButton from "@/views/components/CommonButton.vue";
+import CustomButton from "@/components/CustomButton.vue";
 import GapComponent from "@/views/components/GapComponent.vue";
+import Panel from "@/components/Panel.vue";
 
 @Component({
     components: {
+        Panel,
         GapComponent,
-        CommonButton,
+        CustomButton,
         ModalPresentation: ModalPresentationView
     }
 })
@@ -254,11 +259,6 @@ export default class EditRecordView extends Vue {
 @import "~@/style/common-style.scss";
 @import "~@/style/style-specification";
 
-.page {
-    padding: 8px;
-    background-color: #f7f8fa;
-    height: 100%;
-}
 
 .record-header {
     padding: 16px 16px 8px;
