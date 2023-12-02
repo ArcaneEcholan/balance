@@ -39,6 +39,8 @@
         <transaction-list-component
             ref="transaction-list-component"
         ></transaction-list-component>
+
+        <gap-component :value="'58px'"></gap-component>
     </div>
 </template>
 <script lang="ts">
