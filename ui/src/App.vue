@@ -29,6 +29,11 @@ export default class AppView extends Vue {
 
     // this listener should be put here instead of in the touchstart listener
     mounted() {
+
+
+
+        // app.removeChild(app)
+
         {
             // make sure pageConfig is in vue reactive system, so the change of it
             // to avoid the listener being created every time touchstart is triggered

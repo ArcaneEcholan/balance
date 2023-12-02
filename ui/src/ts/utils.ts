@@ -1,5 +1,6 @@
 import EditRecordView from "@/views/index/index/edit/edit_record.vue";
 import {Component} from "vue-property-decorator";
+import store from "@/store";
 
 export function get_display_file_size(bytes: number) {
     const g = bytes / 1024.0 / 1024.0 / 1024.0;
@@ -181,4 +182,20 @@ export function unmountComponent(vue: any, animationTimeMilli: number) {
     setTimeout(() => {
         vue.$el.parentNode!.removeChild(vue.$el);
     }, animationTimeMilli);
+}
+
+export function enableBodyScroll() {
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('position');
+    document.body.style.removeProperty('top');
+    document.body.style.removeProperty('width');
+    window.scrollTo(0, store.getters.scrollPosition);
+}
+export function disableBodyScroll() {
+    let currentPageScrollPosition = window.pageYOffset
+    store.commit('setScrollPosition', currentPageScrollPosition)
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${currentPageScrollPosition}px`;
+    document.body.style.width = '100%';
 }
