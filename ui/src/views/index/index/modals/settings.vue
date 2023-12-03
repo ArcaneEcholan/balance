@@ -37,6 +37,7 @@ import Panel from "@/components/Panel.vue";
 import EditRecordView from "@/views/index/index/modals/edit_record.vue";
 import LanguagePickerComponent from "@/views/index/index/modals/language-picker.vue";
 import GapComponent from "@/views/components/GapComponent.vue";
+import {getVueEl} from "@/ts/vueUtils";
 @Component({
     components: {GapComponent, Panel, ModalPresentation}
 })
@@ -45,7 +46,7 @@ export default class SettingsView extends Vue {
     onclickLanguageEntry() {
 
 
-        let arg = {}
+        let arg: any = {}
         arg.modalLifeCycleHooks = this.getModalLifeCycleHooks()
         mountComponent(this.mountPointUid, LanguagePickerComponent, arg);
 
@@ -54,9 +55,11 @@ export default class SettingsView extends Vue {
 
     }
     getModalLifeCycleHooks = () => {
+      let elem  = getVueEl(this, 'settings-panel')
         return {
             onOpen: () => {
-                {  let elem  =this.$refs['settings-panel'].$el
+                {
+
                     let right = elem.style.right;
                     right = right.replace('px', '');
                     elem.style.right = 100 + 'px';
@@ -64,22 +67,18 @@ export default class SettingsView extends Vue {
             },
             onClose: () => {
                 // enableBodyScroll()
-                let elem  =this.$refs['settings-panel'].$el
                 elem.style.right = 0 + 'px';
             },
             beforeSwipe: () => {
 
-                let elem  =this.$refs['settings-panel'].$el
                 elem.classList.remove('tran')
             },
             swiping: (args: any) => {
                 let swipingPathPercent = args.swipingPathPercent
                 let r = 1 - swipingPathPercent
-                let elem  =this.$refs['settings-panel'].$el
                 elem.style.right = r * 100 + 'px';
             },
             afterSwipe: () => {
-                let elem  =this.$refs['settings-panel'].$el
                 elem.classList.add('tran')
             },
         };

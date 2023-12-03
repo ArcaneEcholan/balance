@@ -23,36 +23,33 @@ export default class AppView extends Vue {
         that = this;
     }
 
-    touchStartPositionX = 0
 
-    fingerPositionX = 0
 
-    // this listener should be put here instead of in the touchstart listener
     mounted() {
 
 
-
-        // app.removeChild(app)
-
         {
+            let touchStartPositionX = 0
+            let fingerPositionX  = 0
+            let swipeAreaWidth = 30;
             // make sure pageConfig is in vue reactive system, so the change of it
             // to avoid the listener being created every time touchstart is triggered
             let touchMoveListener = (e: any) => {
                 // use that instead of this, because "this" is not the vue instance,
                 // but an object of class AppView
-                that.fingerPositionX = e.changedTouches[0].clientX;
+                fingerPositionX = e.changedTouches[0].clientX;
 
                 //  handleEdgeSwipe
                 {
-                    if (that.touchStartPositionX <= 30) {
-                        if (that.fingerPositionX - that.touchStartPositionX > 0) {
+                    if (touchStartPositionX <= swipeAreaWidth) {
+                        if (fingerPositionX - touchStartPositionX > 0) {
                             console.debug("prevent default swipe gesture")
                             e.preventDefault();
                         }
                     }
 
-                    if (that.touchStartPositionX >= window.innerWidth - 30) {
-                        if (that.fingerPositionX - that.touchStartPositionX < 0) {
+                    if (touchStartPositionX >= window.innerWidth - swipeAreaWidth) {
+                        if (fingerPositionX - touchStartPositionX < 0) {
                             console.debug("prevent default swipe gesture")
                             e.preventDefault();
                         }
@@ -64,7 +61,7 @@ export default class AppView extends Vue {
                 let app = document.getElementById("app")!
 
                 app.addEventListener('touchstart', (e) => {
-                    this.touchStartPositionX = e.changedTouches[0].clientX
+                    touchStartPositionX = e.changedTouches[0].clientX
 
                     // don't prevent default here, this will prevent the click event from being triggered
                     // more information should be collected as the user move finger

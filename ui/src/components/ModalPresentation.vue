@@ -68,6 +68,7 @@ export default class ModalPresentationView extends Vue {
 
             // if and only if the user's finger is in the swipe area, we start to record the swipe action
             if (touchClientX <= swipeAreaWidth) {
+                e.preventDefault()
                 swipeStartTime = new Date().getTime();
                 // remove the transition of modal, because we need the modal to stay tight with the user's finger without latency
                 {
