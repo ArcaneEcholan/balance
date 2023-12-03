@@ -1,9 +1,9 @@
 <template>
     <div
-         class="clickable"
-         @touchstart="ontouchStart"
-         @touchend="ontouchEnd"
-         @click="$emit('click', $event)"
+        style="touch-action: manipulation;"
+        :id="tid"
+        class="clickable"
+        @click="onClick($event)"
     >
         <slot></slot>
     </div>
@@ -11,22 +11,23 @@
 
 <script lang='ts'>
 import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Notify} from "vant";
+import {generateMountPointUid} from "@/ts/utils";
 
 @Component({})
 export default class ClickableComponent extends Vue {
     // @Prop({default: ""}) classNames!: string
     // @Prop({default: ""}) styles!: string
 
-    ontouchStart(event: any) {
-        let c = event.target.closest(".clickable")
+    tid = generateMountPointUid()
+
+    onClick($event: any) {
+        let c = document.getElementById(this.tid)!
         c.classList.add("active")
-    }
-
-    ontouchEnd(event: any) {
-        let c = event.target.closest(".clickable")
-        c.classList.remove("active")
-
-        this.$emit("touchend", event)
+        setTimeout(() => {
+            c.classList.remove("active")
+        }, 10)
+        this.$emit('click', $event)
     }
 }
 </script>

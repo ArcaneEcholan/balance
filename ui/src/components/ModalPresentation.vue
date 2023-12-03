@@ -19,7 +19,7 @@ import {v4 as uuidv4} from 'uuid';
 export default class ModalPresentationView extends Vue {
     modal!: HTMLElement;
     modalWidth = 0;
-    swipePercentage = 0.3;
+    swipePercentage = 0.05;
     modalElemUid: string = uuidv4();
 
     @Prop({default: null})

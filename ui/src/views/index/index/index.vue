@@ -6,14 +6,16 @@
             <div :id="mountPointUid3"></div>
         </div>
 
-        <van-action-sheet :closeable="false" v-model="show" >
+        <van-action-sheet :closeable="false" v-model="show">
             <div class="page">
                 <div class="action-sheet-title">
-                    {{$t('add_record')}}
+                    {{ $t('add_record') }}
                 </div>
-                <add-record-sheet-component
-                    ref="add-transaction-editor-component"
-                ></add-record-sheet-component>
+                <div class="action-sheet-body">
+                    <add-record-sheet-component
+                        ref="add-transaction-editor-component"
+                    ></add-record-sheet-component>
+                </div>
             </div>
         </van-action-sheet>
 

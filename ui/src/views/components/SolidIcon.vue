@@ -1,7 +1,7 @@
 <template>
     <div>
         <template v-if="clickable">
-            <clickable @click="$emit('click', $event)"
+            <clickable @click.native="$emit('click', $event)"
                        class="flex center"
                        style="
             padding: 6px;
@@ -13,7 +13,7 @@
             </clickable>
         </template>
         <template v-else>
-            <div @click="$emit('click', $event)" class="flex center"
+            <div @click.native="$emit('click', $event)" class="flex center"
                  style="
             padding: 6px;
             color: #ffffff;

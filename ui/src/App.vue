@@ -12,7 +12,6 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import pageConfig from "@/ts/pageConfig";
 
 let that: any
 @Component
@@ -24,13 +23,10 @@ export default class AppView extends Vue {
     }
 
 
-
     mounted() {
-
-
         {
             let touchStartPositionX = 0
-            let fingerPositionX  = 0
+            let fingerPositionX = 0
             let swipeAreaWidth = 30;
             // make sure pageConfig is in vue reactive system, so the change of it
             // to avoid the listener being created every time touchstart is triggered
@@ -81,6 +77,14 @@ export default class AppView extends Vue {
 @import "~@/assets/custom-icon.css";
 @import "~@/style/common-style.scss";
 
+html {
+    touch-action: manipulation;
+    user-select: none; /* standard */
+    -moz-user-select: none; /* firefox specific */
+    -webkit-user-select: none; /* Chrome, Opera and Safari*/
+    -ms-user-select: none; /* IE, ms-edge */
+}
+
 body {
     padding: 0;
     margin: 0;
@@ -98,7 +102,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
 }
-
 
 
 nav {

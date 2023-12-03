@@ -84,7 +84,7 @@
         <solid-icon
             :clickable="true"
             icon-class="ali-international-icon-add-1"
-            @click="ff"
+            @click.native="ff"
         ></solid-icon>
       </div>
     </div>

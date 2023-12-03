@@ -31,7 +31,8 @@ import "@/assets/icon-fonts/iconfont.css"
 import i18n from "@/ts/lang";
 
 Vue.config.productionTip = false;
-
+import { NumberKeyboard } from 'vant';
+Vue.use(NumberKeyboard);
 
 Vue.use(DatetimePicker);
 Vue.use(Loading);
@@ -55,6 +56,9 @@ Vue.use(SwipeCell);
 
 Vue.mixin(PageEventbusRegistrationMixin)
 
+import FastClick from 'fastclick'
+// @ts-ignore
+FastClick.attach(document.body)
 
 // Vue.prototype.$customFuncs = {
 //     getRef,
