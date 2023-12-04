@@ -194,7 +194,10 @@ export default class AddTransactionEditorComponent extends Vue {
     }
 
     increaseElemHeight(element: HTMLElement, heightDelt: number) {
-        element.style.height = element.offsetHeight + heightDelt + 'px';
+        let height = element.style.height
+            ? Number(element.style.height.replace('px', ''))
+            : 0;
+        element.style.height = height + heightDelt + 'px';
     }
 
     setElemHeight(element: HTMLElement, height: number) {
@@ -467,7 +470,7 @@ export default class AddTransactionEditorComponent extends Vue {
         if (area == null) {
             throw new Error('area == null');
         }
-        area.style.height = area.offsetHeight + 54 + 'px';
+        this.increaseElemHeight(area, 54)
     }
 
     updated() {}
