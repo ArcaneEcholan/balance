@@ -35,20 +35,20 @@
 
                     <ledger-switcher-component ref="ledger-switcher-component"></ledger-switcher-component>
 
-                    <clickable>
-                        <div class="mg20 flex align-center" @click="showLedgerSwitcherSheet">
+                    <clickable @click="showLedgerSwitcherSheet">
+                        <div class="mg20 flex align-center">
                             <i class="icon ali-international-icon-log"></i>
                         </div>
                     </clickable>
 
-                    <clickable>
-                        <div class="mg20" @click="onClickSettingIcon">
+                    <clickable @click="onClickSettingIcon">
+                        <div class="mg20">
                             <van-icon class="icon" name="setting-o"></van-icon>
                         </div>
                     </clickable>
 
-                    <clickable>
-                        <div class="mg20" @click="show = true">
+                    <clickable @click="show = true">
+                        <div class="mg20">
                             <i class="icon ali-international-icon-plus"></i>
                         </div>
                     </clickable>
