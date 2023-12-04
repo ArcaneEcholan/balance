@@ -12,14 +12,14 @@
 <script lang='ts'>
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {Notify} from "vant";
-import {generateMountPointUid} from "@/ts/utils";
+import {generateElemUid} from "@/ts/utils";
 
 @Component({})
 export default class ClickableComponent extends Vue {
     // @Prop({default: ""}) classNames!: string
     // @Prop({default: ""}) styles!: string
 
-    tid = generateMountPointUid()
+    tid = generateElemUid()
 
     onClick($event: any) {
         let c = document.getElementById(this.tid)!

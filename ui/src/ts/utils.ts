@@ -152,6 +152,10 @@ export function timeout(timeout: number): Promise<any> {
 
 const { v4: uuidv4 } = require('uuid');
 
+export function generateElemUid() {
+    return `elem-${uuidv4()}`;
+}
+
 export function generateMountPointUid() {
     return `mount-point-${uuidv4()}`;
 }

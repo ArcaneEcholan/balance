@@ -27,7 +27,7 @@
                     <van-swipe-cell>
                         <div class="flex">
                             <clickable
-                                class="cell flexg1 flex center"
+                                class="cell flexg1 flex center pd8"
                                 style="
                                     word-break: break-word;
                                     background-color: white;
