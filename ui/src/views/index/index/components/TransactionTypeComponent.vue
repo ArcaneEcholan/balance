@@ -28,7 +28,24 @@
         </div>
 
         <van-action-sheet v-model="addTypeShow">
-            <div class="pd20 textcenter">Add record type</div>
+            <div class="action-sheet-title">Add record type</div>
+            <div class="action-sheet-body">
+
+                <panel>
+                    <van-field v-model="name" placeholder="name" label="name"></van-field>
+                </panel>
+
+                icon:
+                <div class="flex" style="justify-content: start; flex-wrap: wrap;">
+                    <div v-for="i in 10" class=" type-icon ">
+                        <div class="flex flex-center column">
+                            <i class="ali-international-icon-account"></i>
+                            <div>icon</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </van-action-sheet>
     </div>
 </template>
@@ -37,12 +54,14 @@
 import {Component, Vue} from 'vue-property-decorator';
 import Client from "@/request/client";
 import Clickable from "@/views/components/Clickable.vue";
+import Panel from "@/components/Panel.vue";
 
 @Component({
-    components: {Clickable}
+    components: {Panel, Clickable}
 })
 export default class TransTypeComponent extends Vue {
 
+    name: string = ""
     metrics: any[] = []
 
     transactionCategories: any[] = []
@@ -82,4 +101,10 @@ export default class TransTypeComponent extends Vue {
 <style lang='scss' scoped>
 @import "~@/style/common-style.scss";
 @import "~@/style/style-specification";
+
+.type-icon {
+    width: 24%;
+    padding:20px 10px ;
+    box-sizing: border-box;
+}
 </style>

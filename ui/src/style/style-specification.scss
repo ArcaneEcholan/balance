@@ -6,6 +6,12 @@ input {
     font-size: 14px !important;
 }
 
+.van-field__label {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+
 body {
     background-color: #f7f8fa;
 }
