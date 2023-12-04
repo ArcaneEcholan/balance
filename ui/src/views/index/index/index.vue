@@ -1,5 +1,6 @@
 <template>
     <div class="page">
+
         <div style="position: relative; z-index: 101">
             <div :id="mountPointUid"></div>
             <div :id="mountPointUid2"></div>
@@ -30,23 +31,28 @@
             <div id="records-index-header-gradual-color-bg"></div>
 
             <div id="main-page-fix-header">
-                <div class="flex  align-center" style="justify-content: space-around">
+                <div class="flex align-center">
 
-                    <div class="mg20">
-                        <ledger-switcher-component></ledger-switcher-component>
-                    </div>
+                    <ledger-switcher-component ref="ledger-switcher-component"></ledger-switcher-component>
 
-                    <div class="mg20">
-                        <div @click="onClickSettingIcon">
+                    <clickable>
+                        <div class="mg20 flex align-center" @click="showLedgerSwitcherSheet">
+                            <i class="icon ali-international-icon-log"></i>
+                        </div>
+                    </clickable>
+
+                    <clickable>
+                        <div class="mg20" @click="onClickSettingIcon">
                             <van-icon class="icon" name="setting-o"></van-icon>
                         </div>
-                    </div>
+                    </clickable>
 
-                    <div class="mg20">
-                        <div @click="show = true">
+                    <clickable>
+                        <div class="mg20" @click="show = true">
                             <i class="icon ali-international-icon-plus"></i>
                         </div>
-                    </div>
+                    </clickable>
+
                 </div>
             </div>
         </div>
@@ -80,6 +86,7 @@ import EditRecordView from '@/views/index/index/modals/edit_record.vue';
 import ManageLedgerView from '@/views/index/index/modals/ledger.vue';
 import {setLanguage} from "@/ts/lang";
 import SettingsView from "@/views/index/index/modals/settings.vue";
+import Clickable from "@/views/components/Clickable.vue";
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -87,6 +94,7 @@ import SettingsView from "@/views/index/index/modals/settings.vue";
 
 @Component({
     components: {
+        Clickable,
         AddRecordSheetComponent,
         CommonButton,
         MainPageCurrentDatePickerComponent,
@@ -98,10 +106,15 @@ import SettingsView from "@/views/index/index/modals/settings.vue";
     },
 })
 export default class IndexView extends Vue {
+    lwc: any | null = null;
     settingShow = false
     mountPointUid = generateMountPointUid();
     mountPointUid2 = generateMountPointUid();
     mountPointUid3 = generateMountPointUid();
+
+    showLedgerSwitcherSheet() {
+        this.lwc.showSheet()
+    }
 
     onClickSettingIcon() {
         this.mountSettingsComponent({})
@@ -395,6 +408,9 @@ export default class IndexView extends Vue {
     }
 
     mounted() {
+
+        this.lwc = this.$refs["ledger-switcher-component"]
+
         provideListeners(this, [
             {
                 eventName: 'on-click-record-item',
@@ -409,8 +425,8 @@ export default class IndexView extends Vue {
                 },
             },
         ]);
-    }
 
+    }
 
 }
 </script>
