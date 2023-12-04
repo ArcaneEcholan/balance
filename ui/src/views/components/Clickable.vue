@@ -26,7 +26,7 @@ export default class ClickableComponent extends Vue {
         c.classList.add("active")
         setTimeout(() => {
             c.classList.remove("active")
-        }, 10)
+        }, 100)
         this.$emit('click', $event)
     }
 }
