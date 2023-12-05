@@ -113,6 +113,6 @@ export default class SettingsView extends Vue {
 }
 
 #settings-panel.tran{
-    transition: right 0.5s cubic-bezier(0, 1, 0, 1);
+    transition: right var(--transition-duration) var(--transition-easing);
 }
 </style>

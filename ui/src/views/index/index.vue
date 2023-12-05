@@ -79,10 +79,10 @@ export default class IndexIndexView extends Vue {
     height: 100%;
 }
 #page-main-area.tran {
-    transition: right 0.5s cubic-bezier(0, 1, 0, 1);
+    transition: right var(--transition-duration) var(--transition-easing);
 }
 
 #tabbar-area.tran {
-    transition: right 0.5s cubic-bezier(0, 1, 0, 1);
+    transition: right var(--transition-duration) var(--transition-easing);
 }
 </style>

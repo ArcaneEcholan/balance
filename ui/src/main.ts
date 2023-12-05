@@ -59,6 +59,8 @@ import FastClick from 'fastclick'
 // @ts-ignore
 FastClick.attach(document.body)
 
+import "@/import-style-vars"
+
 new Vue({
     router,
     store,

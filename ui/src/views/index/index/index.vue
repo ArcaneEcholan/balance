@@ -478,7 +478,7 @@ $header-bgc: #fcf4d4;
 }
 
 #records-index-header.tran {
-    transition: right 0.5s cubic-bezier(0, 1, 0, 1);
+    transition: right var(--transition-duration) var(--transition-easing);
 }
 
 .fake-marker {

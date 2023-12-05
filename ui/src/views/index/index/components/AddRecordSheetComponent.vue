@@ -112,19 +112,20 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import VanCursorEditorComponent from '@/views/components/VanCursorEditor.vue';
-import { findWordInLine, replace, timeout } from '@/ts/utils';
+import {findWordInLine, replace, timeout} from '@/ts/utils';
 import GapComponent from '@/views/components/GapComponent.vue';
-import { Notify } from 'vant';
+import {Notify} from 'vant';
 import Client from '@/request/client';
 import eventBus from '@/ts/EventBus';
 import CommonButton from '@/views/components/CommonButton.vue';
-import { provideListeners } from '@/page-eventbus-registration-mixin';
+import {provideListeners} from '@/page-eventbus-registration-mixin';
 import TransactionTypeComponent from '@/views/index/index/components/TransactionTypeComponent.vue';
 import Clickable from '@/views/components/Clickable.vue';
 import SolidIcon from '@/views/components/SolidIcon.vue';
 import KeyBoardComponent from '@/views/index/index/components/KeyBoardComponent.vue';
+import settings from "@/settings";
 
 class FormItemField {
     value: string | null = null;
@@ -208,45 +209,7 @@ export default class AddTransactionEditorComponent extends Vue {
         this.setElemHeight(element, 0.01);
     }
 
-    deleteNewRecord(record: any) {
-        let div = this.getANewRecordRowDiv(record);
-        this.squashDivToExtremelyShort(div);
 
-        let area = this.getNewRecordsAreaDiv();
-        this.increaseElemHeight(area, -54);
-
-        timeout(500).then(() => {
-            let curIndex = this.newRecordRows.findIndex(
-                (it) => it === this.cursor.recordRef,
-            );
-            let index = this.newRecordRows.findIndex((it) => it === record);
-            if (index === -1) {
-                throw new Error('index === -1');
-            }
-            this.newRecordRows.splice(index, 1);
-
-            if (this.newRecordRows.length === 0) {
-                this.cursor.recordRef = null;
-                this.cursor.attrName = '';
-            } else {
-                if (curIndex === index) {
-                    if (index === this.newRecordRows.length) {
-                        this.cursor.recordRef = this.newRecordRows[index - 1];
-                    } else {
-                        this.cursor.recordRef = this.newRecordRows[index];
-                    }
-                    this.$nextTick(() => {
-                        this.focusOnNewRecordCell(
-                            null,
-                            '',
-                            this.cursor.recordRef,
-                            this.cursor.attrName,
-                        );
-                    });
-                }
-            }
-        });
-    }
 
     cursor: any = {
         recordRef: null,
@@ -450,20 +413,26 @@ export default class AddTransactionEditorComponent extends Vue {
 
     counter = 0;
 
+    clearingAllRecords = false;
+
     addRecordRow() {
-        let a = {
+        if(this.clearingAllRecords) {
+            return
+        }
+
+        let newRecord = {
             id: this.counter++,
             type: '',
             amount: '',
             count: 1,
             desc: '',
         };
-        this.newRecordRows.push(a);
+        this.newRecordRows.push(newRecord);
         if (this.newRecordRows.length === 1) {
-            this.cursor.recordRef = a;
+            this.cursor.recordRef = newRecord;
             this.cursor.attrName = 'amount';
             this.$nextTick(() => {
-                this.focusOnNewRecordCell(null, '', a, 'amount');
+                this.focusOnNewRecordCell(null, '', newRecord, 'amount');
             });
         }
         let area = document.getElementById('new-records-area');
@@ -473,7 +442,59 @@ export default class AddTransactionEditorComponent extends Vue {
         this.increaseElemHeight(area, 54)
     }
 
-    updated() {}
+    clearAllRecords() {
+        this.clearingAllRecords = true;
+        let area = document.getElementById('new-records-area');
+        if (area == null) {
+            throw new Error('area == null');
+        }
+        area.style.height = 0 + 'px';
+        setTimeout(() => {
+            this.newRecordRows = [];
+            this.clearingAllRecords = false;
+        }, settings.animation.duration);
+    }
+
+    deleteNewRecord(record: any) {
+        let div = this.getANewRecordRowDiv(record);
+        this.squashDivToExtremelyShort(div);
+
+        let area = this.getNewRecordsAreaDiv();
+        this.increaseElemHeight(area, -54);
+
+        timeout(settings.animation.duration).then(() => {
+            let curIndex = this.newRecordRows.findIndex(
+                (it) => it === this.cursor.recordRef,
+            );
+            let index = this.newRecordRows.findIndex((it) => it === record);
+            if (index === -1) {
+                throw new Error('index === -1');
+            }
+            this.newRecordRows.splice(index, 1);
+
+            if (this.newRecordRows.length === 0) {
+                this.cursor.recordRef = null;
+                this.cursor.attrName = '';
+                return;
+            }
+
+            if (curIndex === index) {
+                if (index === this.newRecordRows.length) {
+                    this.cursor.recordRef = this.newRecordRows[index - 1];
+                } else {
+                    this.cursor.recordRef = this.newRecordRows[index];
+                }
+                this.$nextTick(() => {
+                    this.focusOnNewRecordCell(
+                        null,
+                        '',
+                        this.cursor.recordRef,
+                        this.cursor.attrName,
+                    );
+                });
+            }
+        });
+    }
 
     geoLocation: any = {};
 
@@ -481,7 +502,7 @@ export default class AddTransactionEditorComponent extends Vue {
 
     parsedForms: FormItem[] = [];
 
-    curLedger: any = { name: 'default' };
+    curLedger: any = {name: 'default'};
 
     created() {
         provideListeners(this, [
@@ -508,7 +529,7 @@ export default class AddTransactionEditorComponent extends Vue {
             'on-get-current-ledger-name',
             null,
         );
-        this.curLedger = { name: ledgerName };
+        this.curLedger = {name: ledgerName};
     }
     touchKeyBoardEnd(keyObj: any) {
         let cursor = this.cursor;
@@ -680,16 +701,7 @@ export default class AddTransactionEditorComponent extends Vue {
                 });
                 eventBus.$emit('refresh-transaction-list', null);
 
-                let area = document.getElementById('new-records-area');
-                if (area == null) {
-                    throw new Error('area == null');
-                }
-                area.style.height = 0 + 'px';
-                this.$nextTick(() => {
-                    setTimeout(() => {
-                        this.newRecordRows = [];
-                    }, 500);
-                });
+                this.clearAllRecords()
             })
             .catch((resp) => {
                 console.log(resp);
@@ -729,7 +741,7 @@ export default class AddTransactionEditorComponent extends Vue {
 
                 let obj = wordsOrder.reduce(
                     (obj, cur, index) =>
-                        Object.assign(obj, { [cur]: words[index] }),
+                        Object.assign(obj, {[cur]: words[index]}),
                     {},
                 );
 
@@ -802,13 +814,13 @@ export default class AddTransactionEditorComponent extends Vue {
     }
 }
 #new-records-area {
-    height: 0.1px;
-    transition: all 0.5s;
+    height: 0px;
+    transition: all var(--transition-duration) var(--transition-easing);
 
     .new-record-row {
-        animation: upDown 0.5s;
+        animation: upDown var(--transition-duration) var(--transition-easing);
         height: 54px;
-        transition: height 0.5s;
+        transition: height var(--transition-duration) var(--transition-easing);
         overflow: hidden;
 
         .cell {
