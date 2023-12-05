@@ -105,7 +105,7 @@
             ></solid-icon>
         </div>
         <key-board-component
-            @key-touched="touchKeyBoardEnd"
+            @key-touched="keyBoardTouched"
         ></key-board-component>
         <gap-component :value="'8px'"></gap-component>
     </div>
@@ -159,8 +159,6 @@ export default class AddTransactionEditorComponent extends Vue {
         this.cursor.attrName = attrName;
         this.$nextTick(() => {
             this.focusOnNewRecordCell(
-                oldRecordRef,
-                oldAttrName,
                 recordRow,
                 attrName,
             );
@@ -208,7 +206,6 @@ export default class AddTransactionEditorComponent extends Vue {
     squashDivToExtremelyShort(element: HTMLElement) {
         this.setElemHeight(element, 0.01);
     }
-
 
 
     cursor: any = {
@@ -268,16 +265,12 @@ export default class AddTransactionEditorComponent extends Vue {
         let nextRecordRef = this.cursor.recordRef;
 
         this.focusOnNewRecordCell(
-            curRecordRef,
-            curattr,
             nextRecordRef,
             nextattrName,
         );
     }
 
     focusOnNewRecordCell(
-        previousRef: any,
-        previousAttrName: string,
         recordRef: any,
         attrName: string,
     ) {
@@ -346,8 +339,6 @@ export default class AddTransactionEditorComponent extends Vue {
 
         let nextRecordRef = this.cursor.recordRef;
         this.focusOnNewRecordCell(
-            curRecordRef,
-            curattr,
             nextRecordRef,
             nextattrName,
         );
@@ -371,8 +362,6 @@ export default class AddTransactionEditorComponent extends Vue {
             this.cursor.attrName = this.attrOrder[0];
         }
         this.focusOnNewRecordCell(
-            curRecordRef,
-            curAttrName,
             this.cursor.recordRef,
             this.cursor.attrName,
         );
@@ -396,8 +385,6 @@ export default class AddTransactionEditorComponent extends Vue {
             this.cursor.attrName = this.attrOrder[0];
         }
         this.focusOnNewRecordCell(
-            curRecordRef,
-            curAttrName,
             this.cursor.recordRef,
             this.cursor.attrName,
         );
@@ -416,7 +403,7 @@ export default class AddTransactionEditorComponent extends Vue {
     clearingAllRecords = false;
 
     addRecordRow() {
-        if(this.clearingAllRecords) {
+        if (this.clearingAllRecords) {
             return
         }
 
@@ -432,7 +419,7 @@ export default class AddTransactionEditorComponent extends Vue {
             this.cursor.recordRef = newRecord;
             this.cursor.attrName = 'amount';
             this.$nextTick(() => {
-                this.focusOnNewRecordCell(null, '', newRecord, 'amount');
+                this.focusOnNewRecordCell(newRecord, 'amount');
             });
         }
         let area = document.getElementById('new-records-area');
@@ -486,8 +473,6 @@ export default class AddTransactionEditorComponent extends Vue {
                 }
                 this.$nextTick(() => {
                     this.focusOnNewRecordCell(
-                        null,
-                        '',
                         this.cursor.recordRef,
                         this.cursor.attrName,
                     );
@@ -507,12 +492,6 @@ export default class AddTransactionEditorComponent extends Vue {
     created() {
         provideListeners(this, [
             {
-                eventName: 'on-click-one-type',
-                handler: (type: string) => {
-                    this.replaceFirstWord(type);
-                },
-            },
-            {
                 eventName: 'on-cur-ledger-changed',
                 handler: (ledger: any) => {
                     this.curLedger = ledger;
@@ -531,7 +510,8 @@ export default class AddTransactionEditorComponent extends Vue {
         );
         this.curLedger = {name: ledgerName};
     }
-    touchKeyBoardEnd(keyObj: any) {
+
+    keyBoardTouched(keyObj: any) {
         let cursor = this.cursor;
         let recordRef = cursor.recordRef;
         let attrName = cursor.attrName;
@@ -593,8 +573,6 @@ export default class AddTransactionEditorComponent extends Vue {
         }
     }
 
-    mounted() {}
-
     onAddTrans() {
         try {
             this.checkAddTransData();
@@ -611,21 +589,12 @@ export default class AddTransactionEditorComponent extends Vue {
     }
 
     checkAddTransData() {
-        this.doCheckAddTransData();
-    }
-
-    doCheckAddTransData() {
-        let errorType = '';
         if (this.newRecordRows.length == 0) {
-            errorType = 'No data to save';
-            throw new Error(errorType);
+            throw new Error('No data to save');
         }
-        let error = false;
         let parseForms = this.newRecordRows;
         parseForms.forEach((item: any) => {
-            if (error) {
-                throw new Error(errorType);
-            }
+
             let categoryValue = item.type ?? '';
             let amount = item.amount;
             let count = item.count;
@@ -638,60 +607,58 @@ export default class AddTransactionEditorComponent extends Vue {
                 count == null ||
                 count == ''
             ) {
-                error = true;
-                errorType = 'Information not complete';
-                throw new Error(errorType);
+                throw new Error('Information not complete');
             }
 
-            let countValid = this.isPositiveInteger(Number(count));
-            let amountValid = this.isFloat(Number(amount));
-            let amountDecimalPlaces = this.countDecimalPlaces(amount);
+            function isPositiveInteger(number: number): boolean {
+                return Number.isInteger(number) && number > 0;
+            }
+
+            function isFloat(number: number) {
+                return (
+                    (Number(number) === number && !Number.isInteger(number)) ||
+                    Number.isInteger(number)
+                );
+            }
+
+            function countDecimalPlaces(number: string) {
+                if (number === '') {
+                    return 0; // Not a valid float string
+                }
+
+                const parts = number.split('.');
+
+                if (parts.length === 1) {
+                    return 0; // No decimal point found
+                }
+
+                return parts[1].length; // Return the length of the decimal part
+            }
+
+            let countValid = isPositiveInteger(Number(count));
+            let amountValid = isFloat(Number(amount));
+            let amountDecimalPlaces = countDecimalPlaces(amount);
             if (amountDecimalPlaces > 2) {
                 amountValid = false;
             }
 
             if (!countValid || !amountValid) {
-                error = true;
-                errorType = 'Information format invalid';
-                throw new Error(errorType);
+                throw new Error('Information format invalid');
             }
         });
-        // @ts-ignore
-        if (error === true) {
-            Notify({
-                message: errorType,
-                type: 'danger',
-            });
-            throw new Error(errorType);
-        }
-    }
-    isPositiveInteger(number: number): boolean {
-        return Number.isInteger(number) && number > 0;
     }
 
-    isFloat(number: number) {
-        return (
-            (Number(number) === number && !Number.isInteger(number)) ||
-            Number.isInteger(number)
-        );
-    }
-
-    countDecimalPlaces(number: string) {
-        if (number === '') {
-            return 0; // Not a valid float string
-        }
-
-        const parts = number.split('.');
-
-        if (parts.length === 1) {
-            return 0; // No decimal point found
-        }
-
-        return parts[1].length; // Return the length of the decimal part
-    }
-
+    // assemble Add Transaction Request
     addTransactionsByLedgerName(ledgerName: string, trans: any[]) {
-        let request = this.assembleAddTransactionRequest(trans);
+        let request = trans.map((tran) => {
+            return {
+                categoryValue: tran.type,
+                amount: tran.amount,
+                count: tran.count,
+                description: tran.desc,
+                location: this.geoLocation,
+            };
+        });
 
         Client.saveTransactionsByLedgerName(ledgerName, request)
             .then((resp) => {
@@ -708,89 +675,6 @@ export default class AddTransactionEditorComponent extends Vue {
             });
     }
 
-    assembleAddTransactionRequest(trans: any[]): any[] {
-        let request = trans.map((tran) => {
-            let requestTran = {
-                categoryValue: tran.type,
-                amount: tran.amount,
-                count: tran.count,
-                description: tran.desc,
-                location: this.geoLocation,
-            };
-
-            return requestTran;
-        });
-        return request;
-    }
-
-    parseInputStringToObjects() {
-        if (this.rawFormatString == null) {
-            return;
-        }
-        // food 44.00 kfc
-        // fruit 33.00 watermalon
-        let wordsOrder = ['categoryValue', 'amount', 'count', 'description'];
-
-        var lines = this.rawFormatString.split('\n');
-
-        let objs = lines
-            .filter((line) => !/^\s*$/.test(line))
-            .map((line) => line.trim())
-            .map((line) => {
-                let words = line.split(' ').filter((word) => word !== '');
-
-                let obj = wordsOrder.reduce(
-                    (obj, cur, index) =>
-                        Object.assign(obj, {[cur]: words[index]}),
-                    {},
-                );
-
-                return obj;
-            })
-            .map((obj: any) => {
-                let objWithViewStatus = {};
-                const keys = Object.keys(obj);
-                return keys.reduce((objWithViewStatus, key) => {
-                    return Object.assign(objWithViewStatus, {
-                        [key]: {
-                            value: obj[key],
-                            isValid: false,
-                        },
-                    });
-                }, objWithViewStatus);
-            });
-        this.parsedForms = objs as FormItem[];
-    }
-
-    replaceFirstWord(type: string) {
-        let curStringAtInput = this.rawFormatString ?? '';
-        let a = this.$refs.recordInput as VanCursorEditorComponent;
-        let rowNumber = a.cursorPosition.cursorRow;
-        let wordRange = findWordInLine(curStringAtInput, rowNumber, 1);
-
-        if (wordRange == null) {
-            return;
-        }
-
-        curStringAtInput = replace(
-            curStringAtInput,
-            wordRange.start,
-            wordRange.end,
-            type,
-        );
-        this.rawFormatString = curStringAtInput;
-
-        this.parseInputStringToObjects();
-
-        this.updateTextAreaInputCursorPosition(wordRange.start);
-    }
-    updateTextAreaInputCursorPosition(start: number) {
-        let vantinput = (this.$refs.recordInput as VanCursorEditorComponent)
-            .$el;
-
-        let input = vantinput.querySelector('textarea');
-        input!.selectionStart = start;
-    }
 }
 </script>
 <style lang="scss" scoped>
@@ -813,6 +697,7 @@ export default class AddTransactionEditorComponent extends Vue {
         transform: translateY(0%);
     }
 }
+
 #new-records-area {
     height: 0px;
     transition: all var(--transition-duration) var(--transition-easing);
