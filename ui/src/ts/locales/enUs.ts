@@ -10,5 +10,12 @@ export default {
     ledger_management: "Ledger Management",
     delete: 'Delete',
     edit: "Edit",
-    add_record: "Add Record",
+    date_time_picker_title: "Choose Date",
+    add_record: {
+        title: "Add Record",
+        type: "Type",
+        amount: "Amount",
+        comment: "Comment",
+        count: "Count",
+    },
 }

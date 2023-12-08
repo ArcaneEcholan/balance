@@ -6,7 +6,7 @@
                 @cancel="onCancel"
                 @confirm="onPickDate"
                 v-model="currentDate"
-                title="Choose Year-Month"
+                :title="$t('date_time_picker_title')"
                 :min-date="minDate"
                 :max-date="maxDate"
                 :type="columnsType"

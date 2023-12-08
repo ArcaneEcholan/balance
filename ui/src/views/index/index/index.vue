@@ -10,7 +10,7 @@
     <van-action-sheet :closeable="false" v-model="show">
       <div class="page">
         <div class="action-sheet-title">
-          {{ $t('add_record') }}
+          {{ $t('add_record.title') }}
         </div>
         <div class="action-sheet-body">
           <add-record-sheet-component

@@ -10,5 +10,15 @@ export default {
     ledger_management: "账本管理",
     delete: '删除',
     edit: "编辑",
-    add_record: "记一笔",
+    date_time_picker_title: "选择日期",
+    add_record: {
+        title: "记一笔",
+        type: "类型",
+        amount: "金额",
+        count: "数量",
+        comment: "备注",
+        choose_type: {
+            title: "选择类型",
+        }
+    },
 }

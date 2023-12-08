@@ -18,7 +18,7 @@
 
                 <panel>
                     <van-cell-group>
-                        <van-cell clickable :value="'Chinese'" @click="changeLocale('chinese')"/>
+                        <van-cell clickable :value="'中文(简体)'" @click="changeLocale('chinese')"/>
                         <van-cell clickable :value="'English'" @click="changeLocale('english')"/>
                     </van-cell-group>
                 </panel>

@@ -1,7 +1,7 @@
 <template>
     <div>
         <van-action-sheet :closeable="false" v-model="chooseTypePanelShow">
-            <div class="action-sheet-title">Choose A Type</div>
+            <div class="action-sheet-title">{{$t('add_record.choose_type.title')}}</div>
             <div class="action-sheet-body">
                 <transaction-type-component
                     @on-click-one-type="onClickOneType"
@@ -10,11 +10,11 @@
         </van-action-sheet>
 
         <div class="flex column">
-            <div class="flex">
-                <div class="flexg1 flex center">Type</div>
-                <div class="flexg2 flex center">Amount</div>
-                <div class="flexg2 flex center">Count</div>
-                <div class="flexg2 flex center">Desc</div>
+            <div class="flex mgb15">
+                <div class="flexg1 flex center">{{$t('add_record.type')}}</div>
+                <div class="flexg2 flex center">{{$t('add_record.amount')}}</div>
+                <div class="flexg2 flex center">{{$t('add_record.count')}}</div>
+                <div class="flexg2 flex center">{{$t('add_record.comment')}}</div>
             </div>
 
             <div id="new-records-area" class="shadow br8 overflow-hidden">
@@ -77,7 +77,6 @@
                                 class="flexg2 cell last"
                             >
                                 <van-field
-                                    placeholder="comment"
                                     v-model="recordRow.desc"
                                 ></van-field>
                             </div>
