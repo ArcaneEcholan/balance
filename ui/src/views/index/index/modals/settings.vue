@@ -1,92 +1,87 @@
 <template>
-<div class=''>
-    <modal-presentation
-        z-index="109"
-        ref="settings-panel"
-        @on-open="modalLifeCycleHooks.onOpen"
-        @on-close="modalLifeCycleHooks.onClose"
-        @closed="closed"
-        @before-swipe="modalLifeCycleHooks.beforeSwipe"
-        @swiping="modalLifeCycleHooks.swiping"
-        @after-swipe="modalLifeCycleHooks.afterSwipe"
-    >
-        <div :id="mountPointUid"></div>
-        <div class="page">
+    <div class=''>
+        <modal-presentation
+            z-index="109"
+            ref="settings-panel"
+            @on-open="modalLifeCycleHooks.onOpen"
+            @on-close="modalLifeCycleHooks.onClose"
+            @closed="closed"
+            @before-swipe="modalLifeCycleHooks.beforeSwipe"
+            @swiping="modalLifeCycleHooks.swiping"
+            @after-swipe="modalLifeCycleHooks.afterSwipe"
+        >
+            <div :id="mountPointUid"></div>
+            <div class="page">
 
-            <div class="modal-title">
-                {{$t('settings')}}
+                <div class="modal-title">
+                    {{ $t('settings') }}
+                </div>
+
+                <gap-component :value="'55px'"></gap-component>
+
+                <panel>
+                    <van-cell-group>
+                        <van-cell :title="this.$t('language')" clickable @click="onclickLanguageEntry"/>
+                    </van-cell-group>
+                </panel>
             </div>
-
-            <gap-component :value="'55px'"></gap-component>
-
-            <panel>
-                <van-cell-group>
-                    <van-cell :title="this.$t('language')" is-link @click="onclickLanguageEntry"/>
-                </van-cell-group>
-            </panel>
-        </div>
-    </modal-presentation>
-</div>
+        </modal-presentation>
+    </div>
 </template>
 
 <script lang='ts'>
-import { Component, Vue } from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import ModalPresentation from "@/components/ModalPresentation.vue";
-import {disableBodyScroll, enableBodyScroll, generateMountPointUid, mountComponent, unmountComponent} from "@/ts/utils";
+import {generateMountPointUid, mountComponent, unmountComponent} from "@/ts/utils";
 import Panel from "@/components/Panel.vue";
-import EditRecordView from "@/views/index/index/modals/edit_record.vue";
 import LanguagePickerComponent from "@/views/index/index/modals/language-picker.vue";
 import GapComponent from "@/views/components/GapComponent.vue";
 import {getVueEl} from "@/ts/vueUtils";
+
 @Component({
     components: {GapComponent, Panel, ModalPresentation}
 })
 export default class SettingsView extends Vue {
     mountPointUid = generateMountPointUid();
+
     onclickLanguageEntry() {
-
-
+        console.log("hlasjdlfjasldjf")
         let arg: any = {}
         arg.modalLifeCycleHooks = this.getModalLifeCycleHooks()
         mountComponent(this.mountPointUid, LanguagePickerComponent, arg);
-
-
-        this.mountLanguagePickerComponent({})
-
     }
+
     getModalLifeCycleHooks = () => {
-      let elem  = getVueEl(this, 'settings-panel')
+
         return {
             onOpen: () => {
-                {
-
-                    let right = elem.style.right;
-                    right = right.replace('px', '');
-                    elem.style.right = 100 + 'px';
-                }
+                let elem = getVueEl(this, 'settings-panel')
+                elem.style.right = 100 + 'px';
             },
             onClose: () => {
-                // enableBodyScroll()
+                let elem = getVueEl(this, 'settings-panel')
                 elem.style.right = 0 + 'px';
             },
             beforeSwipe: () => {
-
+                let elem = getVueEl(this, 'settings-panel')
                 elem.classList.remove('tran')
             },
             swiping: (args: any) => {
                 let swipingPathPercent = args.swipingPathPercent
                 let r = 1 - swipingPathPercent
+
+                let elem = getVueEl(this, 'settings-panel')
                 elem.style.right = r * 100 + 'px';
             },
             afterSwipe: () => {
+                let elem = getVueEl(this, 'settings-panel')
                 elem.classList.add('tran')
             },
         };
     }
-    mountLanguagePickerComponent(arg: any) {
 
-    }
     modalLifeCycleHooks: any
+
     created() {
         this.modalLifeCycleHooks = {// @ts-ignore
             onOpen: this.$options.$mountProp.modalLifeCycleHooks.onOpen,// @ts-ignore
@@ -96,6 +91,7 @@ export default class SettingsView extends Vue {
             onClose: this.$options.$mountProp.modalLifeCycleHooks.onClose
         }
     }
+
     closed() {
         unmountComponent(this, 0);
     }
@@ -112,7 +108,7 @@ export default class SettingsView extends Vue {
     height: 100%;
 }
 
-#settings-panel.tran{
+#settings-panel.tran {
     transition: right var(--transition-duration) var(--transition-easing);
 }
 </style>

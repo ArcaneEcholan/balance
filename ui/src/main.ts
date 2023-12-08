@@ -55,10 +55,6 @@ import {
 import PageEventbusRegistrationMixin from "@/page-eventbus-registration-mixin";
 Vue.mixin(PageEventbusRegistrationMixin)
 
-import FastClick from 'fastclick'
-// @ts-ignore
-FastClick.attach(document.body)
-
 import "@/import-style-vars"
 
 new Vue({

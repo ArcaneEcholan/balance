@@ -1,5 +1,5 @@
 <template>
-    <div class='' style="touch-action: manipulation;">
+    <div class='' ref="keyboard">
         <div class="keyboard flex" style="height: 200px; width: 100%">
             <div class="flexg2 flex column">
                 <div class="flex flexg1">
@@ -55,7 +55,10 @@
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
 import Clickable from "@/views/components/Clickable.vue";
-import {Notify, Toast} from "vant";
+import {Toast} from "vant";
+
+import FastClick from 'fastclick'
+import {getVueEl} from "@/ts/vueUtils";
 
 @Component({
     computed: {
@@ -67,7 +70,16 @@ import {Notify, Toast} from "vant";
 })
 export default class KeyBoardComponent extends Vue {
 
-    counter = 0;
+    mounted() {
+        let keyboardElem = getVueEl(this, "keyboard")
+
+        // use very carefully !!! Don't apply this function to document.body,
+        // only apply it to the elements on demands, otherwise some components
+        // will work incorrectly
+
+        // @ts-ignore
+        FastClick.attach(keyboardElem)
+    }
 
     touchKeyBoardEnd(e: any) {
         let domKeyElem = e.target.closest(".keyboard-key")
