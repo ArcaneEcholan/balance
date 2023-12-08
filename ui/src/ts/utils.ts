@@ -181,6 +181,11 @@ export function mountComponent(mountPointUid: string, comp: any ,mountProp: any)
     mountPoint.appendChild(mountPointSubPoint);
 
     component.$mount(mountPointSubPoint);
+
+    // this could be wired, it's a workaround on Fastclick,
+    // after mount a component, you have to click twice to trigger
+    // the click event
+    component.$el.click()
     console.log('after $mount');
 }
 

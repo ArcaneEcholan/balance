@@ -57,7 +57,6 @@ import {Component, Vue} from 'vue-property-decorator';
 import Clickable from "@/views/components/Clickable.vue";
 import {Toast} from "vant";
 
-import FastClick from 'fastclick'
 import {getVueEl} from "@/ts/vueUtils";
 
 @Component({
@@ -71,14 +70,11 @@ import {getVueEl} from "@/ts/vueUtils";
 export default class KeyBoardComponent extends Vue {
 
     mounted() {
-        let keyboardElem = getVueEl(this, "keyboard")
-
         // use very carefully !!! Don't apply this function to document.body,
         // only apply it to the elements on demands, otherwise some components
         // will work incorrectly
+        console.log(this.$refs.keyboard)
 
-        // @ts-ignore
-        FastClick.attach(keyboardElem)
     }
 
     touchKeyBoardEnd(e: any) {
