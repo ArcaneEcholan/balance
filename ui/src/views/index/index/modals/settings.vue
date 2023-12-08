@@ -6,6 +6,7 @@
             @on-open="modalLifeCycleHooks.onOpen"
             @on-close="modalLifeCycleHooks.onClose"
             @closed="closed"
+            @opened="modalLifeCycleHooks.opened"
             @before-swipe="modalLifeCycleHooks.beforeSwipe"
             @swiping="modalLifeCycleHooks.swiping"
             @after-swipe="modalLifeCycleHooks.afterSwipe"
@@ -77,6 +78,12 @@ export default class SettingsView extends Vue {
                 let elem = getVueEl(this, 'settings-panel')
                 elem.classList.add('tran')
             },
+            closed: () => {
+                // window.removeEventListener('touchstart', banTouch)
+            },
+            opened: () => {
+                // window.removeEventListener('touchstart', banTouch)
+            }
         };
     }
 
@@ -88,11 +95,14 @@ export default class SettingsView extends Vue {
             beforeSwipe: this.$options.$mountProp.modalLifeCycleHooks.beforeSwipe,// @ts-ignore
             swiping: this.$options.$mountProp.modalLifeCycleHooks.swiping,// @ts-ignore
             afterSwipe: this.$options.$mountProp.modalLifeCycleHooks.afterSwipe,// @ts-ignore
-            onClose: this.$options.$mountProp.modalLifeCycleHooks.onClose
+            onClose: this.$options.$mountProp.modalLifeCycleHooks.onClose,// @ts-ignore
+            closed: this.$options.$mountProp.modalLifeCycleHooks.closed,// @ts-ignore
+            opened: this.$options.$mountProp.modalLifeCycleHooks.opened,
         }
     }
 
     closed() {
+        this.modalLifeCycleHooks.closed()
         unmountComponent(this, 0);
     }
 }

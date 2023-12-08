@@ -157,6 +157,9 @@ export default class ModalPresentationView extends Vue {
         setTimeout(() => {
             this.$emit('on-open');
             this.modal.style.right = `0`;
+            setTimeout(() => {
+                this.$emit('opened');
+            }, 500);
         }, 0);
     }
 
@@ -174,7 +177,7 @@ export default class ModalPresentationView extends Vue {
     }
 
     beforeDestroy() {
-        this.closeModal()
+        // this.closeModal()
     }
 
     /**
