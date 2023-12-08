@@ -42,13 +42,13 @@
           </clickable>
 
           <clickable @click="onClickSettingIcon">
-            <div class="mg20">
+            <div class="mg20 flex align-center">
               <van-icon class="icon" name="setting-o"></van-icon>
             </div>
           </clickable>
 
           <clickable @click="show = true">
-            <div class="mg20">
+            <div class="mg20 flex align-center">
               <i class="icon ali-international-icon-plus"></i>
             </div>
           </clickable>
