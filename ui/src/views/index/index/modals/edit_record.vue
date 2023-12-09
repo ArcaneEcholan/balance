@@ -23,7 +23,7 @@
             </panel>
             <gap-component value="30px"></gap-component>
             <custom-button :disabled="!submitEnable" @click="submit">
-                <template #default>Submit</template>
+                <template #default>{{$t('save')}}</template>
             </custom-button>
         </div>
     </modal-presentation>

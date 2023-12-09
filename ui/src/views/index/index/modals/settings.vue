@@ -15,13 +15,13 @@
       <div class="page">
 
         <div class="modal-title">
-          {{ $t('settings') }}
+          {{ $t('settings.page_title') }}
         </div>
 
         <gap-component :value="'55px'"></gap-component>
 
         <div class="cells-block-title">
-          {{ $t('settings_title_general') }}
+          {{ $t('settings.general_block_title') }}
         </div>
         <panel>
           <van-cell-group>

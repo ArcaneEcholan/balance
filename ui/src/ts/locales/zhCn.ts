@@ -1,7 +1,10 @@
 export default {
     default: '默认',
     language: "语言",
-    settings: '设置',
+    settings: {
+        page_title: "设置",
+        general_block_title: "通用",
+    },
     change_language_successfully: "更改语言成功",
     home: "首页",
     statistics: "统计",
@@ -21,4 +24,14 @@ export default {
             title: "选择类型",
         }
     },
+
+    ledger_list: "账本列表",
+
+    edit_ledger_title: "编辑账本",
+    add_ledger_title: "添加账本",
+    ledger_name: "账本名",
+    save: "保存",
+
+
+
 }

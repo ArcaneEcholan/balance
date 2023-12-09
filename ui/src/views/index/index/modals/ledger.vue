@@ -7,9 +7,11 @@
       @swiping="modalLifeCycleHooks.swiping"
       @after-swipe="modalLifeCycleHooks.afterSwipe"
   >
+
     <van-action-sheet v-model="show">
-      <div class="page">
-        <div class="cells-block-title">Edit Fields</div>
+      <div class="action-sheet-title">{{ $t('edit_ledger_title') }}</div>
+      <div class="action-sheet-body">
+        <div class="cells-block-title">{{ $t('ledger_name') }}</div>
         <van-cell-group class="shadow overflow-hidden br8">
           <van-field
               v-model="editLedgerName"
@@ -22,14 +24,15 @@
             @click="submitEditLedger"
             :disabled="editLedgerLoading"
         >
-          <template #default>Submit</template>
+          <template #default>{{$t('save')}}</template>
         </custom-button>
       </div>
     </van-action-sheet>
-    <van-action-sheet v-model="addLedgerShow" title="Title">
-      <div class="page">
-        <gap-component :value="'32px'"></gap-component>
-        <div class="cells-block-title">Add Fields</div>
+
+    <van-action-sheet v-model="addLedgerShow">
+      <div class="action-sheet-title">{{ $t('add_ledger_title') }}</div>
+      <div class="action-sheet-body">
+        <div class="cells-block-title">{{ $t('ledger_name') }}</div>
         <van-cell-group class="shadow overflow-hidden br8">
           <van-field
               v-model="addLedgerName"
@@ -42,19 +45,20 @@
             @click="submitAddLedger"
             :disabled="addLedgerLoading"
         >
-          <template #default>Submit</template>
+          <template #default>{{$t('save')}}</template>
         </custom-button>
       </div>
     </van-action-sheet>
+
     <div ref="page-main-frame" style="height: 100%">
       <div
           class="page"
           ref="page-main-area"
           style="padding-bottom: 66px; overflow: auto"
       >
-        <div class="modal-title">{{$t('ledger_management')}}</div>
+        <div class="modal-title">{{ $t('ledger_management') }}</div>
         <gap-component :value="'55px'"></gap-component>
-        <div class="cells-block-title">Ledgers</div>
+        <div class="cells-block-title">{{$t('ledger_list')}}</div>
         <van-cell-group class="shadow br15 overflow-hidden">
           <van-swipe-cell v-for="ledger in ledgers">
             <van-cell :border="false" :title="ledger.name"/>
@@ -102,6 +106,7 @@ import CustomButton from '@/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import {disableBodyScroll, enableBodyScroll, unmountComponent} from '@/ts/utils';
 import SolidIcon from '@/views/components/SolidIcon.vue';
+
 let that: any;
 @Component({
   components: {
@@ -284,6 +289,7 @@ export default class ManageLedgerView extends Vue {
 
   ledgersLoading = false;
   modalLifeCycleHooks: any
+
   created() {
     // @ts-ignore
     this.recordId = this.$options.$mountProp.id// @ts-ignore
@@ -340,7 +346,6 @@ export default class ManageLedgerView extends Vue {
 <style lang="scss" scoped>
 @import '~@/style/common-style';
 @import '~@/style/style-specification';
-
 
 .bottom-bar {
   display: flex;

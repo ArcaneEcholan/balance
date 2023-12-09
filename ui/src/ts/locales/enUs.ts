@@ -1,7 +1,10 @@
 export default {
     default: 'default',
-    language: "language",
-    settings: 'settings',
+    language: "Language",
+    settings: {
+        page_title: "Settings",
+        general_block_title: "General",
+    },
     change_language_successfully: "change language successfully",
     home: "Home",
     statistics: "Statistics",
@@ -18,4 +21,11 @@ export default {
         comment: "Comment",
         count: "Count",
     },
+
+    ledger_list: "Ledger List",
+
+    edit_ledger_title: "Edit Ledger",
+    add_ledger_title: "Add Ledger",
+    ledger_name: "Ledger Name",
+    save: "Save"
 }
