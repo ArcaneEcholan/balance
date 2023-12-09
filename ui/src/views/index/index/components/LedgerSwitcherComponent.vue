@@ -25,7 +25,6 @@
 import {Component, Vue} from 'vue-property-decorator';
 import Client from '@/request/client';
 import eventBus from '@/ts/EventBus';
-import CommonButton from '@/views/components/CommonButton.vue';
 import {provideListeners} from '@/page-eventbus-registration-mixin';
 import GapComponent from '@/views/components/GapComponent.vue';
 import CustomButton from '@/components/CustomButton.vue';
@@ -33,7 +32,7 @@ import {getI18nValue} from "../../../../ts/utils";
 
 @Component({
     methods: {getI18nValue},
-    components: {CustomButton, GapComponent, CommonButton},
+    components: {CustomButton, GapComponent},
 })
 export default class LedgerSwitcherComponent extends Vue {
     show = false;

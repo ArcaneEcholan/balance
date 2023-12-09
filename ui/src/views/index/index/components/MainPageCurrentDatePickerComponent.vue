@@ -21,10 +21,8 @@
 import {Component, Vue} from 'vue-property-decorator';
 import eventBus from "@/ts/EventBus";
 import {provideListeners} from "@/page-eventbus-registration-mixin";
-import CommonButton from "@/views/components/CommonButton.vue";
 
 @Component({
-    components: {CommonButton}
 })
 export default class MainPageCurrentDatePickerComponent extends Vue {
     show = false

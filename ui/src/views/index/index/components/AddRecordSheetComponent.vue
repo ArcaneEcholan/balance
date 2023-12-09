@@ -118,7 +118,6 @@ import GapComponent from '@/views/components/GapComponent.vue';
 import {Notify} from 'vant';
 import Client from '@/request/client';
 import eventBus from '@/ts/EventBus';
-import CommonButton from '@/views/components/CommonButton.vue';
 import {provideListeners} from '@/page-eventbus-registration-mixin';
 import TransactionTypeComponent from '@/views/index/index/components/TransactionTypeComponent.vue';
 import Clickable from '@/views/components/Clickable.vue';
@@ -144,7 +143,6 @@ class FormItem {
         KeyBoardComponent,
         SolidIcon,
         Clickable,
-        CommonButton,
         VanCursorEditorComponent,
         GapComponent,
         TransactionTypeComponent,
@@ -679,13 +677,6 @@ export default class AddTransactionEditorComponent extends Vue {
 <style lang="scss" scoped>
 @import '~@/style/common-style.scss';
 @import '~@/style/style-specification.scss';
-
-.record-header {
-    padding: 16px 16px 8px;
-    color: #969799;
-    font-size: 14px;
-    line-height: 16px;
-}
 
 @keyframes upDown {
     0% {

@@ -186,10 +186,4 @@ export default class TransactionListComponent extends Vue {
 <style lang="scss" scoped>
 @import '~@/style/common-style.scss';
 
-.record-header {
-    padding: 16px 16px 8px;
-    color: #969799;
-    font-size: 14px;
-    line-height: 16px;
-}
 </style>

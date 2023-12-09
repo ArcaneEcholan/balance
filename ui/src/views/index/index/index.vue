@@ -78,7 +78,6 @@ import TransactionTypeComponent from '@/views/index/index/components/Transaction
 import GapComponent from '@/views/components/GapComponent.vue';
 import AddRecordSheet from './components/AddRecordSheetComponent.vue';
 import MainPageCurrentDatePickerComponent from '@/views/index/index/components/MainPageCurrentDatePickerComponent.vue';
-import CommonButton from '@/views/components/CommonButton.vue';
 import {provideListeners} from '@/page-eventbus-registration-mixin';
 import AddRecordSheetComponent from '@/views/index/index/components/AddRecordSheetComponent.vue';
 import {disableBodyScroll, enableBodyScroll, generateMountPointUid, mountComponent} from '@/ts/utils';
@@ -95,7 +94,6 @@ import Clickable from "@/views/components/Clickable.vue";
     components: {
         Clickable,
         AddRecordSheetComponent,
-        CommonButton,
         MainPageCurrentDatePickerComponent,
         GapComponent,
         TransactionListComponent,
@@ -491,12 +489,5 @@ $header-bgc: #fcf4d4;
     transform: translate(-50%, -100%);
     background: url('~@/assets/mark_bs.png');
     background-size: cover;
-}
-
-.record-header {
-    padding: 16px 16px 8px;
-    color: #969799;
-    font-size: 14px;
-    line-height: 16px;
 }
 </style>

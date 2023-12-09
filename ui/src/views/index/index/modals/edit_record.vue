@@ -8,10 +8,10 @@
         @swiping="modalLifeCycleHooks.swiping"
         @after-swipe="modalLifeCycleHooks.afterSwipe"
     >
-        <div class="page" id="aaa" style="overflow: auto;">
+        <div class="page" style="overflow: auto;">
             <div class="modal-title">Edit Record</div>
             <gap-component :value="'55px'"></gap-component>
-            <div class="record-header">Edit Fields</div>
+            <div class="cells-block-title">Edit Fields</div>
             <panel>
                 <van-cell-group>
                     <van-field v-model="categoryValue" type="string" label="category"/>
@@ -58,8 +58,10 @@ let that: any;
     }
 })
 export default class EditRecordView extends Vue {
+
     modalLifeCycleHooks: any
 
+  categoryValue: string | null = null
 
     beforeDestroy() {
         console.log("destroyed")
@@ -68,8 +70,6 @@ export default class EditRecordView extends Vue {
     closed() {
         unmountComponent(this, 0);
     }
-
-    categoryValue: string | null = null
 
     amountFractionNumberValid() {
         let i = isFloat(Number(this.amount));
@@ -90,7 +90,7 @@ export default class EditRecordView extends Vue {
         if (categoryValue == null || categoryValue.trim() == "") {
             categoryValid = false
         }
-        return categoryValue
+        return categoryValid
     }
 
     checkValidationOfData() {
@@ -103,7 +103,6 @@ export default class EditRecordView extends Vue {
             this.submitEnable = true
             throw new Error("Information format invalid")
         }
-
 
         let countValid = isPositiveInteger(Number(this.count));
         let amountValid = this.amountFractionNumberValid()
@@ -153,7 +152,6 @@ export default class EditRecordView extends Vue {
             })
         }
 
-
         // format check pass
         Client.updateTransaction(this.recordId,
             this.categoryValue!,
@@ -187,55 +185,6 @@ export default class EditRecordView extends Vue {
     count: string | null = null
     description: string | null = null
 
-
-    modal!: ModalPresentationView
-
-
-    mounted() {
-        // {
-        //     let touchStartPositionX = 0
-        //     let fingerPositionX  = 0
-        //     let swipeAreaWidth = 30;
-        //     // make sure pageConfig is in vue reactive system, so the change of it
-        //     // to avoid the listener being created every time touchstart is triggered
-        //     let touchMoveListener = (e: any) => {
-        //         // use that instead of this, because "this" is not the vue instance,
-        //         // but an object of class AppView
-        //         fingerPositionX = e.changedTouches[0].clientX;
-        //
-        //         //  handleEdgeSwipe
-        //         {
-        //             if (touchStartPositionX <= swipeAreaWidth) {
-        //                 if (fingerPositionX - touchStartPositionX > 0) {
-        //                     console.debug("prevent default swipe gesture")
-        //                     e.preventDefault();
-        //                 }
-        //             }
-        //
-        //             if (touchStartPositionX >= window.innerWidth - swipeAreaWidth) {
-        //                 if (fingerPositionX - touchStartPositionX < 0) {
-        //                     console.debug("prevent default swipe gesture")
-        //                     e.preventDefault();
-        //                 }
-        //             }
-        //         }
-        //     }
-        //
-        //     {
-        //         let app = getVueEl(this, "modal")
-        //
-        //         app.addEventListener('touchstart', (e) => {
-        //             touchStartPositionX = e.changedTouches[0].clientX
-        //
-        //             // don't prevent default here, this will prevent the click event from being triggered
-        //             // more information should be collected as the user move finger
-        //             app.removeEventListener('touchmove', touchMoveListener);
-        //             app.addEventListener('touchmove', touchMoveListener);
-        //         });
-        //     }
-        // }
-
-    }
     created() {
 
 
@@ -261,12 +210,4 @@ export default class EditRecordView extends Vue {
 <style lang='scss' scoped>
 @import "~@/style/common-style.scss";
 @import "~@/style/style-specification";
-
-
-.record-header {
-    padding: 16px 16px 8px;
-    color: #969799;
-    font-size: 14px;
-    line-height: 16px;
-}
 </style>

@@ -9,7 +9,7 @@
   >
     <van-action-sheet v-model="show">
       <div class="page">
-        <div class="record-header">Edit Fields</div>
+        <div class="cells-block-title">Edit Fields</div>
         <van-cell-group class="shadow overflow-hidden br8">
           <van-field
               v-model="editLedgerName"
@@ -18,18 +18,18 @@
           />
         </van-cell-group>
         <gap-component></gap-component>
-        <common-button
+        <custom-button
             @click="submitEditLedger"
             :disabled="editLedgerLoading"
         >
           <template #default>Submit</template>
-        </common-button>
+        </custom-button>
       </div>
     </van-action-sheet>
     <van-action-sheet v-model="addLedgerShow" title="Title">
       <div class="page">
         <gap-component :value="'32px'"></gap-component>
-        <div class="record-header">Add Fields</div>
+        <div class="cells-block-title">Add Fields</div>
         <van-cell-group class="shadow overflow-hidden br8">
           <van-field
               v-model="addLedgerName"
@@ -38,12 +38,12 @@
           />
         </van-cell-group>
         <gap-component></gap-component>
-        <common-button
+        <custom-button
             @click="submitAddLedger"
             :disabled="addLedgerLoading"
         >
           <template #default>Submit</template>
-        </common-button>
+        </custom-button>
       </div>
     </van-action-sheet>
     <div ref="page-main-frame" style="height: 100%">
@@ -54,7 +54,7 @@
       >
         <div class="modal-title">{{$t('ledger_management')}}</div>
         <gap-component :value="'55px'"></gap-component>
-        <div class="record-header">Ledgers</div>
+        <div class="cells-block-title">Ledgers</div>
         <van-cell-group class="shadow br15 overflow-hidden">
           <van-swipe-cell v-for="ledger in ledgers">
             <van-cell :border="false" :title="ledger.name"/>
@@ -98,7 +98,7 @@ import {Notify} from 'vant';
 import {getHtmlElem} from '@/ts/vueUtils';
 import eventBus from '@/ts/EventBus';
 import Client from '@/request/client';
-import CommonButton from '@/views/components/CommonButton.vue';
+import CustomButton from '@/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import {disableBodyScroll, enableBodyScroll, unmountComponent} from '@/ts/utils';
 import SolidIcon from '@/views/components/SolidIcon.vue';
@@ -107,7 +107,7 @@ let that: any;
   components: {
     SolidIcon,
     GapComponent,
-    CommonButton,
+    CustomButton,
     ModalPresentation: ModalPresentationView,
   },
 })
@@ -341,17 +341,6 @@ export default class ManageLedgerView extends Vue {
 @import '~@/style/common-style';
 @import '~@/style/style-specification';
 
-//.page {
-//  padding: 0 8px 0 8px;
-//  background-color: #f7f8fa;
-//}
-
-.record-header {
-  padding: 16px 16px 8px;
-  color: #969799;
-  font-size: 14px;
-  line-height: 16px;
-}
 
 .bottom-bar {
   display: flex;

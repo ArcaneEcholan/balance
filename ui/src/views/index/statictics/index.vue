@@ -246,10 +246,4 @@ export default class StatisticIndexView extends Vue {
 @import "~@/style/common-style.scss";
 @import "~@/assets/custom-icon.css";
 
-.page {
-    box-sizing: border-box;
-    //padding: 0 8px 0 8px;
-    padding: 8px;
-    background-color: #f7f8fa;
-}
 </style>
