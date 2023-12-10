@@ -20,22 +20,25 @@
         </div>
 
         <div class="flex">
-            <clickable
-                class="flex center"
-                style="
-                    padding: 6px;
-                    color: #ffffff;
-                    background-color: #588cf3;
-                    border-radius: 10px;
-                "
+            <solid-icon
+                icon-class="cw-icon-add-fat"
                 @click="onclickAddRecordTypeBtn"
-            >
-                <i class="ali-international-icon-add-1 fs14 bold"></i>
-            </clickable>
+            ></solid-icon>
         </div>
 
         <van-action-sheet v-model="addTypeShow">
-            <div class="action-sheet-title">Add record type</div>
+            <div class="action-sheet-title">
+                <div style="height: 100%; width: 100%" class="flex">
+                    <div class="flexg1"></div>
+                    <div class="flexg1 flex center">Add record type</div>
+                    <div
+                        class="flexg1"
+                        style="text-align: right; padding-right: 10px"
+                    >
+                        {{ $t('save') }}
+                    </div>
+                </div>
+            </div>
             <div class="action-sheet-body">
                 <panel>
                     <van-field
@@ -51,9 +54,18 @@
                     style="justify-content: start; flex-wrap: wrap"
                 >
                     <div v-for="i in 10" class="type-icon">
-                        <div class="flex flex-center column">
-                            <i class="ali-international-icon-account"></i>
-                            <div>icon</div>
+                        <div
+                            class="flex center overflow-hidden"
+                            style="
+                                border-radius: 100px;
+                                width: 100%;
+                                height: 100%;
+                            "
+                        >
+                            <i
+                                class="ali-international-icon-account"
+                                style="font-size: 30px"
+                            ></i>
                         </div>
                     </div>
                 </div>
@@ -67,9 +79,11 @@ import { Component, Vue } from 'vue-property-decorator';
 import Client from '@/request/client';
 import Clickable from '@/views/components/Clickable.vue';
 import Panel from '@/components/Panel.vue';
+import SolidIcon from '@/views/components/SolidIcon.vue';
+import CustomButton from '@/components/CustomButton.vue';
 
 @Component({
-    components: { Panel, Clickable },
+    components: { CustomButton, SolidIcon, Panel, Clickable },
 })
 export default class TransTypeComponent extends Vue {
     name = '';
@@ -113,8 +127,12 @@ export default class TransTypeComponent extends Vue {
 @import '~@/style/style-specification';
 
 .type-icon {
-    width: 24%;
-    padding: 20px 10px;
+    width: 71.67px;
+    height: 71.67px;
     box-sizing: border-box;
+    margin: 10px 10px;
+    background-color: white;
+    border-radius: 100px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 </style>
