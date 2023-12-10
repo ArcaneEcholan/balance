@@ -345,6 +345,8 @@ export default class ManageLedgerView extends Vue {
     width: 100%;
     border-top: 1px solid #ebecf0;
 
+    padding-left: 16px !important;
+
     background-color: white;
 
     display: flex;
