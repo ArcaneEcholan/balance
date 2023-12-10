@@ -9,16 +9,16 @@
         @after-swipe="modalLifeCycleHooks.afterSwipe"
     >
         <div class="page" style="overflow: auto;">
-            <div class="modal-title">Edit Record</div>
+            <div class="modal-title">{{$t('edit_record.title')}}</div>
             <gap-component :value="'55px'"></gap-component>
-            <div class="cells-block-title">Edit Fields</div>
+            <div class="cells-block-title">{{$t('edit_fields')}}</div>
             <panel>
                 <van-cell-group>
-                    <van-field v-model="categoryValue" type="string" label="category"/>
-                    <van-field v-model="amount" type="number" label="amount"/>
-                    <van-field v-model="datetime" type="text" label="datetime"/>
-                    <van-field v-model="count" type="digit" label="count"/>
-                    <van-field v-model="description" type="text" label="description"/>
+                    <van-field v-model="categoryValue" type="string" :label="$t('edit_record.type')"/>
+                    <van-field v-model="amount" type="number" :label="$t('edit_record.amount')"/>
+                    <van-field v-model="datetime" type="text" :label="$t('edit_record.datetime')"/>
+                    <van-field v-model="count" type="digit" :label="$t('edit_record.count')"/>
+                    <van-field v-model="description" type="text" :label="$t('edit_record.comment')"/>
                 </van-cell-group>
             </panel>
             <gap-component value="30px"></gap-component>

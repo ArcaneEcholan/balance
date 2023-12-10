@@ -14,6 +14,19 @@ export default {
     delete: '删除',
     edit: "编辑",
     date_time_picker_title: "选择日期",
+
+    edit_fields: "编辑字段",
+
+    edit_record: {
+        title: "编辑记录",
+        type: "类型",
+        amount: "金额",
+        comment: "备注",
+        count: "数量",
+        datetime: "时间"
+    }
+    ,
+
     add_record: {
         title: "记一笔",
         type: "类型",

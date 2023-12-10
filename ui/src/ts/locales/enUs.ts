@@ -14,6 +14,9 @@ export default {
     delete: 'Delete',
     edit: "Edit",
     date_time_picker_title: "Choose Date",
+
+    edit_fields: "Edit Fields",
+
     add_record: {
         title: "Add Record",
         type: "Type",
@@ -22,6 +25,15 @@ export default {
         count: "Count",
     },
 
+    edit_record: {
+        title: "Edit Record",
+        type: "Type",
+        amount: "Amount",
+        comment: "Comment",
+        count: "Count",
+        datetime: "Datetime"
+    }
+,
     ledger_list: "Ledger List",
 
     edit_ledger_title: "Edit Ledger",
