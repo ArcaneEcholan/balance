@@ -1,127 +1,136 @@
 <template>
-  <div class=''>
-    <modal-presentation
-        z-index="109"
-        ref="settings-panel"
-        @on-open="modalLifeCycleHooks.onOpen"
-        @on-close="modalLifeCycleHooks.onClose"
-        @closed="closed"
-        @opened="modalLifeCycleHooks.opened"
-        @before-swipe="modalLifeCycleHooks.beforeSwipe"
-        @swiping="modalLifeCycleHooks.swiping"
-        @after-swipe="modalLifeCycleHooks.afterSwipe"
-    >
-      <div :id="mountPointUid"></div>
-      <div class="page">
+    <div class="">
+        <modal-presentation
+            z-index="109"
+            ref="settings-panel"
+            @on-open="modalLifeCycleHooks.onOpen"
+            @on-close="modalLifeCycleHooks.onClose"
+            @closed="closed"
+            @opened="modalLifeCycleHooks.opened"
+            @before-swipe="modalLifeCycleHooks.beforeSwipe"
+            @swiping="modalLifeCycleHooks.swiping"
+            @after-swipe="modalLifeCycleHooks.afterSwipe"
+        >
+            <div :id="mountPointUid"></div>
+            <div class="page">
+                <div class="modal-title">
+                    {{ $t('settings.page_title') }}
+                </div>
 
-        <div class="modal-title">
-          {{ $t('settings.page_title') }}
-        </div>
+                <gap-component :value="'55px'"></gap-component>
 
-        <gap-component :value="'55px'"></gap-component>
-
-        <div class="cells-block-title">
-          {{ $t('settings.general_block_title') }}
-        </div>
-        <panel>
-          <van-cell-group>
-            <van-cell :title="this.$t('language')" clickable @click="onclickLanguageEntry"/>
-          </van-cell-group>
-        </panel>
-      </div>
-    </modal-presentation>
-  </div>
+                <div class="cells-block-title">
+                    {{ $t('settings.general_block_title') }}
+                </div>
+                <panel>
+                    <van-cell-group>
+                        <van-cell
+                            :title="this.$t('language')"
+                            clickable
+                            @click="onclickLanguageEntry"
+                        />
+                    </van-cell-group>
+                </panel>
+            </div>
+        </modal-presentation>
+    </div>
 </template>
 
-<script lang='ts'>
-import {Component, Vue} from 'vue-property-decorator';
-import ModalPresentation from "@/components/ModalPresentation.vue";
-import {generateMountPointUid, mountComponent, unmountComponent} from "@/ts/utils";
-import Panel from "@/components/Panel.vue";
-import LanguagePickerComponent from "@/views/index/index/modals/language-picker.vue";
-import GapComponent from "@/views/components/GapComponent.vue";
-import {getVueEl} from "@/ts/vueUtils";
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import ModalPresentation from '@/components/ModalPresentation.vue';
+import {
+    generateMountPointUid,
+    mountComponent,
+    unmountComponent,
+} from '@/ts/utils';
+import Panel from '@/components/Panel.vue';
+import LanguagePickerComponent from '@/views/index/index/modals/language-picker.vue';
+import GapComponent from '@/views/components/GapComponent.vue';
+import { getVueEl } from '@/ts/vueUtils';
 
 @Component({
-  components: {GapComponent, Panel, ModalPresentation}
+    components: { GapComponent, Panel, ModalPresentation },
 })
 export default class SettingsView extends Vue {
-  mountPointUid = generateMountPointUid();
+    mountPointUid = generateMountPointUid();
 
-  onclickLanguageEntry() {
-    console.log("hlasjdlfjasldjf")
-    let arg: any = {}
-    arg.modalLifeCycleHooks = this.getModalLifeCycleHooks()
-    mountComponent(this.mountPointUid, LanguagePickerComponent, arg);
-  }
-
-  getModalLifeCycleHooks = () => {
-
-    return {
-      onOpen: () => {
-        let elem = getVueEl(this, 'settings-panel')
-        elem.style.right = 100 + 'px';
-      },
-      onClose: () => {
-        let elem = getVueEl(this, 'settings-panel')
-        elem.style.right = 0 + 'px';
-      },
-      beforeSwipe: () => {
-        let elem = getVueEl(this, 'settings-panel')
-        elem.classList.remove('tran')
-      },
-      swiping: (args: any) => {
-        let swipingPathPercent = args.swipingPathPercent
-        let r = 1 - swipingPathPercent
-
-        let elem = getVueEl(this, 'settings-panel')
-        elem.style.right = r * 100 + 'px';
-      },
-      afterSwipe: () => {
-        let elem = getVueEl(this, 'settings-panel')
-        elem.classList.add('tran')
-      },
-      closed: () => {
-        // window.removeEventListener('touchstart', banTouch)
-      },
-      opened: () => {
-        // window.removeEventListener('touchstart', banTouch)
-      }
-    };
-  }
-
-  modalLifeCycleHooks: any
-
-  created() {
-    this.modalLifeCycleHooks = {// @ts-ignore
-      onOpen: this.$options.$mountProp.modalLifeCycleHooks.onOpen,// @ts-ignore
-      beforeSwipe: this.$options.$mountProp.modalLifeCycleHooks.beforeSwipe,// @ts-ignore
-      swiping: this.$options.$mountProp.modalLifeCycleHooks.swiping,// @ts-ignore
-      afterSwipe: this.$options.$mountProp.modalLifeCycleHooks.afterSwipe,// @ts-ignore
-      onClose: this.$options.$mountProp.modalLifeCycleHooks.onClose,// @ts-ignore
-      closed: this.$options.$mountProp.modalLifeCycleHooks.closed,// @ts-ignore
-      opened: this.$options.$mountProp.modalLifeCycleHooks.opened,
+    onclickLanguageEntry() {
+        console.log('hlasjdlfjasldjf');
+        let arg: any = {};
+        arg.modalLifeCycleHooks = this.getModalLifeCycleHooks();
+        mountComponent(this.mountPointUid, LanguagePickerComponent, arg);
     }
-  }
 
-  closed() {
-    this.modalLifeCycleHooks.closed()
-    unmountComponent(this, 0);
-  }
+    getModalLifeCycleHooks = () => {
+        return {
+            onOpen: () => {
+                let elem = getVueEl(this, 'settings-panel');
+                elem.style.right = 100 + 'px';
+            },
+            onClose: () => {
+                let elem = getVueEl(this, 'settings-panel');
+                elem.style.right = 0 + 'px';
+            },
+            beforeSwipe: () => {
+                let elem = getVueEl(this, 'settings-panel');
+                elem.classList.remove('tran');
+            },
+            swiping: (args: any) => {
+                let swipingPathPercent = args.swipingPathPercent;
+                let r = 1 - swipingPathPercent;
+
+                let elem = getVueEl(this, 'settings-panel');
+                elem.style.right = r * 100 + 'px';
+            },
+            afterSwipe: () => {
+                let elem = getVueEl(this, 'settings-panel');
+                elem.classList.add('tran');
+            },
+            closed: () => {
+                // window.removeEventListener('touchstart', banTouch)
+            },
+            opened: () => {
+                // window.removeEventListener('touchstart', banTouch)
+            },
+        };
+    };
+
+    modalLifeCycleHooks: any;
+
+    created() {
+        // @ts-ignore
+        let mountProp = this.$options.$mountProp as any;
+
+        this.modalLifeCycleHooks = {
+            onOpen: mountProp.modalLifeCycleHooks.onOpen,
+            beforeSwipe: mountProp.modalLifeCycleHooks.beforeSwipe,
+            swiping: mountProp.modalLifeCycleHooks.swiping,
+            afterSwipe: mountProp.modalLifeCycleHooks.afterSwipe,
+            onClose: mountProp.modalLifeCycleHooks.onClose,
+            closed: mountProp.modalLifeCycleHooks.closed,
+            opened: mountProp.modalLifeCycleHooks.opened,
+        };
+    }
+
+    closed() {
+        this.modalLifeCycleHooks.closed();
+        unmountComponent(this, 0);
+    }
 }
 </script>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 @import '~@/style/common-style';
 @import '~@/style/style-specification';
 
 #settings-panel {
-  position: relative;
-  right: 0.1px;
-  width: 100%;
-  height: 100%;
+    position: relative;
+    right: 0.1px;
+    width: 100%;
+    height: 100%;
 }
 
 #settings-panel.tran {
-  transition: right var(--transition-duration) var(--transition-easing);
+    transition: right var(--transition-duration) var(--transition-easing);
 }
 </style>
