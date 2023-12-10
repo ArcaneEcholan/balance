@@ -1,4 +1,3 @@
-
 class ErrorCode {
     static SUCCESS = 'SUCCESS';
 }
@@ -10,10 +9,10 @@ class GlobalHandledRespCode {
     constructor() {
         this.codeHandlerMapping = {
             TOKEN_MISSING: () => {
-                console.log('token missing')
+                console.log('token missing');
             },
             SERVER_ERROR: () => {
-                console.log('server error')
+                console.log('server error');
             },
         };
     }
@@ -22,7 +21,7 @@ class GlobalHandledRespCode {
         if (this.codeHandlerMapping[code] != null) {
             this.codeHandlerMapping[code]();
         } else {
-            console.log(`Unhandled global response code: ${code}`)
+            console.log(`Unhandled global response code: ${code}`);
         }
     }
 

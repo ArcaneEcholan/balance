@@ -1,8 +1,8 @@
-import EditRecordView from "@/views/index/index/modals/edit_record.vue";
-import {Component} from "vue-property-decorator";
-import store from "@/store";
-import i18n from "@/ts/lang";
-import router from "@/router";
+import EditRecordView from '@/views/index/index/modals/edit_record.vue';
+import { Component } from 'vue-property-decorator';
+import store from '@/store';
+import i18n from '@/ts/lang';
+import router from '@/router';
 
 export function get_display_file_size(bytes: number) {
     const g = bytes / 1024.0 / 1024.0 / 1024.0;
@@ -78,8 +78,7 @@ export function convertToShortDateTime(timeString: string) {
     return formattedString;
 }
 
-export function
-countDecimalPlaces(number: string) {
+export function countDecimalPlaces(number: string) {
     if (number === '') {
         return 0; // Not a valid float string
     }
@@ -93,13 +92,14 @@ countDecimalPlaces(number: string) {
     return parts[1].length; // Return the length of the decimal part
 }
 
-export function
-isFloat(number: number) {
-    return Number(number) === number && !Number.isInteger(number) || Number.isInteger(number);
+export function isFloat(number: number) {
+    return (
+        (Number(number) === number && !Number.isInteger(number)) ||
+        Number.isInteger(number)
+    );
 }
 
-export function
-isPositiveInteger(number: number): boolean {
+export function isPositiveInteger(number: number): boolean {
     return Number.isInteger(number) && number > 0;
 }
 
@@ -115,12 +115,21 @@ export function insert(target: string, pos: number, str: string): string {
     return target.slice(0, pos) + str + target.slice(pos);
 }
 
-export function replace(target: string, start: number, end: number, replacement: string): string {
+export function replace(
+    target: string,
+    start: number,
+    end: number,
+    replacement: string,
+): string {
     const removed = remove(target, start, end);
     return insert(removed, start, replacement);
 }
 
-export function findWordInLine(target: string, lineNumber: number, count: number): { start: number, end: number } | null {
+export function findWordInLine(
+    target: string,
+    lineNumber: number,
+    count: number,
+): { start: number; end: number } | null {
     const lines = target.split('\n');
     if (lineNumber < 0 || lineNumber >= lines.length) {
         return null; // Line number out of range
@@ -145,11 +154,9 @@ export function findWordInLine(target: string, lineNumber: number, count: number
     return { start, end };
 }
 
-
 export function timeout(timeout: number): Promise<any> {
-    return new Promise(resolve => setTimeout(resolve, timeout));
+    return new Promise((resolve) => setTimeout(resolve, timeout));
 }
-
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -165,17 +172,21 @@ export function generateModalUid() {
     return `modal-${uuidv4()}`;
 }
 
-export function mountComponent(mountPointUid: string, comp: any ,mountProp: any) {
+export function mountComponent(
+    mountPointUid: string,
+    comp: any,
+    mountProp: any,
+) {
     let mountPoint = document.getElementById(mountPointUid) as HTMLElement;
     if (mountPoint == null) {
         throw new Error(`mount point ${mountPointUid} not found`);
     }
-    let component = (new comp({
-        $mountProp : mountProp,
+    let component = new comp({
+        $mountProp: mountProp,
         i18n,
         store,
-        router
-    }));
+        router,
+    });
 
     // the sub mount point must be mounted before the component
     // is mounted, otherwise when the mounted life cycle hook is invoked,
@@ -188,7 +199,7 @@ export function mountComponent(mountPointUid: string, comp: any ,mountProp: any)
     // this could be wired, it's a workaround on Fastclick,
     // after mount a component, you have to click twice to trigger
     // the click event
-    component.$el.click()
+    component.$el.click();
     console.log('after $mount');
 }
 
@@ -207,14 +218,13 @@ export function enableBodyScroll() {
     window.scrollTo(0, store.getters.scrollPosition);
 }
 export function disableBodyScroll() {
-    let currentPageScrollPosition = window.pageYOffset
-    store.commit('setScrollPosition', currentPageScrollPosition)
+    let currentPageScrollPosition = window.pageYOffset;
+    store.commit('setScrollPosition', currentPageScrollPosition);
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.top = `-${currentPageScrollPosition}px`;
     document.body.style.width = '100%';
 }
-
 
 export function getI18nValue(key: string) {
     return i18n.t(key).toString();
@@ -228,25 +238,25 @@ export function getI18nValue(key: string) {
  */
 export function getMobileOperatingSystem() {
     // @ts-ignore
-    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    let userAgent = navigator.userAgent || navigator.vendor || window.opera;
     // Windows Phone must come first because its UA also contains "Android"
     if (/windows phone/i.test(userAgent)) {
-        return "windows-phone";
+        return 'windows-phone';
     }
 
     if (/android/i.test(userAgent)) {
-        return "android";
+        return 'android';
     }
 
     // iOS detection from: http://stackoverflow.com/a/9039885/177710
     // @ts-ignore
     if (/iPad|iPhone|iPod/i.test(userAgent) && !window.MSStream) {
-        return "ios";
+        return 'ios';
     }
 
-    if(/win|linux/i.test(userAgent)) {
-        return "desktop"
+    if (/win|linux/i.test(userAgent)) {
+        return 'desktop';
     }
 
-    return "unknown";
+    return 'unknown';
 }

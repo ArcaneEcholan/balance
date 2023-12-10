@@ -1,5 +1,5 @@
 import request from '@/request';
-import {AxiosPromise} from 'axios';
+import { AxiosPromise } from 'axios';
 
 class Client {
     static saveTransactions(trans: any[]) {
@@ -80,7 +80,7 @@ class Client {
         return request({
             url: `/playground-project-template/${playgroundProjectTemplateId}`,
             method: 'get',
-            params: {playgroundProjectTemplateId},
+            params: { playgroundProjectTemplateId },
             responseType: 'blob',
         });
     }
@@ -90,24 +90,29 @@ class Client {
         return request({
             url: `/transactions`,
             method: 'get',
-            params: {month: yearHyphenMonth},
+            params: { month: yearHyphenMonth },
         });
     }
 
-    static getTransactionListByLedgerName(ledgerName: string, yearHyphenMonth: string) {
+    static getTransactionListByLedgerName(
+        ledgerName: string,
+        yearHyphenMonth: string,
+    ) {
         return request({
             url: `/transactions/${encodeURIComponent(ledgerName)}`,
             method: 'get',
-            params: {month: yearHyphenMonth},
+            params: { month: yearHyphenMonth },
         });
     }
 
-    static updateTransaction(recordId: number | string | null,
-                             categoryValue: string,
-                             amount: string,
-                             datetime: string | null,
-                             count: string,
-                             description: string | null) {
+    static updateTransaction(
+        recordId: number | string | null,
+        categoryValue: string,
+        amount: string,
+        datetime: string | null,
+        count: string,
+        description: string | null,
+    ) {
         return request({
             url: `/transaction`,
             method: 'put',
@@ -118,10 +123,9 @@ class Client {
                 datetime,
                 count,
                 description,
-            }
+            },
         });
     }
-
 
     static getTransactionCategories() {
         return request({
@@ -143,7 +147,7 @@ class Client {
             method: 'post',
             data: {
                 name: addLedgerName,
-            }
+            },
         });
     }
 
@@ -158,8 +162,8 @@ class Client {
         return request({
             url: `/statistics`,
             method: 'get',
-            params: {month: currentMonth},
-        })
+            params: { month: currentMonth },
+        });
     }
 }
 

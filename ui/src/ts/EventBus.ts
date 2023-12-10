@@ -7,7 +7,7 @@ class EventBus {
 
     $off(name: string) {
         if (this.callbacks[name]) {
-            this.callbacks[name] = []
+            this.callbacks[name] = [];
         }
     }
 
@@ -29,12 +29,12 @@ class EventBus {
         }
     }
 
-    $emitWithReturnValue(name:string, args: any): any | null {
+    $emitWithReturnValue(name: string, args: any): any | null {
         if (this.callbacks[name]) {
-            if(this.callbacks[name].length > 0) {
-                return this.callbacks[name][0](args)
+            if (this.callbacks[name].length > 0) {
+                return this.callbacks[name][0](args);
             } else {
-                return null
+                return null;
             }
         }
     }

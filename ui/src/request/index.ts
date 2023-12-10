@@ -1,6 +1,6 @@
 import axios from 'axios';
-import {PageLocation} from '@/ts/dynamicLocation';
-import {Notify} from "vant";
+import { PageLocation } from '@/ts/dynamicLocation';
+import { Notify } from 'vant';
 
 // create an axios instance
 const service = axios.create({
@@ -12,7 +12,7 @@ const service = axios.create({
 // request interceptor
 service.interceptors.request.use(
     (config) => {
-        logRequest(config)
+        logRequest(config);
         return config;
     },
     (error) => {
@@ -30,8 +30,7 @@ function logRequest(config: any) {
 // response interceptor
 service.interceptors.response.use(
     (response) => {
-
-        logSuccessResponse(response)
+        logSuccessResponse(response);
 
         return Promise.resolve(response);
     },
@@ -39,16 +38,12 @@ service.interceptors.response.use(
         let response = error.response;
 
         if (response == null) {
-            Notify(
-                {type: 'danger', message: `server unreachable`}
-            )
+            Notify({ type: 'danger', message: `server unreachable` });
             return Promise.reject();
         }
         let status = response.status;
         let data = response.data;
-        Notify(
-            {type: 'danger', message: `${status}: ${data}`}
-        )
+        Notify({ type: 'danger', message: `${status}: ${data}` });
         return Promise.reject(error);
     },
 );

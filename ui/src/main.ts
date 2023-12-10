@@ -4,9 +4,9 @@ import router from './router';
 import store from './store';
 import './permission'; // permission control
 
-import "@/assets/icon-fonts/iconfont.css"
+import '@/assets/icon-fonts/iconfont.css';
 
-import i18n from "@/ts/lang";
+import i18n from '@/ts/lang';
 
 Vue.config.productionTip = false;
 
@@ -29,7 +29,7 @@ import {
     SwipeCell,
     Tabbar,
     TabbarItem,
-    Tag
+    Tag,
 } from 'vant';
 {
     Vue.use(DatetimePicker);
@@ -52,14 +52,14 @@ import {
     Vue.use(SwipeCell);
 }
 
-import PageEventbusRegistrationMixin from "@/page-eventbus-registration-mixin";
-Vue.mixin(PageEventbusRegistrationMixin)
+import PageEventbusRegistrationMixin from '@/page-eventbus-registration-mixin';
+Vue.mixin(PageEventbusRegistrationMixin);
 
-import "@/import-style-vars"
-import FastClick from "fastclick";
+import '@/import-style-vars';
+import FastClick from 'fastclick';
 
 // @ts-ignore
-FastClick.attach(document.body)
+FastClick.attach(document.body);
 
 new Vue({
     router,

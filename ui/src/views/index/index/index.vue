@@ -1,6 +1,5 @@
 <template>
     <div class="page">
-
         <div style="position: relative; z-index: 101">
             <div :id="mountPointUid"></div>
             <div :id="mountPointUid2"></div>
@@ -21,7 +20,6 @@
         </van-action-sheet>
 
         <div id="records-index-header">
-
             <div class="flex center">
                 <div class="current-ledger">{{ curLedger.name }}</div>
             </div>
@@ -32,8 +30,9 @@
 
             <div id="main-page-fix-header">
                 <div class="flex align-center">
-
-                    <ledger-switcher-component ref="ledger-switcher-component"></ledger-switcher-component>
+                    <ledger-switcher-component
+                        ref="ledger-switcher-component"
+                    ></ledger-switcher-component>
 
                     <clickable @click="showLedgerSwitcherSheet">
                         <div class="mg20 flex align-center">
@@ -52,7 +51,6 @@
                             <i class="icon ali-international-icon-plus"></i>
                         </div>
                     </clickable>
-
                 </div>
             </div>
         </div>
@@ -68,9 +66,9 @@
 </template>
 <script lang="ts">
 import AMapLoader from '@amap/amap-jsapi-loader';
-import {Component, Vue} from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import request from '@/request';
-import {Notify} from 'vant';
+import { Notify } from 'vant';
 
 import TransactionListComponent from '@/views/index/index/components/TransactionListComponent.vue';
 import LedgerSwitcherComponent from '@/views/index/index/components/LedgerSwitcherComponent.vue';
@@ -78,13 +76,18 @@ import TransactionTypeComponent from '@/views/index/index/components/Transaction
 import GapComponent from '@/views/components/GapComponent.vue';
 import AddRecordSheet from './components/AddRecordSheetComponent.vue';
 import MainPageCurrentDatePickerComponent from '@/views/index/index/components/MainPageCurrentDatePickerComponent.vue';
-import {provideListeners} from '@/page-eventbus-registration-mixin';
+import { provideListeners } from '@/page-eventbus-registration-mixin';
 import AddRecordSheetComponent from '@/views/index/index/components/AddRecordSheetComponent.vue';
-import {disableBodyScroll, enableBodyScroll, generateMountPointUid, mountComponent} from '@/ts/utils';
+import {
+    disableBodyScroll,
+    enableBodyScroll,
+    generateMountPointUid,
+    mountComponent,
+} from '@/ts/utils';
 import EditRecordView from '@/views/index/index/modals/edit_record.vue';
 import ManageLedgerView from '@/views/index/index/modals/ledger.vue';
-import SettingsView from "@/views/index/index/modals/settings.vue";
-import Clickable from "@/views/components/Clickable.vue";
+import SettingsView from '@/views/index/index/modals/settings.vue';
+import Clickable from '@/views/components/Clickable.vue';
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -104,18 +107,18 @@ import Clickable from "@/views/components/Clickable.vue";
 })
 export default class IndexView extends Vue {
     lwc: any | null = null;
-    settingShow = false
+    settingShow = false;
     mountPointUid = generateMountPointUid();
     mountPointUid2 = generateMountPointUid();
     mountPointUid3 = generateMountPointUid();
 
     showLedgerSwitcherSheet() {
-        this.lwc.showSheet()
+        this.lwc.showSheet();
     }
 
     onClickSettingIcon() {
-        let arg: any = {}
-        arg.modalLifeCycleHooks = this.getModalLifeCycleHooks()
+        let arg: any = {};
+        arg.modalLifeCycleHooks = this.getModalLifeCycleHooks();
         mountComponent(this.mountPointUid3, SettingsView, arg);
     }
 
@@ -123,7 +126,7 @@ export default class IndexView extends Vue {
         return {
             onOpen: () => {
                 {
-                    disableBodyScroll()
+                    disableBodyScroll();
 
                     let elem = document.getElementById('page-main-area')!;
                     elem.style.right = 100 + 'px';
@@ -136,7 +139,7 @@ export default class IndexView extends Vue {
                 }
             },
             onClose: () => {
-                enableBodyScroll()
+                enableBodyScroll();
 
                 let modal = document.getElementById('page-main-area')!;
                 modal.style.right = 0 + 'px';
@@ -148,19 +151,18 @@ export default class IndexView extends Vue {
                 modal.style.right = 0 + 'px';
             },
             beforeSwipe: () => {
-
                 let elem = document.getElementById('page-main-area')!;
-                elem.classList.remove('tran')
+                elem.classList.remove('tran');
 
                 elem = document.getElementById('tabbar-area')!;
-                elem.classList.remove('tran')
+                elem.classList.remove('tran');
 
                 elem = document.getElementById('records-index-header')!;
-                elem.classList.remove('tran')
+                elem.classList.remove('tran');
             },
             swiping: (args: any) => {
-                let swipingPathPercent = args.swipingPathPercent
-                let r = 1 - swipingPathPercent
+                let swipingPathPercent = args.swipingPathPercent;
+                let r = 1 - swipingPathPercent;
 
                 let modal = document.getElementById('page-main-area')!;
                 modal.style.right = r * 100 + 'px';
@@ -173,33 +175,32 @@ export default class IndexView extends Vue {
             },
             afterSwipe: () => {
                 let modal = document.getElementById('page-main-area')!;
-                modal.classList.add('tran')
+                modal.classList.add('tran');
 
                 modal = document.getElementById('tabbar-area')!;
-                modal.classList.add('tran')
+                modal.classList.add('tran');
 
                 modal = document.getElementById('records-index-header')!;
-                modal.classList.add('tran')
+                modal.classList.add('tran');
             },
             closed: () => {
-                console.log("animation stop")
+                console.log('animation stop');
                 // window.removeEventListener('touchstart', banTouch)
             },
             opened: () => {
-                console.log("animation stop")
+                console.log('animation stop');
                 // window.removeEventListener('touchstart', banTouch)
-            }
+            },
         };
-    }
+    };
 
     mountEditRecordComponent(arg: any) {
-        arg.modalLifeCycleHooks = this.getModalLifeCycleHooks()
+        arg.modalLifeCycleHooks = this.getModalLifeCycleHooks();
         mountComponent(this.mountPointUid, EditRecordView, arg);
     }
 
-
     mountLedgerManagementLedger(arg: any) {
-        arg.modalLifeCycleHooks = this.getModalLifeCycleHooks()
+        arg.modalLifeCycleHooks = this.getModalLifeCycleHooks();
         mountComponent(this.mountPointUid2, ManageLedgerView, arg);
     }
 
@@ -236,7 +237,6 @@ export default class IndexView extends Vue {
     //   });
     // }
 
-
     created() {
         provideListeners(this, [
             {
@@ -246,7 +246,7 @@ export default class IndexView extends Vue {
                 },
             },
         ]);
-        //loadAmap
+        // loadAmap
         {
             AMapLoader.load({
                 key: '8375fa99f0a19ba66b137bddcb2fceac', // 申请好的Web端开发者Key，首次调用 load 时必填
@@ -262,12 +262,11 @@ export default class IndexView extends Vue {
         }
     }
 
-
     locationLoading = false;
 
     getCurrentLocation(AMap: any) {
         if (this.amapGeolocationPlugin == null) {
-            //loadAmapGeolocationPlugin
+            // loadAmapGeolocationPlugin
             {
                 AMap.plugin('AMap.Geolocation', () => {
                     let geolocation = new AMap.Geolocation();
@@ -281,20 +280,20 @@ export default class IndexView extends Vue {
     }
 
     doGetCurrentLocation() {
-
         let onSuccessGetCurrentPosition = (status: any, result: any) => {
             this.locationLoading = false;
-            if (status === 'complete') {    //ifSuccessGetCurrentPosition
+            if (status === 'complete') {
+                // ifSuccessGetCurrentPosition
                 this.locationLoading = false;
                 let position = result.position;
 
-                //updateCor
+                // updateCor
                 {
                     this.geoLocation.latitude = position.lat;
                     this.geoLocation.longitude = position.lng;
                 }
 
-                //getAndUpdateDetailLocationData
+                // getAndUpdateDetailLocationData
                 {
                     let lat = this.geoLocation.latitude;
                     let lng = this.geoLocation.longitude;
@@ -306,7 +305,10 @@ export default class IndexView extends Vue {
                             this.getInfoFromAmapLocationDetail(locationDetail);
                         },
                         (respBodyOrError: any) => {
-                            console.error(`fail to get location detail: `, respBodyOrError);
+                            console.error(
+                                `fail to get location detail: `,
+                                respBodyOrError,
+                            );
                             Notify({
                                 message: 'Fail to get location detail',
                                 type: 'warning',
@@ -326,7 +328,7 @@ export default class IndexView extends Vue {
                     type: 'danger',
                 });
             }
-        }
+        };
 
         let onFailedGetCurrentPosition = (error: any) => {
             Notify({
@@ -336,7 +338,7 @@ export default class IndexView extends Vue {
             console.error(
                 `fail to get geollocation: ${error.code}-${error.message}`,
             );
-        }
+        };
 
         this.locationLoading = true;
         this.amapGeolocationPlugin.getCurrentPosition(
@@ -384,9 +386,9 @@ export default class IndexView extends Vue {
             // this is the format of the response entry of amap api,
             // an empty array means a not existing entry value( the same meaning as null )
 
-            let entry = amapDetailLocationResp.regeocode.formatted_address
+            let entry = amapDetailLocationResp.regeocode.formatted_address;
             if (Array.isArray(entry) && entry.length === 0) {
-                finalLocationInfo.formattedName = "";
+                finalLocationInfo.formattedName = '';
                 Notify({
                     type: 'danger',
                     message: 'Your location is out of the service of amap ',
@@ -404,8 +406,7 @@ export default class IndexView extends Vue {
     }
 
     mounted() {
-
-        this.lwc = this.$refs["ledger-switcher-component"]
+        this.lwc = this.$refs['ledger-switcher-component'];
 
         provideListeners(this, [
             {
@@ -421,9 +422,7 @@ export default class IndexView extends Vue {
                 },
             },
         ]);
-
     }
-
 }
 </script>
 <style lang="scss" scoped>

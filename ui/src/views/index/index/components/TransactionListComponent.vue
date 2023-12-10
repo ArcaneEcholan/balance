@@ -185,5 +185,4 @@ export default class TransactionListComponent extends Vue {
 </script>
 <style lang="scss" scoped>
 @import '~@/style/common-style.scss';
-
 </style>

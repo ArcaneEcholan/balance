@@ -1,32 +1,25 @@
 <template>
     <div id="app" class="tran">
-
         <div id="main-app-area">
-            <router-view/>
+            <router-view />
         </div>
-
-
     </div>
 </template>
 
-
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
-let that: any
+let that: any;
 @Component
 export default class AppView extends Vue {
-
-
     created() {
         that = this;
     }
 
-
     mounted() {
         {
-            let touchStartPositionX = 0
-            let fingerPositionX = 0
+            let touchStartPositionX = 0;
+            let fingerPositionX = 0;
             let swipeAreaWidth = 30;
             // make sure pageConfig is in vue reactive system, so the change of it
             // to avoid the listener being created every time touchstart is triggered
@@ -39,25 +32,28 @@ export default class AppView extends Vue {
                 {
                     if (touchStartPositionX <= swipeAreaWidth) {
                         if (fingerPositionX - touchStartPositionX > 0) {
-                            console.debug("prevent default swipe gesture")
+                            console.debug('prevent default swipe gesture');
                             e.preventDefault();
                         }
                     }
 
-                    if (touchStartPositionX >= window.innerWidth - swipeAreaWidth) {
+                    if (
+                        touchStartPositionX >=
+                        window.innerWidth - swipeAreaWidth
+                    ) {
                         if (fingerPositionX - touchStartPositionX < 0) {
-                            console.debug("prevent default swipe gesture")
+                            console.debug('prevent default swipe gesture');
                             e.preventDefault();
                         }
                     }
                 }
-            }
+            };
 
             {
-                let app = document.getElementById("app")!
+                let app = document.getElementById('app')!;
 
                 app.addEventListener('touchstart', (e) => {
-                    touchStartPositionX = e.changedTouches[0].clientX
+                    touchStartPositionX = e.changedTouches[0].clientX;
 
                     // don't prevent default here, this will prevent the click event from being triggered
                     // more information should be collected as the user move finger
@@ -67,15 +63,12 @@ export default class AppView extends Vue {
             }
         }
     }
-
-
 }
-
 </script>
 
 <style lang="scss">
-@import "~@/assets/custom-icon.css";
-@import "~@/style/common-style.scss";
+@import '~@/assets/custom-icon.css';
+@import '~@/style/common-style.scss';
 
 html {
     touch-action: manipulation;
@@ -103,7 +96,6 @@ body {
     color: #2c3e50;
 }
 
-
 nav {
     padding: 30px;
 
@@ -118,7 +110,7 @@ nav {
 }
 
 #tabbar-area {
-    border-top: 1px solid #EBECF0;
+    border-top: 1px solid #ebecf0;
     padding: 8px 0;
 }
 

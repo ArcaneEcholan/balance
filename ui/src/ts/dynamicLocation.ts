@@ -36,7 +36,10 @@ export class PageLocation {
 
     // In general, hardCode mode is used in develepment while dynamic mode is used in production.
     customBaseURL() {
-        if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+        if (
+            process.env.NODE_ENV === 'development' ||
+            process.env.NODE_ENV === 'test'
+        ) {
             return {
                 baseURL: 'http://localhost:8094/api',
                 hardCode: true,
@@ -49,6 +52,5 @@ export class PageLocation {
         } else {
             throw new Error('Unknown NODE_ENV: ' + process.env.NODE_ENV);
         }
-
     }
 }

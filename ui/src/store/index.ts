@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import development from './modules/development';
-import {getMobileOperatingSystem} from "@/ts/utils";
+import { getMobileOperatingSystem } from '@/ts/utils';
 
 Vue.use(Vuex);
 
@@ -25,12 +25,12 @@ export default new Vuex.Store({
         os: () => {
             // @ts-ignore
             return getMobileOperatingSystem();
-        }
+        },
     },
     mutations: {
         setScrollPosition(state, scrollPosition) {
             state.scrollPosition = scrollPosition;
-        }
+        },
     },
     actions: {},
     modules: {
