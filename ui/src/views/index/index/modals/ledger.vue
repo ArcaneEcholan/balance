@@ -86,7 +86,7 @@
             >
                 <solid-icon
                     :clickable="true"
-                    icon-class="ali-international-icon-add-1"
+                    icon-class="cw-icon-add-fat"
                     @click.native="ff"
                 ></solid-icon>
             </div>
