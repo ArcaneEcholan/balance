@@ -1,10 +1,10 @@
 @font-face {
-    font-family: 'icomoon';
-    src: url('fonts/icomoon.eot?te9976');
-    src: url('fonts/icomoon.eot?te9976#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?te9976') format('truetype'),
-    url('fonts/icomoon.woff?te9976') format('woff'),
-    url('fonts/icomoon.svg?te9976#icomoon') format('svg');
+    font-family: 'cw-icon';
+    src:  url('fonts/cw-icon.eot?jgyn3j');
+    src:  url('fonts/cw-icon.eot?jgyn3j#iefix') format('embedded-opentype'),
+    url('fonts/cw-icon.ttf?jgyn3j') format('truetype'),
+    url('fonts/cw-icon.woff?jgyn3j') format('woff'),
+    url('fonts/cw-icon.svg?jgyn3j#cw-icon') format('svg');
     font-weight: normal;
     font-style: normal;
     font-display: block;
@@ -12,7 +12,7 @@
 
 [class^="cw-icon-"], [class*=" cw-icon-"] {
     /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'icomoon' !important;
+    font-family: 'cw-icon' !important;
     font-size: 16px;
     speak: never;
     font-style: normal;
@@ -26,6 +26,9 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-.cw-icon-add-normal:before {
+.cw-icon-add-fat:before {
     content: "\e900";
+}
+.cw-icon-add:before {
+    content: "\e901";
 }

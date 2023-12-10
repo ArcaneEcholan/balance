@@ -107,12 +107,7 @@
         <div class="flex pd5" style="border-top: 1px solid #ebecf0">
             <solid-icon
                 :clickable="true"
-                icon-class="ali-international-icon-add-1"
-                @click="addRecordRow"
-            ></solid-icon>
-            <solid-icon
-                :clickable="true"
-                icon-class="cw-icon-add-normal"
+                icon-class="cw-icon-add-fat"
                 @click="addRecordRow"
             ></solid-icon>
         </div>
