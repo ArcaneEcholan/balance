@@ -6,7 +6,7 @@
                     @click.native="$emit('click', $event)"
                     class="flex center"
                     style="
-                        padding: 6px 7px;
+                        padding: 6px 6px;
                         color: #ffffff;
                         background-color: #588cf3;
                         border-radius: 10px;
@@ -36,7 +36,7 @@
                     @click.native="$emit('click', $event)"
                     class="flex center"
                     style="
-                        padding: 6px 7px;
+                        padding: 6px 6px;
                         color: #ffffff;
                         background-color: #588cf3;
                         border-radius: 10px;
