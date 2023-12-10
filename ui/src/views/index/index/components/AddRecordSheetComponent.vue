@@ -37,27 +37,23 @@
                     <van-swipe-cell>
                         <div class="flex">
                             <clickable
+                                @click="onclickPickTypeBtn(recordRow)"
                                 class="cell flexg1 flex center pd8"
                                 style="
                                     word-break: break-word;
                                     background-color: white;
                                 "
                             >
-                                <div @click="onclickPickTypeBtn(recordRow)">
-                                    <div
-                                        v-if="
-                                            recordRow.type == null ||
-                                            recordRow.type === ''
-                                        "
-                                    >
-                                        <van-icon
-                                            class="fs24"
-                                            name="question-o"
-                                        />
-                                    </div>
-                                    <div style="font-size: 14px" v-else>
-                                        {{ recordRow.type }}
-                                    </div>
+                                <div
+                                    v-if="
+                                        recordRow.type == null ||
+                                        recordRow.type === ''
+                                    "
+                                >
+                                    <van-icon class="fs24" name="question-o" />
+                                </div>
+                                <div style="font-size: 14px" v-else>
+                                    {{ recordRow.type }}
                                 </div>
                             </clickable>
 
