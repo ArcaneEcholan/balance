@@ -110,6 +110,11 @@
                 icon-class="ali-international-icon-add-1"
                 @click="addRecordRow"
             ></solid-icon>
+            <solid-icon
+                :clickable="true"
+                icon-class="cw-icon-add-normal"
+                @click="addRecordRow"
+            ></solid-icon>
         </div>
         <key-board-component
             @key-touched="keyBoardTouched"

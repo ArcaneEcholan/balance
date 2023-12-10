@@ -33,7 +33,6 @@
                     <ledger-switcher-component
                         ref="ledger-switcher-component"
                     ></ledger-switcher-component>
-
                     <clickable @click="showLedgerSwitcherSheet">
                         <div class="mg20 flex align-center">
                             <i class="icon ali-international-icon-log"></i>
