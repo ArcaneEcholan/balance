@@ -4,15 +4,14 @@
             <div v-for="row in metrics">
                 <div class="flex">
                     <clickable v-for="type in row"
-                         class="flex center shadow br8 flexg1 mg8 pd8"
-                         style="line-height: 24px; word-break: break-word;
+                               class="flex center shadow br8 flexg1 mg8 pd8"
+                               style="line-height: 24px; word-break: break-word;
                                 background-color: white;
                         "
-                         @click="onClickOneType(type.value)">
+                               @click="onClickOneType(type.value)">
                         {{ type.value }}
                     </clickable>
                 </div>
-
             </div>
         </div>
 
@@ -28,7 +27,8 @@
         </div>
 
         <van-action-sheet v-model="addTypeShow">
-            <div class="action-sheet-title">Add record type</div>
+
+            <div class="action-sheet-title">{{ $t('add_record_type.title') }}</div>
             <div class="action-sheet-body">
 
                 <panel>
@@ -36,15 +36,13 @@
                 </panel>
 
                 icon:
-                <div class="flex" style="justify-content: start; flex-wrap: wrap;">
-                    <div v-for="i in 10" class=" type-icon ">
-                        <div class="flex flex-center column">
-                            <i class="ali-international-icon-account"></i>
-                            <div>icon</div>
+                <div id="icon-panel" class="flex" style="justify-content: start; flex-wrap: wrap;">
+                    <div v-for="icon in icons" class=" type-icon-cell ">
+                        <div class="flex flex-center column type-icon">
+                            <i :class="icon.className" style="font-size: inherit"></i>
                         </div>
                     </div>
                 </div>
-
             </div>
         </van-action-sheet>
     </div>
@@ -64,6 +62,12 @@ export default class TransTypeComponent extends Vue {
     name: string = ""
     metrics: any[] = []
 
+    icons:any[] = [
+
+    ]
+
+
+
     transactionCategories: any[] = []
     addTypeShow = false
 
@@ -73,6 +77,14 @@ export default class TransTypeComponent extends Vue {
 
     created() {
         this.initTransactionTypes()
+        this.icons.push(
+            {
+                className: 'ali-international-icon-home1'
+            },
+            {
+                className: 'ali-international-icon-home1'
+            }
+        )
     }
 
     initTransactionTypes() {
@@ -102,9 +114,19 @@ export default class TransTypeComponent extends Vue {
 @import "~@/style/common-style.scss";
 @import "~@/style/style-specification";
 
-.type-icon {
-    width: 24%;
-    padding:20px 10px ;
+.type-icon-cell {
+    width: 25%;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.type-icon {
+    font-size: 2em;
+    padding: 12px;
+    border-radius: 100px;
+    background-color: $icon-bgc;
 }
 </style>
