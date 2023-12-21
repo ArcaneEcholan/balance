@@ -1,7 +1,9 @@
 <template>
     <div>
         <van-action-sheet :closeable="false" v-model="chooseTypePanelShow">
-            <div class="action-sheet-title">{{$t('add_record.choose_type.title')}}</div>
+            <div class="action-sheet-title">
+                {{ $t('add_record.choose_type.title') }}
+            </div>
             <div class="action-sheet-body">
                 <transaction-type-component
                     @on-click-one-type="onClickOneType"
@@ -11,10 +13,18 @@
 
         <div class="flex column">
             <div class="flex mgb15">
-                <div class="flexg1 flex center">{{$t('add_record.type')}}</div>
-                <div class="flexg2 flex center">{{$t('add_record.amount')}}</div>
-                <div class="flexg2 flex center">{{$t('add_record.count')}}</div>
-                <div class="flexg2 flex center">{{$t('add_record.comment')}}</div>
+                <div class="flexg1 flex center">
+                    {{ $t('add_record.type') }}
+                </div>
+                <div class="flexg2 flex center">
+                    {{ $t('add_record.amount') }}
+                </div>
+                <div class="flexg2 flex center">
+                    {{ $t('add_record.count') }}
+                </div>
+                <div class="flexg2 flex center">
+                    {{ $t('add_record.comment') }}
+                </div>
             </div>
 
             <div id="new-records-area" class="shadow br8 overflow-hidden">
@@ -24,30 +34,39 @@
                     v-for="recordRow in newRecordRows"
                     class="new-record-row"
                 >
-                    <van-swipe-cell>
-                        <div class="flex">
+                    <van-swipe-cell style="height: 100%">
+                        <div class="flex" style="height: 100%">
                             <clickable
-                                class="cell flexg1 flex center pd8"
+                                class="cell flexg1 flex center"
                                 style="
+                                    height: 100%;
                                     word-break: break-word;
                                     background-color: white;
                                 "
                             >
-                                <div @click="onclickPickTypeBtn(recordRow)">
-                                    <div
-                                        v-if="
-                                            recordRow.type == null ||
-                                            recordRow.type === ''
-                                        "
-                                    >
-                                        <van-icon
-                                            class="fs24"
-                                            name="question-o"
-                                        />
-                                    </div>
-                                    <div style="font-size: 14px" v-else>
-                                        {{ recordRow.type }}
-                                    </div>
+                                <div
+                                    @click="onclickPickTypeBtn(recordRow)"
+                                    v-if="
+                                        recordRow.type == null ||
+                                        recordRow.type === ''
+                                    "
+                                >
+                                    <van-icon class="fs24" name="question-o" />
+                                </div>
+                                <div
+                                    @click="onclickPickTypeBtn(recordRow)"
+                                    style="
+                                        padding-left: 5px;
+                                        font-size: 14px;
+                                        text-overflow: ellipsis;
+                                        -webkit-line-clamp: 2;
+                                        overflow: hidden;
+                                        display: -webkit-box;
+                                        -webkit-box-orient: vertical;
+                                    "
+                                    v-else
+                                >
+                                    {{ recordRow.type }}
                                 </div>
                             </clickable>
 
@@ -76,9 +95,7 @@
                                 :ref="`${recordRow.id}-desc`"
                                 class="flexg2 cell last"
                             >
-                                <van-field
-                                    v-model="recordRow.desc"
-                                ></van-field>
+                                <van-field v-model="recordRow.desc"></van-field>
                             </div>
                         </div>
 
@@ -111,20 +128,20 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import VanCursorEditorComponent from '@/views/components/VanCursorEditor.vue';
-import {findWordInLine, replace, timeout} from '@/ts/utils';
+import { findWordInLine, replace, timeout } from '@/ts/utils';
 import GapComponent from '@/views/components/GapComponent.vue';
-import {Notify} from 'vant';
+import { Notify } from 'vant';
 import Client from '@/request/client';
 import eventBus from '@/ts/EventBus';
 import CommonButton from '@/views/components/CommonButton.vue';
-import {provideListeners} from '@/page-eventbus-registration-mixin';
+import { provideListeners } from '@/page-eventbus-registration-mixin';
 import TransactionTypeComponent from '@/views/index/index/components/TransactionTypeComponent.vue';
 import Clickable from '@/views/components/Clickable.vue';
 import SolidIcon from '@/views/components/SolidIcon.vue';
 import KeyBoardComponent from '@/views/index/index/components/KeyBoardComponent.vue';
-import settings from "@/settings";
+import settings from '@/settings';
 
 class FormItemField {
     value: string | null = null;
@@ -157,10 +174,7 @@ export default class AddTransactionEditorComponent extends Vue {
         this.cursor.recordRef = recordRow;
         this.cursor.attrName = attrName;
         this.$nextTick(() => {
-            this.focusOnNewRecordCell(
-                recordRow,
-                attrName,
-            );
+            this.focusOnNewRecordCell(recordRow, attrName);
         });
     }
 
@@ -205,7 +219,6 @@ export default class AddTransactionEditorComponent extends Vue {
     squashDivToExtremelyShort(element: HTMLElement) {
         this.setElemHeight(element, 0.01);
     }
-
 
     cursor: any = {
         recordRef: null,
@@ -263,16 +276,10 @@ export default class AddTransactionEditorComponent extends Vue {
 
         let nextRecordRef = this.cursor.recordRef;
 
-        this.focusOnNewRecordCell(
-            nextRecordRef,
-            nextattrName,
-        );
+        this.focusOnNewRecordCell(nextRecordRef, nextattrName);
     }
 
-    focusOnNewRecordCell(
-        recordRef: any,
-        attrName: string,
-    ) {
+    focusOnNewRecordCell(recordRef: any, attrName: string) {
         this.newRecordRows.forEach((it) => {
             this.attrOrder.forEach((attr) => {
                 // @ts-ignore
@@ -337,10 +344,7 @@ export default class AddTransactionEditorComponent extends Vue {
         }
 
         let nextRecordRef = this.cursor.recordRef;
-        this.focusOnNewRecordCell(
-            nextRecordRef,
-            nextattrName,
-        );
+        this.focusOnNewRecordCell(nextRecordRef, nextattrName);
     }
 
     focusOnNextRow() {
@@ -360,10 +364,7 @@ export default class AddTransactionEditorComponent extends Vue {
         if (this.cursor.attrName == null || this.cursor.attrName == '') {
             this.cursor.attrName = this.attrOrder[0];
         }
-        this.focusOnNewRecordCell(
-            this.cursor.recordRef,
-            this.cursor.attrName,
-        );
+        this.focusOnNewRecordCell(this.cursor.recordRef, this.cursor.attrName);
     }
 
     focusOnPreviousRow() {
@@ -383,10 +384,7 @@ export default class AddTransactionEditorComponent extends Vue {
         if (this.cursor.attrName == null || this.cursor.attrName == '') {
             this.cursor.attrName = this.attrOrder[0];
         }
-        this.focusOnNewRecordCell(
-            this.cursor.recordRef,
-            this.cursor.attrName,
-        );
+        this.focusOnNewRecordCell(this.cursor.recordRef, this.cursor.attrName);
     }
 
     newRecordRows: any[] = [];
@@ -403,7 +401,7 @@ export default class AddTransactionEditorComponent extends Vue {
 
     addRecordRow() {
         if (this.clearingAllRecords) {
-            return
+            return;
         }
 
         let newRecord = {
@@ -425,7 +423,7 @@ export default class AddTransactionEditorComponent extends Vue {
         if (area == null) {
             throw new Error('area == null');
         }
-        this.increaseElemHeight(area, 54)
+        this.increaseElemHeight(area, 54);
     }
 
     clearAllRecords() {
@@ -486,7 +484,7 @@ export default class AddTransactionEditorComponent extends Vue {
 
     parsedForms: FormItem[] = [];
 
-    curLedger: any = {name: 'default'};
+    curLedger: any = { name: 'default' };
 
     created() {
         provideListeners(this, [
@@ -507,7 +505,7 @@ export default class AddTransactionEditorComponent extends Vue {
             'on-get-current-ledger-name',
             null,
         );
-        this.curLedger = {name: ledgerName};
+        this.curLedger = { name: ledgerName };
     }
 
     keyBoardTouched(keyObj: any) {
@@ -593,7 +591,6 @@ export default class AddTransactionEditorComponent extends Vue {
         }
         let parseForms = this.newRecordRows;
         parseForms.forEach((item: any) => {
-
             let categoryValue = item.type ?? '';
             let amount = item.amount;
             let count = item.count;
@@ -667,16 +664,15 @@ export default class AddTransactionEditorComponent extends Vue {
                 });
                 eventBus.$emit('refresh-transaction-list', null);
 
-                this.clearAllRecords()
+                this.clearAllRecords();
             })
             .catch((resp) => {
                 console.log(resp);
             });
     }
-
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 @import '~@/style/common-style.scss';
 @import '~@/style/style-specification.scss';
 
@@ -727,5 +723,9 @@ export default class AddTransactionEditorComponent extends Vue {
     button {
         height: 100%;
     }
+}
+
+.van-swipe-cell__wrapper {
+    height: 100%;
 }
 </style>
