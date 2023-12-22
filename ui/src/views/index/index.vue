@@ -64,7 +64,7 @@ export default class IndexIndexView extends Vue {
     }
 
     onClickHome() {
-        this.activeTabBar = getI18nValue('home');
+        this.activeTabBar = 'home';
         this.$router.push({ name: 'home' });
     }
 
