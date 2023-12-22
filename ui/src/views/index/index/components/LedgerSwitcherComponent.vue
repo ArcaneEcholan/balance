@@ -18,22 +18,21 @@
             <gap-component :value="'30px'"></gap-component>
         </div>
     </van-action-sheet>
-
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import Client from '@/request/client';
 import eventBus from '@/ts/EventBus';
 import CommonButton from '@/views/components/CommonButton.vue';
-import {provideListeners} from '@/page-eventbus-registration-mixin';
+import { provideListeners } from '@/page-eventbus-registration-mixin';
 import GapComponent from '@/views/components/GapComponent.vue';
 import CustomButton from '@/components/CustomButton.vue';
-import {getI18nValue} from "../../../../ts/utils";
+import { getI18nValue } from '../../../../ts/utils';
 
 @Component({
-    methods: {getI18nValue},
-    components: {CustomButton, GapComponent, CommonButton},
+    methods: { getI18nValue },
+    components: { CustomButton, GapComponent, CommonButton },
 })
 export default class LedgerSwitcherComponent extends Vue {
     show = false;
@@ -69,7 +68,7 @@ export default class LedgerSwitcherComponent extends Vue {
                             this.currentLedger = this.ledgerList[0];
                         } else {
                             // this is undefined behavior
-                            this.currentLedger = {id: null, name: 'unknown'};
+                            this.currentLedger = { id: null, name: 'unknown' };
                         }
                     }
                 },

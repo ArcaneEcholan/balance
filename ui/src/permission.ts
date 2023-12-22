@@ -1,5 +1,4 @@
-import router from '@/router/index'
-
+import router from '@/router/index';
 
 let count = 0;
 
@@ -8,7 +7,7 @@ function isThisTheFirstNav() {
 }
 
 router.beforeEach(async (to, from, next) => {
-    next()
+    next();
     // // first nav means user refresh the page, which represent user closing the app
     // if (isThisTheFirstNav()) {
     //     // ok, it's the first time the app starts up
@@ -26,6 +25,4 @@ router.beforeEach(async (to, from, next) => {
     //     count++
     //     next()
     // }
-})
-
-
+});

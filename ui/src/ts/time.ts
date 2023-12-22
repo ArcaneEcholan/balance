@@ -7,5 +7,5 @@ export function getCurrentMonth() {
 }
 
 export function getCurrentYearAndMonth() {
-    return `${getCurrentYear()}-${getCurrentMonth()}`
+    return `${getCurrentYear()}-${getCurrentMonth()}`;
 }

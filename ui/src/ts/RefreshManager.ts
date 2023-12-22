@@ -1,11 +1,7 @@
 class RefreshManager {
-    refrestTimes = 0
+    refrestTimes = 0;
 
-    constructor() {
+    constructor() {}
 
-    }
-
-    refresh() {
-
-    }
+    refresh() {}
 }

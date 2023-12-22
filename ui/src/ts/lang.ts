@@ -1,25 +1,24 @@
-import Vue from "vue";// @ts-ignore
-import VueI18n from "vue-i18n";
+import Vue from 'vue'; // @ts-ignore
+import VueI18n from 'vue-i18n';
 
-const languageKey = 'language'
-
+const languageKey = 'language';
 
 // @ts-ignore
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
 
-export const getLanguage = () => Cookies.get(languageKey)
-export const setLanguage = (language: string) => Cookies.set(languageKey, language)
-
+export const getLanguage = () => Cookies.get(languageKey);
+export const setLanguage = (language: string) =>
+    Cookies.set(languageKey, language);
 
 // Vant built-in lang
-import {Locale} from 'vant';
+import { Locale } from 'vant';
 // @ts-ignore
-import enUS from "vant/es/locale/lang/en-US";// @ts-ignore
-import zhCN from "vant/es/locale/lang/zh-CN";// @ts-ignore
-import customZhCN from "./locales/zhCn"// @ts-ignore
-import customEnUs from "./locales/enUs"// @ts-ignore
-import zhTW from "vant/es/locale/lang/zh-TW";// @ts-ignore
-import jaJP from "vant/es/locale/lang/ja-JP";
+import enUS from 'vant/es/locale/lang/en-US'; // @ts-ignore
+import zhCN from 'vant/es/locale/lang/zh-CN'; // @ts-ignore
+import customZhCN from './locales/zhCn'; // @ts-ignore
+import customEnUs from './locales/enUs'; // @ts-ignore
+import zhTW from 'vant/es/locale/lang/zh-TW'; // @ts-ignore
+import jaJP from 'vant/es/locale/lang/ja-JP';
 
 // User defined lang
 // import enUsLocale from "./en_US";
@@ -29,10 +28,10 @@ import jaJP from "vant/es/locale/lang/ja-JP";
 
 Vue.use(VueI18n);
 
-const messages:any = {
+const messages: any = {
     'zh-CN': {
         ...zhCN,
-        ...customZhCN
+        ...customZhCN,
         // ...zhCnLocale
     },
     'zh-TW': {
@@ -41,13 +40,13 @@ const messages:any = {
     },
     'en-US': {
         ...enUS,
-        ...customEnUs
+        ...customEnUs,
         // ...enUsLocale
     },
     'ja-JP': {
         ...jaJP,
         // ...jaJpLocale
-    }
+    },
 };
 
 export const getLocale = (): string => {
@@ -67,17 +66,16 @@ export const getLocale = (): string => {
     }
 
     // Default language is english
-    return "en-US";
+    return 'en-US';
 };
 
 const CURRENT_LANG = getLocale();
 // first entry
-Locale.use(CURRENT_LANG, messages[CURRENT_LANG])
+Locale.use(CURRENT_LANG, messages[CURRENT_LANG]);
 
 const i18n = new VueI18n({
     locale: CURRENT_LANG,
-    messages
+    messages,
 });
 
 export default i18n;
-

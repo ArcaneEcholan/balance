@@ -20,12 +20,12 @@ export default new Vuex.Store({
         scrollPosition: (state) => {
             // @ts-ignore
             return state.scrollPosition;
-        }
+        },
     },
     mutations: {
         setScrollPosition(state, scrollPosition) {
             state.scrollPosition = scrollPosition;
-        }
+        },
     },
     actions: {},
     modules: {

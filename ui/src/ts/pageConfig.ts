@@ -1,5 +1,4 @@
 class PageConfig {
-
     private title: string;
 
     constructor(title: string) {
@@ -15,8 +14,6 @@ class PageConfig {
     }
 }
 
-let pageConfig = new PageConfig("title");
-export {
-    PageConfig
-}
+let pageConfig = new PageConfig('title');
+export { PageConfig };
 export default pageConfig;

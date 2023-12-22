@@ -2,7 +2,7 @@
     <div
         class="slide-panel transition"
         :id="modalElemUid"
-        :style="` ${zIndex?('z-index: '+zIndex + ';'):''} `"
+        :style="` ${zIndex ? 'z-index: ' + zIndex + ';' : ''} `"
     >
         <div style="height: 100%">
             <slot>content</slot>
@@ -11,9 +11,8 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {v4 as uuidv4} from 'uuid';
-
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component
 export default class ModalPresentationView extends Vue {
@@ -22,12 +21,12 @@ export default class ModalPresentationView extends Vue {
     swipePercentage = 0.05;
     modalElemUid: string = uuidv4();
 
-    @Prop({default: null})
+    @Prop({ default: null })
     zIndex!: string | null;
 
     mounted() {
-        this.registerSwipeRelatedEventHandler()
-        this.openModal()
+        this.registerSwipeRelatedEventHandler();
+        this.openModal();
     }
 
     registerSwipeRelatedEventHandler() {
@@ -68,7 +67,7 @@ export default class ModalPresentationView extends Vue {
 
             // if and only if the user's finger is in the swipe area, we start to record the swipe action
             if (touchClientX <= swipeAreaWidth) {
-                e.preventDefault()
+                e.preventDefault();
                 swipeStartTime = new Date().getTime();
                 // remove the transition of modal, because we need the modal to stay tight with the user's finger without latency
                 {
@@ -108,7 +107,7 @@ export default class ModalPresentationView extends Vue {
                 console.debug('new modal right: ' + -userSwipePathWidth);
 
                 this.$emit('swiping', {
-                    swipingPathPercent:userSwipePathWidth / this.modalWidth
+                    swipingPathPercent: userSwipePathWidth / this.modalWidth,
                 });
 
                 this.setModalStyleRight(-userSwipePathWidth);
@@ -123,15 +122,16 @@ export default class ModalPresentationView extends Vue {
                 // restore the transition of modal
                 this.modal.classList.add('transition');
                 {
-                    this.$emit("after-swipe")
+                    this.$emit('after-swipe');
                 }
 
                 swipeEndTime = new Date().getTime();
 
                 // if the span user swipes is less than a certain time span limit, close the modal no matter where the modal is
                 if (
-                    swipeEndTime - swipeStartTime <= closeModalSwipeSpanLimitation
-                    && userSwipePathWidth > 0
+                    swipeEndTime - swipeStartTime <=
+                        closeModalSwipeSpanLimitation &&
+                    userSwipePathWidth > 0
                 ) {
                     this.closeModal();
                     return;
@@ -146,12 +146,9 @@ export default class ModalPresentationView extends Vue {
                 isThereASwipe = false;
             }
         });
-
     }
 
-    increPageRight(num: number) {
-
-    }
+    increPageRight(num: number) {}
 
     openModal() {
         setTimeout(() => {
@@ -200,9 +197,8 @@ export default class ModalPresentationView extends Vue {
         return modalRightValue > this.modalWidth / 2;
     }
 
-
     closeModal() {
-        this.$emit("on-close")
+        this.$emit('on-close');
 
         this.modal.style.right = `${-this.modalWidth}px`;
         setTimeout(() => {
@@ -218,12 +214,9 @@ export default class ModalPresentationView extends Vue {
             this.$emit('closed', this);
         }, 500);
     }
-
 }
 </script>
 <style lang="scss">
-
-
 .slide-panel {
     position: fixed;
     top: 0;
@@ -234,5 +227,4 @@ export default class ModalPresentationView extends Vue {
 .transition {
     transition: right var(--transition-duration) var(--transition-easing);
 }
-
 </style>
