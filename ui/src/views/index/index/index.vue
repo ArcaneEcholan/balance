@@ -12,19 +12,20 @@
                 <div class="current-ledger">{{ curLedger.name }}</div>
             </div>
 
-            <div class="flex justify-between">
-                <main-page-current-date-picker-component></main-page-current-date-picker-component>
-                <div class="fs16">
-                    <van-icon name="location-o"></van-icon>
-                    {{
-                        geoLocation.formattedName === 'out_of_service'
-                            ? $t('out_of_service')
-                            : geoLocation.formattedName
-                    }}
-                </div>
+            <main-page-current-date-picker-component></main-page-current-date-picker-component>
+
+            <gap-component :value="'8px'"></gap-component>
+
+            <div class="fs16">
+                <van-icon name="location-o"></van-icon>
+                {{
+                    geoLocation.formattedName === 'out_of_service'
+                        ? $t('out_of_service')
+                        : geoLocation.formattedName
+                }}
             </div>
 
-            <div id="records-index-header-gradual-color-bg"></div>
+            <gap-component :value="'8px'"></gap-component>
 
             <div id="main-page-fix-header">
                 <div class="flex align-center">
@@ -236,6 +237,7 @@ export default class IndexView extends Vue {
     onClickRefreshLocationData() {
         this.getCurrentLocation(this.amap);
     }
+
     // mountAmap(AMap: any) {
     //     this.amap = new AMap.Map('amap', {
     //         zoom: 16,
@@ -455,15 +457,26 @@ $header-bgc: #fcf4d4;
     width: 100%;
 
     #main-page-fix-header {
-        position: absolute;
-        left: 8px;
-        right: 8px;
-        top: 76px;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 
         background-color: white;
         border-radius: 5px;
         padding: 0 16px;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20%;
+            background: linear-gradient(
+                to bottom,
+                $header-bgc 0%,
+                #f7f8fa 100%
+            );
+            z-index: -1;
+        }
     }
 
     #records-index-header-gradual-color-bg {
