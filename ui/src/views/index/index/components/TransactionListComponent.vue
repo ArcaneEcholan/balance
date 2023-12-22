@@ -1,64 +1,86 @@
 <template>
     <!--list-->
-    <div class="shadow br15 overflow-hidden">
-        <template v-for="(form, index) in transactionList">
-            <!--list item-->
-            <div
-                class="flex pdt10 pdb10 pdl16 pdr16"
-                @click="toEditTransactionPage(form.id)"
-                :style="`border-bottom: 1px solid #f5f5f5;
-                     background-color: white;
-                     `"
-            >
-                <!--card left-->
-                <div class="flexg5">
-                    <div>
-                        <span class="pdr10">{{ form.categoryValue }}</span>
-                        <span class="fs14 google-gray-400">test location</span>
-                    </div>
-                    <div class="fs14">
-                        <span class="google-gray-400">
-                            {{ form.datetime | formatTimeForRecordItem }}
-                        </span>
-                        <span class="pd5 google-gray-300">|</span>
-                        <span class="google-gray-400">
-                            {{ form.description }}
-                        </span>
+    <div class="">
+        <div v-for="day in recordsListByDay">
+            <div class="record-header">{{ day.date }}</div>
+            <panel>
+                <div :key="record.id" v-for="record in day.records">
+                    <div
+                        class="record-row"
+                        @click="toEditTransactionPage(record.id)"
+                    >
+                        <!--card left-->
+                        <div class="flexg5">
+                            <div>
+                                <span class="pdr10">
+                                    {{
+                                        record.categoryValue == null
+                                            ? $t('unknown_record_type')
+                                            : record.categoryValue
+                                    }}
+                                </span>
+                                <span class="fs14 google-gray-400">
+                                    test location
+                                </span>
+                            </div>
+                            <div class="fs14">
+                                <span class="google-gray-400">
+                                    {{
+                                        record.datetime |
+                                            formatTimeForRecordItem
+                                    }}
+                                </span>
+                                <span class="pd5 google-gray-300">|</span>
+                                <span class="google-gray-400">
+                                    {{ record.description }}
+                                </span>
+                            </div>
+                        </div>
+                        <!--card right-->
+                        <div class="flexg1 flex center">
+                            <span class="bold fs18">
+                                {{ record.amount }}
+                                {{
+                                    `${
+                                        record.count > 1
+                                            ? 'x ' + record.count
+                                            : ''
+                                    }`
+                                }}
+                            </span>
+                        </div>
                     </div>
                 </div>
-                <!--card right-->
-                <div class="flexg1">
-                    <span class="bold">
-                        {{ form.amount }}
-                        {{ `${form.count > 1 ? 'x ' + form.count : ''}` }}
-                    </span>
-                </div>
-            </div>
-        </template>
+            </panel>
+            <gap-component></gap-component>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { convertToShortDateTime } from '@/ts/utils';
+import { convertToShortDateTime, getTimeOnly } from '@/ts/utils';
 import Client from '@/ts/request/client';
 import eventBus from '@/ts/EventBus';
 import { Notify } from 'vant';
 import { provideListeners } from '@/page-eventbus-registration-mixin';
+import Panel from '@/views/components/Panel.vue';
+import GapComponent from '@/views/components/GapComponent.vue';
 
 @Component({
+    components: { GapComponent, Panel },
     filters: {
         formatTimeForRecordItem: function (timeString: string | null) {
             if (!timeString) {
                 return 'unknown datetime';
             }
-            return convertToShortDateTime(timeString);
+            return getTimeOnly(timeString);
         },
     },
 })
 export default class TransactionListComponent extends Vue {
     transactionList: any[] = [];
-
+    recordsListByDay: any[] = [];
     created() {
         this.prepareListeners();
         this.onRefreshTransactionList();
@@ -86,8 +108,11 @@ export default class TransactionListComponent extends Vue {
         ]);
     }
 
+    flatMapRecordsForSearching() {
+        return this.recordsListByDay.flatMap((it: any) => it.records);
+    }
     updateTransaction(newTransaction: any) {
-        let found = this.transactionList.find((item) => {
+        let found = this.flatMapRecordsForSearching().find((item) => {
             return item.id === newTransaction.id;
         });
         if (found) {
@@ -101,19 +126,45 @@ export default class TransactionListComponent extends Vue {
 
     onRefreshTransactionList() {
         try {
-            this.doRefreshTransactionList();
+            let currentLedgerName = this.getCurrentLedgerName();
+            let currentDate = this.getCurrentDate();
+            Client.getTransactionListByLedgerName(
+                currentLedgerName,
+                currentDate,
+            )
+                .then((res) => {
+                    console.debug(res);
+                    // sort records by day
+                    let recordsByDay: any = {};
+                    res.data.forEach((it: any) => {
+                        console.debug(it.datetime);
+                        let date = it.datetime.split(' ')[0];
+                        if (!recordsByDay[date]) {
+                            recordsByDay[date] = [];
+                        }
+                        recordsByDay[date].push(it);
+                    });
+
+                    console.debug(recordsByDay);
+
+                    // convert map to list for view rendering
+                    let resultList: any[] = [];
+                    Object.keys(recordsByDay).forEach((it) => {
+                        resultList.push({
+                            date: it,
+                            records: recordsByDay[it],
+                        });
+                    });
+                    console.debug(resultList);
+
+                    this.recordsListByDay = resultList;
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
         } catch (e) {
             console.log(e);
         }
-    }
-
-    doRefreshTransactionList() {
-        let currentLedgerName = this.getCurrentLedgerName();
-        let currentDate = this.getCurrentDate();
-        this.getAndUpdateTransListByLedgerNameAndMonth(
-            currentLedgerName,
-            currentDate,
-        );
     }
 
     getCurrentLedgerName(): string {
@@ -143,19 +194,11 @@ export default class TransactionListComponent extends Vue {
     getAndUpdateTransListByLedgerNameAndMonth(
         ledgerName: any,
         yearHyphenMonth: string,
-    ) {
-        Client.getTransactionListByLedgerName(ledgerName, yearHyphenMonth)
-            .then((res) => {
-                this.transactionList = res.data;
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }
+    ) {}
 
     toEditTransactionPage(recordId: string | number) {
         // find the record
-        let foundTrans = this.transactionList.find((item) => {
+        let foundTrans = this.flatMapRecordsForSearching().find((item) => {
             return item.id === recordId;
         });
 
@@ -171,18 +214,15 @@ export default class TransactionListComponent extends Vue {
             categoryValue: foundTrans.categoryValue,
             description: foundTrans.description,
         });
-        //
-        // pushPage(`edit_transaction`, {
-        //     id: foundTrans.id,
-        //     amount: foundTrans.amount,
-        //     datetime: foundTrans.datetime,
-        //     count: foundTrans.count,
-        //     categoryValue: foundTrans.categoryValue,
-        //     description: foundTrans.description
-        // })
     }
 }
 </script>
 <style lang="scss" scoped>
 @import '~@/style/common-style.scss';
+.record-row {
+    display: flex;
+    padding: 10px 16px;
+    border-bottom: 1px solid $google-gray-100;
+    background-color: white;
+}
 </style>

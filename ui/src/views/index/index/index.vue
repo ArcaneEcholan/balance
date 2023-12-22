@@ -1,24 +1,12 @@
 <template>
     <div class="page">
-        <div style="position: relative; z-index: 101">
+        <div name="mount-point" style="position: relative; z-index: 101">
             <div :id="mountPointUid"></div>
             <div :id="mountPointUid2"></div>
             <div :id="mountPointUid3"></div>
         </div>
 
-        <van-action-sheet :closeable="false" v-model="show">
-            <div class="page">
-                <div class="action-sheet-title">
-                    {{ $t('add_record.title') }}
-                </div>
-                <div class="action-sheet-body">
-                    <add-record-sheet-component
-                        ref="add-transaction-editor-component"
-                    ></add-record-sheet-component>
-                </div>
-            </div>
-        </van-action-sheet>
-
+        <!-- page header ( fixed ) -->
         <div id="records-index-header">
             <div class="flex center">
                 <div class="current-ledger">{{ curLedger.name }}</div>
@@ -57,11 +45,29 @@
 
         <gap-component :value="'140px'"></gap-component>
 
+        <!-- records list -->
         <transaction-list-component
+            name="records-list"
             ref="transaction-list-component"
         ></transaction-list-component>
 
         <gap-component :value="'58px'"></gap-component>
+
+        <div name="sheets">
+            <!-- where user add new records -->
+            <van-action-sheet :closeable="false" v-model="show">
+                <div class="page">
+                    <div class="action-sheet-title">
+                        {{ $t('add_record.title') }}
+                    </div>
+                    <div class="action-sheet-body">
+                        <add-record-sheet-component
+                            ref="add-transaction-editor-component"
+                        ></add-record-sheet-component>
+                    </div>
+                </div>
+            </van-action-sheet>
+        </div>
     </div>
 </template>
 <script lang="ts">

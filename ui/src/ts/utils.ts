@@ -75,6 +75,24 @@ export function convertToShortDateTime(timeString: string) {
     return formattedString;
 }
 
+export function getTimeOnly(timeString: string) {
+    // Create a Date object from the input time string
+    const dateTime = new Date(timeString);
+
+    // Extract month and day values
+    const month = dateTime.getMonth() + 1; // Months are 0-indexed
+    const day = dateTime.getDate();
+
+    // Format hours and minutes with leading zeros
+    const hours = String(dateTime.getHours()).padStart(2, '0');
+    const minutes = String(dateTime.getMinutes()).padStart(2, '0');
+
+    // Construct the desired formatted string
+    const formattedString = `${hours}:${minutes}`;
+
+    return formattedString;
+}
+
 export function countDecimalPlaces(number: string) {
     if (number === '') {
         return 0; // Not a valid float string
