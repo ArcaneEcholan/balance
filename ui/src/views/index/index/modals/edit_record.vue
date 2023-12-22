@@ -243,21 +243,21 @@ export default class EditRecordView extends Vue {
     }
     created() {
         // @ts-ignore
-        this.recordId = this.$options.$mountProp.id; // @ts-ignore
-        this.amount = this.$options.$mountProp.amount; // @ts-ignore
-        this.datetime = this.$options.$mountProp.datetime; // @ts-ignore
-        this.count = this.$options.$mountProp.count; // @ts-ignore
-        this.categoryValue = this.$options.$mountProp.categoryValue; // @ts-ignore
-        this.description = this.$options.$mountProp.description;
+        let mountProp = this.$options.$mountProp;
+
+        this.recordId = mountProp.id;
+        this.amount = mountProp.amount;
+        this.datetime = mountProp.datetime;
+        this.count = mountProp.count;
+        this.categoryValue = mountProp.categoryValue;
+        this.description = mountProp.description;
 
         this.modalLifeCycleHooks = {
-            // @ts-ignore
-            onOpen: this.$options.$mountProp.modalLifeCycleHooks.onOpen, // @ts-ignore
-            beforeSwipe:
-                this.$options.$mountProp.modalLifeCycleHooks.beforeSwipe, // @ts-ignore
-            swiping: this.$options.$mountProp.modalLifeCycleHooks.swiping, // @ts-ignore
-            afterSwipe: this.$options.$mountProp.modalLifeCycleHooks.afterSwipe, // @ts-ignore
-            onClose: this.$options.$mountProp.modalLifeCycleHooks.onClose,
+            onOpen: mountProp.modalLifeCycleHooks.onOpen,
+            beforeSwipe: mountProp.modalLifeCycleHooks.beforeSwipe,
+            swiping: mountProp.modalLifeCycleHooks.swiping,
+            afterSwipe: mountProp.modalLifeCycleHooks.afterSwipe,
+            onClose: mountProp.modalLifeCycleHooks.onClose,
         };
     }
 }

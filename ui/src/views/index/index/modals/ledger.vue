@@ -191,14 +191,12 @@ export default class ManageLedgerView extends Vue {
     varTable: any = {};
     show = false;
 
-    categoryValue: string | null = null;
     name = '';
     editLedgerId: number | null = null;
     editLedgerName: string | null = '';
     addLedgerLoading = false;
     addLedgerShow = false;
     addLedgerName: string | null = '';
-    countxxx = 100;
 
     submitAddLedger() {
         let name = this.addLedgerName;
@@ -284,21 +282,13 @@ export default class ManageLedgerView extends Vue {
     modalLifeCycleHooks: any;
     created() {
         // @ts-ignore
-        this.recordId = this.$options.$mountProp.id; // @ts-ignore
-        this.amount = this.$options.$mountProp.amount; // @ts-ignore
-        this.datetime = this.$options.$mountProp.datetime; // @ts-ignore
-        this.count = this.$options.$mountProp.count; // @ts-ignore
-        this.categoryValue = this.$options.$mountProp.categoryValue; // @ts-ignore
-        this.description = this.$options.$mountProp.description;
-
+        let mountProp = this.$options.$mountProp
         this.modalLifeCycleHooks = {
-            // @ts-ignore
-            onOpen: this.$options.$mountProp.modalLifeCycleHooks.onOpen, // @ts-ignore
-            beforeSwipe:
-                this.$options.$mountProp.modalLifeCycleHooks.beforeSwipe, // @ts-ignore
-            swiping: this.$options.$mountProp.modalLifeCycleHooks.swiping, // @ts-ignore
-            afterSwipe: this.$options.$mountProp.modalLifeCycleHooks.afterSwipe, // @ts-ignore
-            onClose: this.$options.$mountProp.modalLifeCycleHooks.onClose,
+            onOpen: mountProp.modalLifeCycleHooks.onOpen,
+            beforeSwipe: mountProp.modalLifeCycleHooks.beforeSwipe,
+            swiping: mountProp.modalLifeCycleHooks.swiping,
+            afterSwipe: mountProp.modalLifeCycleHooks.afterSwipe,
+            onClose: mountProp.modalLifeCycleHooks.onClose,
         };
 
         this.ledgersLoading = true;

@@ -96,16 +96,16 @@ export default class SettingsView extends Vue {
     modalLifeCycleHooks: any;
 
     created() {
+        // @ts-ignore
+        let mountProp = this.$options.$mountProp;
         this.modalLifeCycleHooks = {
-            // @ts-ignore
-            onOpen: this.$options.$mountProp.modalLifeCycleHooks.onOpen, // @ts-ignore
-            beforeSwipe:
-                this.$options.$mountProp.modalLifeCycleHooks.beforeSwipe, // @ts-ignore
-            swiping: this.$options.$mountProp.modalLifeCycleHooks.swiping, // @ts-ignore
-            afterSwipe: this.$options.$mountProp.modalLifeCycleHooks.afterSwipe, // @ts-ignore
-            onClose: this.$options.$mountProp.modalLifeCycleHooks.onClose, // @ts-ignore
-            closed: this.$options.$mountProp.modalLifeCycleHooks.closed, // @ts-ignore
-            opened: this.$options.$mountProp.modalLifeCycleHooks.opened,
+            onOpen: mountProp.modalLifeCycleHooks.onOpen,
+            beforeSwipe: mountProp.modalLifeCycleHooks.beforeSwipe,
+            swiping: mountProp.modalLifeCycleHooks.swiping,
+            afterSwipe: mountProp.modalLifeCycleHooks.afterSwipe,
+            onClose: mountProp.modalLifeCycleHooks.onClose,
+            closed: mountProp.modalLifeCycleHooks.closed,
+            opened: mountProp.modalLifeCycleHooks.opened,
         };
     }
 
