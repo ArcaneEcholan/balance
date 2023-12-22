@@ -1,12 +1,5 @@
 <template>
-    <modal-presentation
-        @on-open="modalLifeCycleHooks.onOpen"
-        @on-close="modalLifeCycleHooks.onClose"
-        @closed="closed"
-        @before-swipe="modalLifeCycleHooks.beforeSwipe"
-        @swiping="modalLifeCycleHooks.swiping"
-        @after-swipe="modalLifeCycleHooks.afterSwipe"
-    >
+    <modal-presentation :hooks="modalLifeCycleHooks" @closed="closed">
         <van-action-sheet v-model="show">
             <div class="page">
                 <div class="record-header">Edit Fields</div>
@@ -103,6 +96,7 @@ import GapComponent from '@/views/components/GapComponent.vue';
 import {
     disableBodyScroll,
     enableBodyScroll,
+    stripType,
     unmountComponent,
 } from '@/ts/utils';
 import SolidIcon from '@/views/components/SolidIcon.vue';
@@ -184,8 +178,6 @@ export default class ManageLedgerView extends Vue {
     beforeDestroy() {
         console.log('destroyed');
     }
-
-    onclose() {}
 
     ledgers: any = [];
     varTable: any = {};
@@ -281,15 +273,8 @@ export default class ManageLedgerView extends Vue {
     ledgersLoading = false;
     modalLifeCycleHooks: any;
     created() {
-        // @ts-ignore
-        let mountProp = this.$options.$mountProp
-        this.modalLifeCycleHooks = {
-            onOpen: mountProp.modalLifeCycleHooks.onOpen,
-            beforeSwipe: mountProp.modalLifeCycleHooks.beforeSwipe,
-            swiping: mountProp.modalLifeCycleHooks.swiping,
-            afterSwipe: mountProp.modalLifeCycleHooks.afterSwipe,
-            onClose: mountProp.modalLifeCycleHooks.onClose,
-        };
+        this.modalLifeCycleHooks =
+            stripType(this).$options.$mountProp.modalLifeCycleHooks;
 
         this.ledgersLoading = true;
         Client.getLedgerList()

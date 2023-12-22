@@ -127,18 +127,16 @@ export default class IndexView extends Vue {
     getModalLifeCycleHooks = () => {
         return {
             onOpen: () => {
-                {
-                    disableBodyScroll();
+                disableBodyScroll();
 
-                    let elem = document.getElementById('page-main-area')!;
-                    elem.style.right = 100 + 'px';
+                let elem = document.getElementById('page-main-area')!;
+                elem.style.right = 100 + 'px';
 
-                    elem = document.getElementById('tabbar-area')!;
-                    elem.style.right = 100 + 'px';
+                elem = document.getElementById('tabbar-area')!;
+                elem.style.right = 100 + 'px';
 
-                    elem = document.getElementById('records-index-header')!;
-                    elem.style.right = 100 + 'px';
-                }
+                elem = document.getElementById('records-index-header')!;
+                elem.style.right = 100 + 'px';
             },
             onClose: () => {
                 enableBodyScroll();

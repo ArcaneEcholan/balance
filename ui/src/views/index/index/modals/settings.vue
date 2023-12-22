@@ -1,36 +1,29 @@
 <template>
-    <div class="">
-        <modal-presentation
-            z-index="109"
-            ref="settings-panel"
-            @on-open="modalLifeCycleHooks.onOpen"
-            @on-close="modalLifeCycleHooks.onClose"
-            @closed="closed"
-            @opened="modalLifeCycleHooks.opened"
-            @before-swipe="modalLifeCycleHooks.beforeSwipe"
-            @swiping="modalLifeCycleHooks.swiping"
-            @after-swipe="modalLifeCycleHooks.afterSwipe"
-        >
-            <div :id="mountPointUid"></div>
-            <div class="page">
-                <div class="modal-title">
-                    {{ $t('settings') }}
-                </div>
-
-                <gap-component :value="'55px'"></gap-component>
-
-                <panel>
-                    <van-cell-group>
-                        <van-cell
-                            :title="this.$t('language')"
-                            clickable
-                            @click="onclickLanguageEntry"
-                        />
-                    </van-cell-group>
-                </panel>
+    <modal-presentation
+        z-index="109"
+        ref="settings-panel"
+        :hooks="modalLifeCycleHooks"
+        @closed="closed"
+    >
+        <div :id="mountPointUid"></div>
+        <div class="page">
+            <div class="modal-title">
+                {{ $t('settings') }}
             </div>
-        </modal-presentation>
-    </div>
+
+            <gap-component :value="'55px'"></gap-component>
+
+            <panel>
+                <van-cell-group>
+                    <van-cell
+                        :title="this.$t('language')"
+                        clickable
+                        @click="onclickLanguageEntry"
+                    />
+                </van-cell-group>
+            </panel>
+        </div>
+    </modal-presentation>
 </template>
 
 <script lang="ts">
@@ -79,12 +72,6 @@ export default class SettingsView extends Vue {
                     let elem = getVueEl(this, 'settings-panel');
                     elem.classList.add('tran');
                 },
-                closed: () => {
-                    // window.removeEventListener('touchstart', banTouch)
-                },
-                opened: () => {
-                    // window.removeEventListener('touchstart', banTouch)
-                },
             },
         });
     }
@@ -92,13 +79,11 @@ export default class SettingsView extends Vue {
     modalLifeCycleHooks: any;
 
     created() {
-        this.modalLifeCycleHooks = stripType(
-            this.$options,
-        ).$mountProp.modalLifeCycleHooks;
+        this.modalLifeCycleHooks =
+            stripType(this).$options.$mountProp.modalLifeCycleHooks;
     }
 
     closed() {
-        this.modalLifeCycleHooks.closed();
         unmountComponent(this, 0);
     }
 }

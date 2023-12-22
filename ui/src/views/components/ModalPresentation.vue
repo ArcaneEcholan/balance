@@ -24,6 +24,123 @@ export default class ModalPresentationView extends Vue {
     @Prop({ default: null })
     zIndex!: string | null;
 
+    @Prop({
+        default: () => ({
+            beforeSwipe: (arg: any) => {
+                console.log('before swipe');
+            },
+            swiping: (arg: any) => {
+                console.log('swiping');
+            },
+            afterSwipe: (arg: any) => {
+                console.log('after swipe');
+            },
+            onOpen: (arg: any) => {
+                console.log('on open');
+            },
+            opened: (arg: any) => {
+                console.log('opened');
+            },
+            onClose: (arg: any) => {
+                console.log('on close');
+            },
+            close100: (arg: any) => {
+                console.log('close 100');
+            },
+            close200: (arg: any) => {
+                console.log('close 200');
+            },
+            close300: (arg: any) => {
+                console.log('close 300');
+            },
+            closed: (arg: any) => {
+                console.log('closed');
+            },
+        }),
+        required: false,
+    })
+    hooks!: any;
+
+    created() {
+        let requiredFuncs = [
+            'beforeSwipe',
+            'swiping',
+            'afterSwipe',
+            'onOpen',
+            'opened',
+            'onClose',
+            'close100',
+            'close200',
+            'close300',
+            'closed',
+        ];
+
+        let hooksObj = this.hooks;
+        Object.keys(hooksObj).forEach((key) => {
+            requiredFuncs.forEach((name: string) => {
+                if (key === name) {
+                    if (typeof hooksObj[key] !== 'function') {
+                        throw new Error(`hook: ${key} must be a function`);
+                    }
+                } else {
+                    console.debug(`hook: ${name} not exists`);
+                    this.hooks[name] = (arg: any) => {
+                        console.debug(`default impl of hook: ${name}`);
+                    };
+                }
+            });
+        });
+    }
+
+    invokeCallbacks(event: string, arg: any) {
+        switch (event) {
+            case 'before-swipe': {
+                this.hooks.beforeSwipe(arg);
+                break;
+            }
+            case 'swiping': {
+                this.hooks.swiping(arg);
+                break;
+            }
+            case 'after-swipe': {
+                this.hooks.afterSwipe(arg);
+                break;
+            }
+            case 'on-open': {
+                this.hooks.onOpen(arg);
+                break;
+            }
+            case 'opened': {
+                this.hooks.opened(arg);
+                break;
+            }
+            case 'on-close': {
+                this.hooks.onClose(arg);
+                break;
+            }
+            case 'close-100': {
+                this.hooks.close100(arg);
+                break;
+            }
+            case 'close-200': {
+                this.hooks.close200(arg);
+                break;
+            }
+            case 'close-300': {
+                this.hooks.close300(arg);
+                break;
+            }
+            case 'closed': {
+                this.hooks.closed(arg);
+                this.$emit('closed', arg);
+                break;
+            }
+            default: {
+                console.warn('modal unknown event: ' + event);
+            }
+        }
+    }
+
     mounted() {
         this.registerSwipeRelatedEventHandler();
         this.openModal();
@@ -71,7 +188,7 @@ export default class ModalPresentationView extends Vue {
                 swipeStartTime = new Date().getTime();
                 // remove the transition of modal, because we need the modal to stay tight with the user's finger without latency
                 {
-                    this.$emit('before-swipe', this);
+                    this.invokeCallbacks('before-swipe', this);
                     this.modal.classList.remove('transition');
                 }
 
@@ -106,7 +223,7 @@ export default class ModalPresentationView extends Vue {
                 // how long should modal move from the beginning is the same as how long user's finger moves. For example if user swipe 20px, modal should move 20px from the beginning
                 console.debug('new modal right: ' + -userSwipePathWidth);
 
-                this.$emit('swiping', {
+                this.invokeCallbacks('swiping', {
                     swipingPathPercent: userSwipePathWidth / this.modalWidth,
                 });
 
@@ -121,9 +238,7 @@ export default class ModalPresentationView extends Vue {
             if (isThereASwipe) {
                 // restore the transition of modal
                 this.modal.classList.add('transition');
-                {
-                    this.$emit('after-swipe');
-                }
+                this.invokeCallbacks('after-swipe', null);
 
                 swipeEndTime = new Date().getTime();
 
@@ -152,10 +267,10 @@ export default class ModalPresentationView extends Vue {
 
     openModal() {
         setTimeout(() => {
-            this.$emit('on-open');
+            this.invokeCallbacks('on-open', null);
             this.modal.style.right = `0`;
             setTimeout(() => {
-                this.$emit('opened');
+                this.invokeCallbacks('opened', null);
             }, 500);
         }, 0);
     }
@@ -198,20 +313,19 @@ export default class ModalPresentationView extends Vue {
     }
 
     closeModal() {
-        this.$emit('on-close');
-
+        this.invokeCallbacks('on-close', null);
         this.modal.style.right = `${-this.modalWidth}px`;
         setTimeout(() => {
-            this.$emit('close-100', this);
+            this.invokeCallbacks('close-100', null);
         }, 100);
         setTimeout(() => {
-            this.$emit('close-200', this);
+            this.invokeCallbacks('close-200', null);
         }, 200);
         setTimeout(() => {
-            this.$emit('close-300', this);
+            this.invokeCallbacks('close-300', null);
         }, 300);
         setTimeout(() => {
-            this.$emit('closed', this);
+            this.invokeCallbacks('closed', null);
         }, 500);
     }
 }

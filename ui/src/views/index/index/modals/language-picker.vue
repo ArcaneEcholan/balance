@@ -2,13 +2,8 @@
     <div class="">
         <modal-presentation
             z-index="110"
-            @on-open="modalLifeCycleHooks.onOpen"
-            @on-close="modalLifeCycleHooks.onClose"
+            :hooks="modalLifeCycleHooks"
             @closed="closed"
-            @opened="modalLifeCycleHooks.opened"
-            @before-swipe="modalLifeCycleHooks.beforeSwipe"
-            @swiping="modalLifeCycleHooks.swiping"
-            @after-swipe="modalLifeCycleHooks.afterSwipe"
         >
             <div class="page">
                 <div class="modal-title">
@@ -77,13 +72,11 @@ export default class LanguagePickerComponent extends Vue {
     }
 
     created() {
-        this.modalLifeCycleHooks = stripType(
-            this.$options,
-        ).$mountProp.modalLifeCycleHooks;
+        this.modalLifeCycleHooks =
+            stripType(this).$options.$mountProp.modalLifeCycleHooks;
     }
 
     closed() {
-        this.modalLifeCycleHooks.closed();
         unmountComponent(this, 0);
     }
 }

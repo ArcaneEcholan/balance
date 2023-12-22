@@ -1,6 +1,7 @@
 <template>
     <modal-presentation
         ref="modal"
+        :hooks="modalLifeCycleHooks"
         @on-open="modalLifeCycleHooks.onOpen"
         @on-close="modalLifeCycleHooks.onClose"
         @closed="closed"
