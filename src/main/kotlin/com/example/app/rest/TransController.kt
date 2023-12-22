@@ -36,6 +36,7 @@ class SaveTranDTO {
 
     var description: String? = null
 
+    @NotNull
     var location: Map<String, String>? = null
 }
 
@@ -115,8 +116,7 @@ class TransController {
                 description = it.description,
                 datetime = DateTime.now().toString(),
                 // leave location as empty, support it later
-                location = it.location ?: mapOf(
-                )
+                location = it.location!!
             )
         }.toList().apply {
             return ResponseEntity.ok(this)

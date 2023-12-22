@@ -244,28 +244,14 @@ class TransactionServiceImpl : TransactionService {
         datetime: String,
         location: Map<String, String>,
     ): TransactionVO {
-        var location = LocationPO(
-            formattedName = location?.get("formattedName"),
-            latitude = location?.get("latitude"),
-            longitude = location?.get("longitude"),
-            province = location?.get("province"),
-            city = location?.get("city"),
-            district = location?.get("district"),
-            adcode = location?.get("adcode"),
-            citycode = location?.get("citycode"),
-
-            streetName = location?.get("streetName"),
-            streetNumber = location?.get("streetNumber"),
-            streetDirection = location?.get("streetDirection"),
-            streetDistance = location?.get("streetDistance"),
-            streetLocation = location?.get("streetLocation"),
-
-            towncode = location?.get("towncode"),
-            township = location?.get("township"),
+        var locPo = LocationPO(
+            formattedName = location.get("formattedName"),
+            latitude = location.get("latitude"),
+            longitude = location.get("longitude"),
         )
 
-        if (!location.allNull()) {
-            locationDao.save(location)
+        if (!locPo.allNull()) {
+            locationDao.save(locPo)
         }
 
         var transaction = TransactionPO(
@@ -274,7 +260,7 @@ class TransactionServiceImpl : TransactionService {
             categoryId = categoryId,
             description = description,
             datetime = DateTime.now().toString(),
-            locationId = location.id,
+            locationId = locPo.id,
             orderNo = UUID.randomUUID().toString()
         )
 
