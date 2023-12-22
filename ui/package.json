@@ -7,7 +7,9 @@
         "build-development": "vue-cli-service build",
         "build-production": "vue-cli-service build --mode production",
         "test:unit": "vue-cli-service test:unit",
-        "lint": "vue-cli-service lint"
+        "lint": "vue-cli-service lint",
+        "eslint": "eslint --ext .js,.vue",
+        "eslint-fix": "eslint --fix --ext .js,.ts,.vue"
     },
     "dependencies": {
         "@amap/amap-jsapi-loader": "^1.0.1",
