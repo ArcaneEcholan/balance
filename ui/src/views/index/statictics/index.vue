@@ -22,9 +22,13 @@
         </div>
 
         <gap-component></gap-component>
-        <div class="card shadow">
-            <div>compare</div>
-            <div class="flex" style="width: 100%">
+
+        <div class="record-header">
+            {{ $t('sibling_month_expense_compare') }}
+        </div>
+
+        <panel>
+            <div class="flex bg-white pd8">
                 <div class="flexg1" id="compare-total-percentage">
                     <div
                         style="width: fit-content"
@@ -64,83 +68,58 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </panel>
 
-        <div class="card shadow">
-            <div>type ranking</div>
-            <div>
-                <div v-for="i in typeRankList">
-                    <div class="flex">
-                        <div class="flexg1 rank">
-                            <div class="rank-text" style="width: fit-content">
-                                1
-                            </div>
-                        </div>
-                        <div class="flexg9">
-                            <div class="flex justify-between">
-                                <div>{{ i.type }}</div>
-                                <div>{{ i.total }}</div>
-                            </div>
+        <div class="record-header">{{ $t('expense_type_ranking') }}</div>
 
-                            <div :style="`width: ${i.percent * 100}%`">
-                                <div
-                                    style="
-                                        width: 100%;
-                                        height: 6px;
-                                        background-color: #409eff;
-                                        border-radius: 100px;
-                                    "
-                                ></div>
-                            </div>
-                        </div>
+        <panel>
+            <div v-for="i in typeRankList" class="record-row">
+                <div class="left">
+                    <div>{{ i.type }}</div>
+                    <div class="google-gray-400">
+                        {{ i.description }}
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="card shadow">
-            <div>single ranking</div>
-            <div>
-                <div v-for="i in rankList">
-                    <div class="flex">
-                        <div class="flexg1 rank">
-                            <div class="rank-text" style="width: fit-content">
-                                1
-                            </div>
-                        </div>
-                        <div class="flexg9">
-                            <div class="flex justify-between">
-                                <div>{{ i.description }}</div>
-                                <div>{{ i.total }}</div>
-                            </div>
 
-                            <div :style="`width: ${i.percent * 100}%`">
-                                <div
-                                    style="
-                                        width: 100%;
-                                        height: 6px;
-                                        background-color: #409eff;
-                                        border-radius: 100px;
-                                    "
-                                ></div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="right bold">
+                    {{ i.total }}
                 </div>
             </div>
-        </div>
+        </panel>
+
+        <gap-component></gap-component>
+
+        <div class="record-header">{{ $t('expense_single_ranking') }}</div>
+
+        <panel>
+            <div v-for="i in rankList" class="record-row">
+                <div class="left">
+                    <div>{{ i.type }}</div>
+                    <div class="google-gray-400">
+                        {{ i.description }}
+                    </div>
+                </div>
+
+                <div class="right bold">
+                    {{ i.total }}
+                </div>
+            </div>
+        </panel>
+
+        <gap-component :value="'58px'"></gap-component>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Client from '@/ts/request/client';
-import { getCurrentYearAndMonth } from '@/ts/time';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { shallowMount } from '@vue/test-utils';
+import Panel from '@/views/components/Panel.vue';
 
 @Component({
     methods: { shallowMount },
-    components: { GapComponent },
+    components: { Panel, GapComponent },
 })
 export default class StatisticIndexView extends Vue {
     show = false;
@@ -207,6 +186,7 @@ export default class StatisticIndexView extends Vue {
             });
         });
     }
+
     format() {
         return '';
     }
@@ -279,12 +259,6 @@ export default class StatisticIndexView extends Vue {
 </script>
 <style lang="scss" scoped>
 @import '~@/style/common-style.scss';
+@import '~@/style/style-specification';
 @import '~@/assets/custom-icon.css';
-
-.page {
-    box-sizing: border-box;
-    //padding: 0 8px 0 8px;
-    padding: 8px;
-    background-color: #f7f8fa;
-}
 </style>

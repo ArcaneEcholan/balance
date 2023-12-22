@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { convertToShortDateTime, getTimeOnly } from '@/ts/utils';
+import { getTimeOnly } from '@/ts/utils';
 import Client from '@/ts/request/client';
 import eventBus from '@/ts/EventBus';
 import { Notify } from 'vant';
@@ -85,6 +85,7 @@ import GapComponent from '@/views/components/GapComponent.vue';
 export default class TransactionListComponent extends Vue {
     transactionList: any[] = [];
     recordsListByDay: any[] = [];
+
     created() {
         this.prepareListeners();
         this.onRefreshTransactionList();
@@ -115,6 +116,7 @@ export default class TransactionListComponent extends Vue {
     flatMapRecordsForSearching() {
         return this.recordsListByDay.flatMap((it: any) => it.records);
     }
+
     updateTransaction(newTransaction: any) {
         let found = this.flatMapRecordsForSearching().find((item) => {
             return item.id === newTransaction.id;
@@ -223,10 +225,5 @@ export default class TransactionListComponent extends Vue {
 </script>
 <style lang="scss" scoped>
 @import '~@/style/common-style.scss';
-.record-row {
-    display: flex;
-    padding: 10px 16px;
-    border-bottom: 1px solid $google-gray-100;
-    background-color: white;
-}
+@import '~@/style/style-specification';
 </style>
