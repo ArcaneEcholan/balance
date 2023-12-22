@@ -39,6 +39,7 @@ import ModalPresentation from '@/views/components/ModalPresentation.vue';
 import {
     generateMountPointUid,
     mountComponent,
+    stripType,
     unmountComponent,
 } from '@/ts/utils';
 import Panel from '@/views/components/Panel.vue';
@@ -53,60 +54,47 @@ export default class SettingsView extends Vue {
     mountPointUid = generateMountPointUid();
 
     onclickLanguageEntry() {
-        console.log('hlasjdlfjasldjf');
-        let arg: any = {};
-        arg.modalLifeCycleHooks = this.getModalLifeCycleHooks();
-        mountComponent(this.mountPointUid, LanguagePickerComponent, arg);
+        mountComponent(this.mountPointUid, LanguagePickerComponent, {
+            modalLifeCycleHooks: {
+                onOpen: () => {
+                    let elem = getVueEl(this, 'settings-panel');
+                    elem.style.right = 100 + 'px';
+                },
+                onClose: () => {
+                    let elem = getVueEl(this, 'settings-panel');
+                    elem.style.right = 0 + 'px';
+                },
+                beforeSwipe: () => {
+                    let elem = getVueEl(this, 'settings-panel');
+                    elem.classList.remove('tran');
+                },
+                swiping: (args: any) => {
+                    let swipingPathPercent = args.swipingPathPercent;
+                    let r = 1 - swipingPathPercent;
+
+                    let elem = getVueEl(this, 'settings-panel');
+                    elem.style.right = r * 100 + 'px';
+                },
+                afterSwipe: () => {
+                    let elem = getVueEl(this, 'settings-panel');
+                    elem.classList.add('tran');
+                },
+                closed: () => {
+                    // window.removeEventListener('touchstart', banTouch)
+                },
+                opened: () => {
+                    // window.removeEventListener('touchstart', banTouch)
+                },
+            },
+        });
     }
-
-    getModalLifeCycleHooks = () => {
-        return {
-            onOpen: () => {
-                let elem = getVueEl(this, 'settings-panel');
-                elem.style.right = 100 + 'px';
-            },
-            onClose: () => {
-                let elem = getVueEl(this, 'settings-panel');
-                elem.style.right = 0 + 'px';
-            },
-            beforeSwipe: () => {
-                let elem = getVueEl(this, 'settings-panel');
-                elem.classList.remove('tran');
-            },
-            swiping: (args: any) => {
-                let swipingPathPercent = args.swipingPathPercent;
-                let r = 1 - swipingPathPercent;
-
-                let elem = getVueEl(this, 'settings-panel');
-                elem.style.right = r * 100 + 'px';
-            },
-            afterSwipe: () => {
-                let elem = getVueEl(this, 'settings-panel');
-                elem.classList.add('tran');
-            },
-            closed: () => {
-                // window.removeEventListener('touchstart', banTouch)
-            },
-            opened: () => {
-                // window.removeEventListener('touchstart', banTouch)
-            },
-        };
-    };
 
     modalLifeCycleHooks: any;
 
     created() {
-        // @ts-ignore
-        let mountProp = this.$options.$mountProp;
-        this.modalLifeCycleHooks = {
-            onOpen: mountProp.modalLifeCycleHooks.onOpen,
-            beforeSwipe: mountProp.modalLifeCycleHooks.beforeSwipe,
-            swiping: mountProp.modalLifeCycleHooks.swiping,
-            afterSwipe: mountProp.modalLifeCycleHooks.afterSwipe,
-            onClose: mountProp.modalLifeCycleHooks.onClose,
-            closed: mountProp.modalLifeCycleHooks.closed,
-            opened: mountProp.modalLifeCycleHooks.opened,
-        };
+        this.modalLifeCycleHooks = stripType(
+            this.$options,
+        ).$mountProp.modalLifeCycleHooks;
     }
 
     closed() {

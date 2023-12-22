@@ -219,3 +219,7 @@ export function disableBodyScroll() {
 export function getI18nValue(key: string) {
     return i18n.t(key).toString();
 }
+
+export function stripType(obj: any): any {
+    return obj as any;
+}

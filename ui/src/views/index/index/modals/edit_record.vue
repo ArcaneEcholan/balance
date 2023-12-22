@@ -48,19 +48,16 @@ import { Notify } from 'vant';
 import Client from '@/ts/request/client';
 import {
     countDecimalPlaces,
-    disableBodyScroll,
-    enableBodyScroll,
     isFloat,
     isPositiveInteger,
+    stripType,
     unmountComponent,
 } from '@/ts/utils';
 import eventBus from '@/ts/EventBus';
 import CustomButton from '@/views/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import Panel from '@/views/components/Panel.vue';
-import { getVueEl } from '@/ts/vueUtils';
 
-let that: any;
 @Component({
     components: {
         Panel,
@@ -182,6 +179,7 @@ export default class EditRecordView extends Vue {
                 this.submitEnable = true;
             })
             .catch((err: any) => {
+                console.log(err);
                 this.submitEnable = true;
             });
     }
@@ -195,55 +193,10 @@ export default class EditRecordView extends Vue {
     count: string | null = null;
     description: string | null = null;
 
-    modal!: ModalPresentationView;
-
-    mounted() {
-        // {
-        //     let touchStartPositionX = 0
-        //     let fingerPositionX  = 0
-        //     let swipeAreaWidth = 30;
-        //     // make sure pageConfig is in vue reactive system, so the change of it
-        //     // to avoid the listener being created every time touchstart is triggered
-        //     let touchMoveListener = (e: any) => {
-        //         // use that instead of this, because "this" is not the vue instance,
-        //         // but an object of class AppView
-        //         fingerPositionX = e.changedTouches[0].clientX;
-        //
-        //         //  handleEdgeSwipe
-        //         {
-        //             if (touchStartPositionX <= swipeAreaWidth) {
-        //                 if (fingerPositionX - touchStartPositionX > 0) {
-        //                     console.debug("prevent default swipe gesture")
-        //                     e.preventDefault();
-        //                 }
-        //             }
-        //
-        //             if (touchStartPositionX >= window.innerWidth - swipeAreaWidth) {
-        //                 if (fingerPositionX - touchStartPositionX < 0) {
-        //                     console.debug("prevent default swipe gesture")
-        //                     e.preventDefault();
-        //                 }
-        //             }
-        //         }
-        //     }
-        //
-        //     {
-        //         let app = getVueEl(this, "modal")
-        //
-        //         app.addEventListener('touchstart', (e) => {
-        //             touchStartPositionX = e.changedTouches[0].clientX
-        //
-        //             // don't prevent default here, this will prevent the click event from being triggered
-        //             // more information should be collected as the user move finger
-        //             app.removeEventListener('touchmove', touchMoveListener);
-        //             app.addEventListener('touchmove', touchMoveListener);
-        //         });
-        //     }
-        // }
-    }
     created() {
-        // @ts-ignore
-        let mountProp = this.$options.$mountProp;
+        let mountProp = stripType(this.$options).$mountProp;
+
+        this.modalLifeCycleHooks = mountProp.modalLifeCycleHooks;
 
         this.recordId = mountProp.id;
         this.amount = mountProp.amount;
@@ -251,14 +204,6 @@ export default class EditRecordView extends Vue {
         this.count = mountProp.count;
         this.categoryValue = mountProp.categoryValue;
         this.description = mountProp.description;
-
-        this.modalLifeCycleHooks = {
-            onOpen: mountProp.modalLifeCycleHooks.onOpen,
-            beforeSwipe: mountProp.modalLifeCycleHooks.beforeSwipe,
-            swiping: mountProp.modalLifeCycleHooks.swiping,
-            afterSwipe: mountProp.modalLifeCycleHooks.afterSwipe,
-            onClose: mountProp.modalLifeCycleHooks.onClose,
-        };
     }
 }
 </script>
