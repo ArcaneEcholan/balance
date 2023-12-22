@@ -647,8 +647,6 @@ export default class AddTransactionEditorComponent extends Vue {
                 longitude: null,
                 formattedName: null,
             };
-        } else {
-            loc.formattedName = 'out_of_service';
         }
         let request = trans.map((tran) => {
             return {
