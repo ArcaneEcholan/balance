@@ -93,11 +93,11 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import ModalPresentationView from '@/components/ModalPresentation.vue';
+import ModalPresentationView from '@/views/components/ModalPresentation.vue';
 import { Notify } from 'vant';
 import { getHtmlElem } from '@/ts/vueUtils';
 import eventBus from '@/ts/EventBus';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import CommonButton from '@/views/components/CommonButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import {

@@ -67,7 +67,7 @@
 <script lang="ts">
 import AMapLoader from '@amap/amap-jsapi-loader';
 import { Component, Vue } from 'vue-property-decorator';
-import request from '@/request';
+import request from '@/ts/request';
 import { Notify } from 'vant';
 
 import TransactionListComponent from '@/views/index/index/components/TransactionListComponent.vue';

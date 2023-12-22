@@ -35,13 +35,13 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import ModalPresentation from '@/components/ModalPresentation.vue';
+import ModalPresentation from '@/views/components/ModalPresentation.vue';
 import {
     generateMountPointUid,
     mountComponent,
     unmountComponent,
 } from '@/ts/utils';
-import Panel from '@/components/Panel.vue';
+import Panel from '@/views/components/Panel.vue';
 import LanguagePickerComponent from '@/views/index/index/modals/language-picker.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { getVueEl } from '@/ts/vueUtils';

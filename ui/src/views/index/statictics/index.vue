@@ -133,7 +133,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import { getCurrentYearAndMonth } from '@/ts/time';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { shallowMount } from '@vue/test-utils';

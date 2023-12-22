@@ -38,8 +38,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import ModalPresentation from '@/components/ModalPresentation.vue';
-import Panel from '@/components/Panel.vue';
+import ModalPresentation from '@/views/components/ModalPresentation.vue';
+import Panel from '@/views/components/Panel.vue';
 import { unmountComponent } from '@/ts/utils';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { Locale, Notify } from 'vant';

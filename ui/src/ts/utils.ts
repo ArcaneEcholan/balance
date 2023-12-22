@@ -1,6 +1,4 @@
-import EditRecordView from '@/views/index/index/modals/edit_record.vue';
-import { Component } from 'vue-property-decorator';
-import store from '@/store';
+import store from '@/ts/store';
 import i18n from '@/ts/lang';
 
 export function get_display_file_size(bytes: number) {

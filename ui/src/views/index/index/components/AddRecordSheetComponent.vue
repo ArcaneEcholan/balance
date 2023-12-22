@@ -133,7 +133,7 @@ import VanCursorEditorComponent from '@/views/components/VanCursorEditor.vue';
 import { findWordInLine, replace, timeout } from '@/ts/utils';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { Notify } from 'vant';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import eventBus from '@/ts/EventBus';
 import CommonButton from '@/views/components/CommonButton.vue';
 import { provideListeners } from '@/page-eventbus-registration-mixin';

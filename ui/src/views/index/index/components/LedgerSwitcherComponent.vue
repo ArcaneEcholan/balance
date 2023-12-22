@@ -22,12 +22,12 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import eventBus from '@/ts/EventBus';
 import CommonButton from '@/views/components/CommonButton.vue';
 import { provideListeners } from '@/page-eventbus-registration-mixin';
 import GapComponent from '@/views/components/GapComponent.vue';
-import CustomButton from '@/components/CustomButton.vue';
+import CustomButton from '@/views/components/CustomButton.vue';
 import { getI18nValue } from '../../../../ts/utils';
 
 @Component({

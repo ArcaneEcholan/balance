@@ -43,9 +43,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import ModalPresentationView from '@/components/ModalPresentation.vue';
+import ModalPresentationView from '@/views/components/ModalPresentation.vue';
 import { Notify } from 'vant';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import {
     countDecimalPlaces,
     disableBodyScroll,
@@ -55,9 +55,9 @@ import {
     unmountComponent,
 } from '@/ts/utils';
 import eventBus from '@/ts/EventBus';
-import CustomButton from '@/components/CustomButton.vue';
+import CustomButton from '@/views/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
-import Panel from '@/components/Panel.vue';
+import Panel from '@/views/components/Panel.vue';
 import { getVueEl } from '@/ts/vueUtils';
 
 let that: any;

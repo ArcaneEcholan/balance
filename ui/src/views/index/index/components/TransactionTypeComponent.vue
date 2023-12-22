@@ -69,9 +69,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import Clickable from '@/views/components/Clickable.vue';
-import Panel from '@/components/Panel.vue';
+import Panel from '@/views/components/Panel.vue';
 
 @Component({
     components: { Panel, Clickable },
