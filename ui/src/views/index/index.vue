@@ -63,6 +63,10 @@ import { getI18nValue } from '@/ts/utils';
 export default class IndexIndexView extends Vue {
     activeTabBar = getI18nValue('home');
 
+    created() {
+        this.$router.push({ name: 'home' });
+    }
+
     mounted() {
         let tabBarArea = document.getElementById('tabbar-area')!;
         let tabBarStyle = tabBarArea.style;
@@ -72,6 +76,7 @@ export default class IndexIndexView extends Vue {
         tabBarStyle.width = '100%';
         tabBarStyle.backgroundColor = 'white';
     }
+
     onClickHome() {
         this.activeTabBar = getI18nValue('home');
         this.$router.push({ name: 'home' });
@@ -90,6 +95,7 @@ export default class IndexIndexView extends Vue {
     width: 100%;
     height: 100%;
 }
+
 #page-main-area.tran {
     transition: right var(--transition-duration) var(--transition-easing);
 }

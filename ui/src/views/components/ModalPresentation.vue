@@ -288,6 +288,8 @@ export default class ModalPresentationView extends Vue {
         );
     }
 
+    func() {}
+
     beforeDestroy() {
         // this.closeModal()
     }

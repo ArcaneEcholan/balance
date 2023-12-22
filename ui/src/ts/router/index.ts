@@ -10,7 +10,6 @@ const routes: Array<RouteConfig> = [
     {
         path: '/',
         component: IndexIndexView,
-        redirect: '/home',
         children: [
             {
                 path: '/home',

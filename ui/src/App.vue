@@ -71,11 +71,7 @@ export default class AppView extends Vue {
 @import '~@/style/common-style.scss';
 
 html {
-    touch-action: manipulation;
-    user-select: none; /* standard */
-    -moz-user-select: none; /* firefox specific */
-    -webkit-user-select: none; /* Chrome, Opera and Safari*/
-    -ms-user-select: none; /* IE, ms-edge */
+    //overscroll-behavior-x: none;
 }
 
 body {
