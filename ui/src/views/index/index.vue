@@ -8,9 +8,7 @@
             <div class="flex">
                 <div
                     :style="`${
-                        activeTabBar == getI18nValue('home')
-                            ? 'color: #1989fa;'
-                            : ''
+                        activeTabBar === 'home' ? 'color: #1989fa;' : ''
                     }`"
                     class="flex column flex-center flexg1"
                     @click="onClickHome"
@@ -28,9 +26,7 @@
                 </div>
                 <div
                     :style="`${
-                        activeTabBar == getI18nValue('statistics')
-                            ? 'color: #1989fa;'
-                            : ''
+                        activeTabBar == 'statistics' ? 'color: #1989fa;' : ''
                     }`"
                     class="flex column flex-center flexg1"
                     @click="onClickStatistics"
@@ -61,20 +57,10 @@ import { getI18nValue } from '@/ts/utils';
     methods: { getI18nValue },
 })
 export default class IndexIndexView extends Vue {
-    activeTabBar = getI18nValue('home');
+    activeTabBar = 'home';
 
     created() {
         this.$router.push({ name: 'home' });
-    }
-
-    mounted() {
-        let tabBarArea = document.getElementById('tabbar-area')!;
-        let tabBarStyle = tabBarArea.style;
-        tabBarStyle.position = 'fixed';
-        tabBarStyle.bottom = '0';
-        tabBarStyle.right = '0.1px';
-        tabBarStyle.width = '100%';
-        tabBarStyle.backgroundColor = 'white';
     }
 
     onClickHome() {
@@ -83,7 +69,7 @@ export default class IndexIndexView extends Vue {
     }
 
     onClickStatistics() {
-        this.activeTabBar = getI18nValue('statistics');
+        this.activeTabBar = 'statistics';
         this.$router.push({ name: 'statistics' });
     }
 }
@@ -98,6 +84,14 @@ export default class IndexIndexView extends Vue {
 
 #page-main-area.tran {
     transition: right var(--transition-duration) var(--transition-easing);
+}
+
+#tabbar-area {
+    position: fixed;
+    bottom: 0;
+    right: 0.1px;
+    width: 100%;
+    background-color: white;
 }
 
 #tabbar-area.tran {
