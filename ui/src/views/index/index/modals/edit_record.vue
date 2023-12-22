@@ -98,7 +98,7 @@ export default class EditRecordView extends Vue {
         if (categoryValue == null || categoryValue.trim() == '') {
             categoryValid = false;
         }
-        return categoryValue;
+        return categoryValid;
     }
 
     checkValidationOfData() {
