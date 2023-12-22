@@ -494,12 +494,6 @@ export default class AddTransactionEditorComponent extends Vue {
                     this.curLedger = ledger;
                 },
             },
-            {
-                eventName: 'on-cur-location-changed',
-                handler: (loc: any) => {
-                    this.geoLocation = loc;
-                },
-            },
         ]);
         let ledgerName = eventBus.$emitWithReturnValue(
             'on-get-current-ledger-name',
@@ -646,13 +640,23 @@ export default class AddTransactionEditorComponent extends Vue {
 
     // assemble Add Transaction Request
     addTransactionsByLedgerName(ledgerName: string, trans: any[]) {
+        let loc = eventBus.$emitWithReturnValue('on-get-cur-location', null);
+        if (loc == null) {
+            loc = {
+                latitude: null,
+                longitude: null,
+                formattedName: null,
+            };
+        } else {
+            loc.formattedName = 'out_of_service';
+        }
         let request = trans.map((tran) => {
             return {
                 categoryValue: tran.type,
                 amount: tran.amount,
                 count: tran.count,
                 description: tran.desc,
-                location: this.geoLocation,
+                location: loc,
             };
         });
 

@@ -12,7 +12,17 @@
                 <div class="current-ledger">{{ curLedger.name }}</div>
             </div>
 
-            <main-page-current-date-picker-component></main-page-current-date-picker-component>
+            <div class="flex justify-between">
+                <main-page-current-date-picker-component></main-page-current-date-picker-component>
+                <div class="fs16">
+                    <van-icon name="location-o"></van-icon>
+                    {{
+                        geoLocation.formattedName === 'out_of_service'
+                            ? $t('out_of_service')
+                            : geoLocation.formattedName
+                    }}
+                </div>
+            </div>
 
             <div id="records-index-header-gradual-color-bg"></div>
 
@@ -223,24 +233,24 @@ export default class IndexView extends Vue {
         formattedName: null,
     };
 
-    // onClickRefreshLocationData() {
-    //   this.getCurrentLocation(this.amap);
-    // }
+    onClickRefreshLocationData() {
+        this.getCurrentLocation(this.amap);
+    }
     // mountAmap(AMap: any) {
-    //   this.amap = new AMap.Map('amap', {
-    //     zoom: 16,
-    //   });
+    //     this.amap = new AMap.Map('amap', {
+    //         zoom: 16,
+    //     });
     // }
 
     // registerAmapMoveEvent() {
-    //   this.amap.on('mapmove', () => {
-    //     let {lat, lng} = this.amap.getCenter();
-    //     this.updateCor(lat, lng);
-    //     clearTimeout(this.apiInvokingTimesSaver);
-    //     this.apiInvokingTimesSaver = setTimeout(() => {
-    //       this.getAndUpdateDetailLocationData();
-    //     }, 500);
-    //   });
+    //     this.amap.on('mapmove', () => {
+    //         let { lat, lng } = this.amap.getCenter();
+    //         this.updateCor(lat, lng);
+    //         clearTimeout(this.apiInvokingTimesSaver);
+    //         this.apiInvokingTimesSaver = setTimeout(() => {
+    //             this.getAndUpdateDetailLocationData();
+    //         }, 500);
+    //     });
     // }
 
     created() {
@@ -251,8 +261,15 @@ export default class IndexView extends Vue {
                     this.curLedger = ledger;
                 },
             },
+            {
+                eventName: 'on-get-cur-location',
+                handler: () => {
+                    return this.geoLocation;
+                },
+            },
         ]);
-        // loadAmap
+
+        // load Amap
         {
             AMapLoader.load({
                 key: '8375fa99f0a19ba66b137bddcb2fceac', // 申请好的Web端开发者Key，首次调用 load 时必填
@@ -271,46 +288,27 @@ export default class IndexView extends Vue {
     locationLoading = false;
 
     getCurrentLocation(AMap: any) {
-        if (this.amapGeolocationPlugin == null) {
-            // loadAmapGeolocationPlugin
-            {
-                AMap.plugin('AMap.Geolocation', () => {
-                    let geolocation = new AMap.Geolocation();
-                    this.amapGeolocationPlugin = geolocation;
-                    this.doGetCurrentLocation();
-                });
-            }
-        } else {
-            this.doGetCurrentLocation();
-        }
-    }
-
-    doGetCurrentLocation() {
-        let onSuccessGetCurrentPosition = (status: any, result: any) => {
-            this.locationLoading = false;
-            if (status === 'complete') {
-                // ifSuccessGetCurrentPosition
+        let doGetCurrentLocation = () => {
+            let onSuccessGetCurrentPosition = (status: any, result: any) => {
                 this.locationLoading = false;
-                let position = result.position;
+                if (status === 'complete') {
+                    // ifSuccessGetCurrentPosition
+                    this.locationLoading = false;
+                    let position = result.position;
 
-                // updateCor
-                {
-                    this.geoLocation.latitude = position.lat;
-                    this.geoLocation.longitude = position.lng;
-                }
+                    // updateCor
+                    {
+                        this.geoLocation.latitude = position.lat;
+                        this.geoLocation.longitude = position.lng;
+                    }
 
-                // getAndUpdateDetailLocationData
-                {
-                    let lat = this.geoLocation.latitude;
-                    let lng = this.geoLocation.longitude;
-                    this.getDetailLocation(
-                        lat,
-                        lng,
-                        (locationDetail: any) => {
+                    // getAndUpdateDetailLocationData
+                    {
+                        let successCb = (locationDetail: any) => {
                             // get information we need from detail response
                             this.getInfoFromAmapLocationDetail(locationDetail);
-                        },
-                        (respBodyOrError: any) => {
+                        };
+                        let failCb = (respBodyOrError: any) => {
                             console.error(
                                 `fail to get location detail: `,
                                 respBodyOrError,
@@ -319,70 +317,74 @@ export default class IndexView extends Vue {
                                 message: 'Fail to get location detail',
                                 type: 'warning',
                             });
-                        },
+                        };
+
+                        let lat = this.geoLocation.latitude;
+                        let lng = this.geoLocation.longitude;
+
+                        request({
+                            url: '//restapi.amap.com/v3/geocode/regeo',
+                            method: 'get',
+                            params: {
+                                key: '0802cbb201f7d81e7ef6ae54d849dc2f',
+                                location: `${lng},${lat}`,
+                                extensions: 'base',
+                                roadlevel: 0,
+                                output: 'json',
+                            },
+                        })
+                            .then((res) => {
+                                let responseData = res.data;
+                                let code = responseData.infocode;
+
+                                if (code == '10000') {
+                                    successCb(responseData);
+                                } else {
+                                    failCb(responseData);
+                                }
+                            })
+                            .catch((err) => {
+                                failCb(err);
+                            });
+                    }
+                } else {
+                    console.error(
+                        `fail to get geolocation, status: `,
+                        status,
+                        `result: `,
+                        result,
                     );
+                    Notify({
+                        message: 'Fail to locate your position',
+                        type: 'danger',
+                    });
                 }
-            } else {
-                console.error(
-                    `fail to get geolocation, status: `,
-                    status,
-                    `result: `,
-                    result,
-                );
+            };
+
+            let onFailedGetCurrentPosition = (error: any) => {
                 Notify({
-                    message: 'Fail to locate your position',
+                    message: `fail to get geollocation: ${error.code}-${error.message}`,
                     type: 'danger',
                 });
-            }
-        };
+                console.error(
+                    `fail to get geollocation: ${error.code}-${error.message}`,
+                );
+            };
 
-        let onFailedGetCurrentPosition = (error: any) => {
-            Notify({
-                message: `fail to get geollocation: ${error.code}-${error.message}`,
-                type: 'danger',
-            });
-            console.error(
-                `fail to get geollocation: ${error.code}-${error.message}`,
+            this.locationLoading = true;
+            this.amapGeolocationPlugin.getCurrentPosition(
+                onSuccessGetCurrentPosition,
+                onFailedGetCurrentPosition,
             );
         };
-
-        this.locationLoading = true;
-        this.amapGeolocationPlugin.getCurrentPosition(
-            onSuccessGetCurrentPosition,
-            onFailedGetCurrentPosition,
-        );
-    }
-
-    getDetailLocation(
-        lat: number,
-        long: number,
-        successCb: (location: any) => void,
-        failCb: (respBodyOrError: any) => void,
-    ) {
-        request({
-            url: '//restapi.amap.com/v3/geocode/regeo',
-            method: 'get',
-            params: {
-                key: '0802cbb201f7d81e7ef6ae54d849dc2f',
-                location: `${long},${lat}`,
-                extensions: 'base',
-                roadlevel: 0,
-                output: 'json',
-            },
-        })
-            .then((res) => {
-                let responseData = res.data;
-                let code = responseData.infocode;
-
-                if (code == '10000') {
-                    successCb(responseData);
-                } else {
-                    failCb(responseData);
-                }
-            })
-            .catch((err) => {
-                failCb(err);
+        if (this.amapGeolocationPlugin == null) {
+            AMap.plugin('AMap.Geolocation', () => {
+                this.amapGeolocationPlugin = new AMap.Geolocation();
+                doGetCurrentLocation();
             });
+        } else {
+            doGetCurrentLocation();
+        }
     }
 
     getInfoFromAmapLocationDetail(amapDetailLocationResp: any): any {
@@ -391,7 +393,6 @@ export default class IndexView extends Vue {
         {
             // this is the format of the response entry of amap api,
             // an empty array means a not existing entry value( the same meaning as null )
-
             let entry = amapDetailLocationResp.regeocode.formatted_address;
             if (Array.isArray(entry) && entry.length === 0) {
                 finalLocationInfo.formattedName = '';
@@ -399,7 +400,7 @@ export default class IndexView extends Vue {
                     type: 'danger',
                     message: 'Your location is out of the service of amap ',
                 });
-                finalLocationInfo.formattedName = 'out of service';
+                finalLocationInfo.formattedName = 'out_of_service';
             } else {
                 finalLocationInfo.formattedName = entry;
             }

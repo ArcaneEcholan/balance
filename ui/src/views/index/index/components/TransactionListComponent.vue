@@ -20,7 +20,11 @@
                                     }}
                                 </span>
                                 <span class="fs14 google-gray-400">
-                                    test location
+                                    {{
+                                        record.location == null
+                                            ? $t('unset')
+                                            : $t(record.location)
+                                    }}
                                 </span>
                             </div>
                             <div class="fs14">

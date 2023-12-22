@@ -1,6 +1,8 @@
 <template>
     <div>
-        <span @click="show = true">{{ this.getCurrentDate() }}</span>
+        <span @click="show = true" class="fs16">
+            {{ this.getCurrentDate() }}
+        </span>
         <van-action-sheet :closeable="false" v-model="show" title="">
             <van-datetime-picker
                 @cancel="onCancel"

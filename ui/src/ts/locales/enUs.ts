@@ -11,6 +11,7 @@ export default {
     delete: 'Delete',
     edit: 'Edit',
     date_time_picker_title: 'Choose Date',
+    out_of_service: 'out of service',
     add_record: {
         title: 'Add Record',
         type: 'Type',
@@ -18,4 +19,6 @@ export default {
         comment: 'Comment',
         count: 'Count',
     },
+    unset: 'unset',
+    unknown_record_type: 'unknown type',
 };
