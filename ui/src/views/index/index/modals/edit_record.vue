@@ -1,6 +1,7 @@
 <template>
     <modal-presentation
         ref="modal"
+        :hooks="modalLifeCycleHooks"
         @on-open="modalLifeCycleHooks.onOpen"
         @on-close="modalLifeCycleHooks.onClose"
         @closed="closed"
@@ -8,42 +9,34 @@
         @swiping="modalLifeCycleHooks.swiping"
         @after-swipe="modalLifeCycleHooks.afterSwipe"
     >
-        <div class="page" style="overflow: auto">
-            <div class="modal-title">{{ $t('edit_record.title') }}</div>
+        <div class="page" id="aaa" style="overflow: auto">
+            <div class="modal-title">Edit Record</div>
             <gap-component :value="'55px'"></gap-component>
-            <div class="cells-block-title">{{ $t('edit_fields') }}</div>
+            <div class="record-header">Edit Fields</div>
             <panel>
                 <van-cell-group>
                     <van-field
                         v-model="categoryValue"
                         type="string"
-                        :label="$t('edit_record.type')"
+                        label="category"
                     />
-                    <van-field
-                        v-model="amount"
-                        type="number"
-                        :label="$t('edit_record.amount')"
-                    />
+                    <van-field v-model="amount" type="number" label="amount" />
                     <van-field
                         v-model="datetime"
                         type="text"
-                        :label="$t('edit_record.datetime')"
+                        label="datetime"
                     />
-                    <van-field
-                        v-model="count"
-                        type="digit"
-                        :label="$t('edit_record.count')"
-                    />
+                    <van-field v-model="count" type="digit" label="count" />
                     <van-field
                         v-model="description"
                         type="text"
-                        :label="$t('edit_record.comment')"
+                        label="description"
                     />
                 </van-cell-group>
             </panel>
             <gap-component value="30px"></gap-component>
             <custom-button :disabled="!submitEnable" @click="submit">
-                <template #default>{{ $t('save') }}</template>
+                <template #default>Submit</template>
             </custom-button>
         </div>
     </modal-presentation>
@@ -51,19 +44,20 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import ModalPresentationView from '@/components/ModalPresentation.vue';
+import ModalPresentationView from '@/views/components/ModalPresentation.vue';
 import { Notify } from 'vant';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import {
     countDecimalPlaces,
     isFloat,
     isPositiveInteger,
+    stripType,
     unmountComponent,
 } from '@/ts/utils';
 import eventBus from '@/ts/EventBus';
-import CustomButton from '@/components/CustomButton.vue';
+import CustomButton from '@/views/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
-import Panel from '@/components/Panel.vue';
+import Panel from '@/views/components/Panel.vue';
 
 @Component({
     components: {
@@ -76,8 +70,6 @@ import Panel from '@/components/Panel.vue';
 export default class EditRecordView extends Vue {
     modalLifeCycleHooks: any;
 
-    categoryValue: string | null = null;
-
     beforeDestroy() {
         console.log('destroyed');
     }
@@ -85,6 +77,8 @@ export default class EditRecordView extends Vue {
     closed() {
         unmountComponent(this, 0);
     }
+
+    categoryValue: string | null = null;
 
     amountFractionNumberValid() {
         let i = isFloat(Number(this.amount));
@@ -200,10 +194,10 @@ export default class EditRecordView extends Vue {
     count: string | null = null;
     description: string | null = null;
 
-    // @ts-nocheck
     created() {
-        // @ts-ignore
-        let mountProp = this.$options.$mountProp as any;
+        let mountProp = stripType(this.$options).$mountProp;
+
+        this.modalLifeCycleHooks = mountProp.modalLifeCycleHooks;
 
         this.recordId = mountProp.id;
         this.amount = mountProp.amount;
@@ -211,18 +205,17 @@ export default class EditRecordView extends Vue {
         this.count = mountProp.count;
         this.categoryValue = mountProp.categoryValue;
         this.description = mountProp.description;
-
-        this.modalLifeCycleHooks = {
-            onOpen: mountProp.modalLifeCycleHooks.onOpen,
-            beforeSwipe: mountProp.modalLifeCycleHooks.beforeSwipe,
-            swiping: mountProp.modalLifeCycleHooks.swiping,
-            afterSwipe: mountProp.modalLifeCycleHooks.afterSwipe,
-            onClose: mountProp.modalLifeCycleHooks.onClose,
-        };
     }
 }
 </script>
 <style lang="scss" scoped>
 @import '~@/style/common-style.scss';
 @import '~@/style/style-specification';
+
+.record-header {
+    padding: 16px 16px 8px;
+    color: #969799;
+    font-size: 14px;
+    line-height: 16px;
+}
 </style>

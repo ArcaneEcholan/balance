@@ -34,17 +34,18 @@
                     v-for="recordRow in newRecordRows"
                     class="new-record-row"
                 >
-                    <van-swipe-cell>
-                        <div class="flex">
+                    <van-swipe-cell style="height: 100%">
+                        <div class="flex" style="height: 100%">
                             <clickable
-                                @click="onclickPickTypeBtn(recordRow)"
-                                class="cell flexg1 flex center pd8"
+                                class="cell flexg1 flex center"
                                 style="
+                                    height: 100%;
                                     word-break: break-word;
                                     background-color: white;
                                 "
                             >
                                 <div
+                                    @click="onclickPickTypeBtn(recordRow)"
                                     v-if="
                                         recordRow.type == null ||
                                         recordRow.type === ''
@@ -52,7 +53,19 @@
                                 >
                                     <van-icon class="fs24" name="question-o" />
                                 </div>
-                                <div style="font-size: 14px" v-else>
+                                <div
+                                    @click="onclickPickTypeBtn(recordRow)"
+                                    style="
+                                        padding-left: 5px;
+                                        font-size: 14px;
+                                        text-overflow: ellipsis;
+                                        -webkit-line-clamp: 2;
+                                        overflow: hidden;
+                                        display: -webkit-box;
+                                        -webkit-box-orient: vertical;
+                                    "
+                                    v-else
+                                >
                                     {{ recordRow.type }}
                                 </div>
                             </clickable>
@@ -103,7 +116,7 @@
         <div class="flex pd5" style="border-top: 1px solid #ebecf0">
             <solid-icon
                 :clickable="true"
-                icon-class="cw-icon-add-fat"
+                icon-class="ali-international-icon-add-1"
                 @click="addRecordRow"
             ></solid-icon>
         </div>
@@ -120,8 +133,9 @@ import VanCursorEditorComponent from '@/views/components/VanCursorEditor.vue';
 import { findWordInLine, replace, timeout } from '@/ts/utils';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { Notify } from 'vant';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import eventBus from '@/ts/EventBus';
+import CommonButton from '@/views/components/CommonButton.vue';
 import { provideListeners } from '@/page-eventbus-registration-mixin';
 import TransactionTypeComponent from '@/views/index/index/components/TransactionTypeComponent.vue';
 import Clickable from '@/views/components/Clickable.vue';
@@ -147,6 +161,7 @@ class FormItem {
         KeyBoardComponent,
         SolidIcon,
         Clickable,
+        CommonButton,
         VanCursorEditorComponent,
         GapComponent,
         TransactionTypeComponent,
@@ -657,9 +672,16 @@ export default class AddTransactionEditorComponent extends Vue {
     }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 @import '~@/style/common-style.scss';
 @import '~@/style/style-specification.scss';
+
+.record-header {
+    padding: 16px 16px 8px;
+    color: #969799;
+    font-size: 14px;
+    line-height: 16px;
+}
 
 @keyframes upDown {
     0% {
@@ -701,5 +723,9 @@ export default class AddTransactionEditorComponent extends Vue {
     button {
         height: 100%;
     }
+}
+
+.van-swipe-cell__wrapper {
+    height: 100%;
 }
 </style>

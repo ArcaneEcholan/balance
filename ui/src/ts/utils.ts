@@ -1,8 +1,5 @@
-import EditRecordView from '@/views/index/index/modals/edit_record.vue';
-import { Component } from 'vue-property-decorator';
-import store from '@/store';
+import store from '@/ts/store';
 import i18n from '@/ts/lang';
-import router from '@/router';
 
 export function get_display_file_size(bytes: number) {
     const g = bytes / 1024.0 / 1024.0 / 1024.0;
@@ -184,8 +181,6 @@ export function mountComponent(
     let component = new comp({
         $mountProp: mountProp,
         i18n,
-        store,
-        router,
     });
 
     // the sub mount point must be mounted before the component
@@ -195,11 +190,6 @@ export function mountComponent(
     mountPoint.appendChild(mountPointSubPoint);
 
     component.$mount(mountPointSubPoint);
-
-    // this could be wired, it's a workaround on Fastclick,
-    // after mount a component, you have to click twice to trigger
-    // the click event
-    component.$el.click();
     console.log('after $mount');
 }
 
@@ -230,33 +220,6 @@ export function getI18nValue(key: string) {
     return i18n.t(key).toString();
 }
 
-/**
- * Determine the mobile operating system.
- * This function returns one of 'iOS', 'Android', 'Windows Phone', or 'unknown'.
- *
- * @returns {String}
- */
-export function getMobileOperatingSystem() {
-    // @ts-ignore
-    let userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    // Windows Phone must come first because its UA also contains "Android"
-    if (/windows phone/i.test(userAgent)) {
-        return 'windows-phone';
-    }
-
-    if (/android/i.test(userAgent)) {
-        return 'android';
-    }
-
-    // iOS detection from: http://stackoverflow.com/a/9039885/177710
-    // @ts-ignore
-    if (/iPad|iPhone|iPod/i.test(userAgent) && !window.MSStream) {
-        return 'ios';
-    }
-
-    if (/win|linux/i.test(userAgent)) {
-        return 'desktop';
-    }
-
-    return 'unknown';
+export function stripType(obj: any): any {
+    return obj as any;
 }

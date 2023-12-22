@@ -2,28 +2,19 @@
     <van-action-sheet :closeable="false" v-model="show" title="">
         <div class="action-sheet-title">{{ $t('pick_a_ledger') }}</div>
         <div class="action-sheet-body">
-            <div class="cells-block-title">
-                {{ $t('ledger_list') }}
-            </div>
-
-            <panel>
-                <van-cell-group class="shadow br15 overflow-hidden">
-                    <van-cell
-                        @click="onClickSwitchLedger(ledger)"
-                        v-for="ledger in ledgerList"
-                        :title="ledger.name"
-                    ></van-cell>
-                </van-cell-group>
-            </panel>
-
-            <gap-component></gap-component>
-
+            <van-cell-group class="shadow br15 overflow-hidden">
+                <van-cell
+                    @click="onClickSwitchLedger(ledger)"
+                    v-for="ledger in ledgerList"
+                    :title="ledger.name"
+                ></van-cell>
+            </van-cell-group>
+            <gap-component :value="'30px'"></gap-component>
             <div class="flex center">
                 <custom-button @click="onClickManageLedgerList">
                     {{ $t('all_ledgers') }}
                 </custom-button>
             </div>
-
             <gap-component :value="'30px'"></gap-component>
         </div>
     </van-action-sheet>
@@ -31,17 +22,17 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import eventBus from '@/ts/EventBus';
+import CommonButton from '@/views/components/CommonButton.vue';
 import { provideListeners } from '@/page-eventbus-registration-mixin';
 import GapComponent from '@/views/components/GapComponent.vue';
-import CustomButton from '@/components/CustomButton.vue';
+import CustomButton from '@/views/components/CustomButton.vue';
 import { getI18nValue } from '../../../../ts/utils';
-import Panel from '@/components/Panel.vue';
 
 @Component({
     methods: { getI18nValue },
-    components: { Panel, CustomButton, GapComponent },
+    components: { CustomButton, GapComponent, CommonButton },
 })
 export default class LedgerSwitcherComponent extends Vue {
     show = false;

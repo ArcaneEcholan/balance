@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
-import router from './router';
-import store from './store';
+import router from './ts/router';
+import store from './ts/store';
 import './permission'; // permission control
 
 import '@/assets/icon-fonts/iconfont.css';
@@ -9,8 +9,6 @@ import '@/assets/icon-fonts/iconfont.css';
 import i18n from '@/ts/lang';
 
 Vue.config.productionTip = false;
-
-import '@/assets/custom-icon-fonts/icons.css';
 
 import 'vant/lib/index.css';
 import {
@@ -58,10 +56,6 @@ import PageEventbusRegistrationMixin from '@/page-eventbus-registration-mixin';
 Vue.mixin(PageEventbusRegistrationMixin);
 
 import '@/import-style-vars';
-import FastClick from 'fastclick';
-
-// @ts-ignore
-FastClick.attach(document.body);
 
 new Vue({
     router,

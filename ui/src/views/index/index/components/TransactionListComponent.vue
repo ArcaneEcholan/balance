@@ -41,7 +41,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { convertToShortDateTime } from '@/ts/utils';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import eventBus from '@/ts/EventBus';
 import { Notify } from 'vant';
 import { provideListeners } from '@/page-eventbus-registration-mixin';

@@ -1,5 +1,6 @@
 $secondary-bgc: #F7F8FA;
 $common-page-padding: 16px;
+$icon-bgc: #DFE1E5;
 
 input {
     height: 32px !important;
@@ -13,13 +14,13 @@ input {
 }
 
 body {
-    background-color: #f7f8fa;
+    background-color: $secondary-bgc;
 }
 
 .page {
     box-sizing: border-box;
     padding: $common-page-padding;
-    background-color: #f7f8fa;
+    background-color: $secondary-bgc;
     height: 100%;
 }
 
@@ -49,7 +50,7 @@ body {
     padding-top: 58px;
     box-sizing: border-box;
 
-    background-color: #f7f8fa;
+    background-color: $secondary-bgc;
     height: 100%;
 }
 

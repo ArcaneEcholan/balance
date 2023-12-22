@@ -33,6 +33,7 @@
                     <ledger-switcher-component
                         ref="ledger-switcher-component"
                     ></ledger-switcher-component>
+
                     <clickable @click="showLedgerSwitcherSheet">
                         <div class="mg20 flex align-center">
                             <i class="icon ali-international-icon-log"></i>
@@ -66,7 +67,7 @@
 <script lang="ts">
 import AMapLoader from '@amap/amap-jsapi-loader';
 import { Component, Vue } from 'vue-property-decorator';
-import request from '@/request';
+import request from '@/ts/request';
 import { Notify } from 'vant';
 
 import TransactionListComponent from '@/views/index/index/components/TransactionListComponent.vue';
@@ -75,6 +76,7 @@ import TransactionTypeComponent from '@/views/index/index/components/Transaction
 import GapComponent from '@/views/components/GapComponent.vue';
 import AddRecordSheet from './components/AddRecordSheetComponent.vue';
 import MainPageCurrentDatePickerComponent from '@/views/index/index/components/MainPageCurrentDatePickerComponent.vue';
+import CommonButton from '@/views/components/CommonButton.vue';
 import { provideListeners } from '@/page-eventbus-registration-mixin';
 import AddRecordSheetComponent from '@/views/index/index/components/AddRecordSheetComponent.vue';
 import {
@@ -96,6 +98,7 @@ import Clickable from '@/views/components/Clickable.vue';
     components: {
         Clickable,
         AddRecordSheetComponent,
+        CommonButton,
         MainPageCurrentDatePickerComponent,
         GapComponent,
         TransactionListComponent,
@@ -124,18 +127,16 @@ export default class IndexView extends Vue {
     getModalLifeCycleHooks = () => {
         return {
             onOpen: () => {
-                {
-                    disableBodyScroll();
+                disableBodyScroll();
 
-                    let elem = document.getElementById('page-main-area')!;
-                    elem.style.right = 100 + 'px';
+                let elem = document.getElementById('page-main-area')!;
+                elem.style.right = 100 + 'px';
 
-                    elem = document.getElementById('tabbar-area')!;
-                    elem.style.right = 100 + 'px';
+                elem = document.getElementById('tabbar-area')!;
+                elem.style.right = 100 + 'px';
 
-                    elem = document.getElementById('records-index-header')!;
-                    elem.style.right = 100 + 'px';
-                }
+                elem = document.getElementById('records-index-header')!;
+                elem.style.right = 100 + 'px';
             },
             onClose: () => {
                 enableBodyScroll();
@@ -487,5 +488,12 @@ $header-bgc: #fcf4d4;
     transform: translate(-50%, -100%);
     background: url('~@/assets/mark_bs.png');
     background-size: cover;
+}
+
+.record-header {
+    padding: 16px 16px 8px;
+    color: #969799;
+    font-size: 14px;
+    line-height: 16px;
 }
 </style>

@@ -133,7 +133,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import { getCurrentYearAndMonth } from '@/ts/time';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { shallowMount } from '@vue/test-utils';
@@ -280,4 +280,11 @@ export default class StatisticIndexView extends Vue {
 <style lang="scss" scoped>
 @import '~@/style/common-style.scss';
 @import '~@/assets/custom-icon.css';
+
+.page {
+    box-sizing: border-box;
+    //padding: 0 8px 0 8px;
+    padding: 8px;
+    background-color: #f7f8fa;
+}
 </style>

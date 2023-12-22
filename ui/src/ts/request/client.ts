@@ -1,4 +1,4 @@
-import request from '@/request';
+import request from '@/ts/request/index';
 import { AxiosPromise } from 'axios';
 
 class Client {

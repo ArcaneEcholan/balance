@@ -2,13 +2,8 @@
     <div class="">
         <modal-presentation
             z-index="110"
-            @on-open="modalLifeCycleHooks.onOpen"
-            @on-close="modalLifeCycleHooks.onClose"
+            :hooks="modalLifeCycleHooks"
             @closed="closed"
-            @opened="modalLifeCycleHooks.opened"
-            @before-swipe="modalLifeCycleHooks.beforeSwipe"
-            @swiping="modalLifeCycleHooks.swiping"
-            @after-swipe="modalLifeCycleHooks.afterSwipe"
         >
             <div class="page">
                 <div class="modal-title">
@@ -38,9 +33,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import ModalPresentation from '@/components/ModalPresentation.vue';
-import Panel from '@/components/Panel.vue';
-import { unmountComponent } from '@/ts/utils';
+import ModalPresentation from '@/views/components/ModalPresentation.vue';
+import Panel from '@/views/components/Panel.vue';
+import { stripType, unmountComponent } from '@/ts/utils';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { Locale, Notify } from 'vant';
 import { setLanguage } from '@/ts/lang';
@@ -50,7 +45,6 @@ import { setLanguage } from '@/ts/lang';
 })
 export default class LanguagePickerComponent extends Vue {
     modalLifeCycleHooks: any;
-
     changeLocale(name: string) {
         if (name === 'chinese') {
             let value = 'zh-CN';
@@ -78,22 +72,11 @@ export default class LanguagePickerComponent extends Vue {
     }
 
     created() {
-        // @ts-ignore
-        let mountProp = this.$options.$mountProp as any;
-
-        this.modalLifeCycleHooks = {
-            onOpen: mountProp.modalLifeCycleHooks.onOpen,
-            beforeSwipe: mountProp.modalLifeCycleHooks.beforeSwipe,
-            swiping: mountProp.modalLifeCycleHooks.swiping,
-            afterSwipe: mountProp.modalLifeCycleHooks.afterSwipe,
-            onClose: mountProp.modalLifeCycleHooks.onClose,
-            closed: mountProp.modalLifeCycleHooks.closed,
-            opened: mountProp.modalLifeCycleHooks.opened,
-        };
+        this.modalLifeCycleHooks =
+            stripType(this).$options.$mountProp.modalLifeCycleHooks;
     }
 
     closed() {
-        this.modalLifeCycleHooks.closed();
         unmountComponent(this, 0);
     }
 }

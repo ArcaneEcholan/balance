@@ -1,16 +1,8 @@
 <template>
-    <modal-presentation
-        @on-open="modalLifeCycleHooks.onOpen"
-        @on-close="modalLifeCycleHooks.onClose"
-        @closed="closed"
-        @before-swipe="modalLifeCycleHooks.beforeSwipe"
-        @swiping="modalLifeCycleHooks.swiping"
-        @after-swipe="modalLifeCycleHooks.afterSwipe"
-    >
+    <modal-presentation :hooks="modalLifeCycleHooks" @closed="closed">
         <van-action-sheet v-model="show">
-            <div class="action-sheet-title">{{ $t('edit_ledger_title') }}</div>
-            <div class="action-sheet-body">
-                <div class="cells-block-title">{{ $t('ledger_name') }}</div>
+            <div class="page">
+                <div class="record-header">Edit Fields</div>
                 <van-cell-group class="shadow overflow-hidden br8">
                     <van-field
                         v-model="editLedgerName"
@@ -19,19 +11,18 @@
                     />
                 </van-cell-group>
                 <gap-component></gap-component>
-                <custom-button
+                <common-button
                     @click="submitEditLedger"
                     :disabled="editLedgerLoading"
                 >
-                    <template #default>{{ $t('save') }}</template>
-                </custom-button>
+                    <template #default>Submit</template>
+                </common-button>
             </div>
         </van-action-sheet>
-
-        <van-action-sheet v-model="addLedgerShow">
-            <div class="action-sheet-title">{{ $t('add_ledger_title') }}</div>
-            <div class="action-sheet-body">
-                <div class="cells-block-title">{{ $t('ledger_name') }}</div>
+        <van-action-sheet v-model="addLedgerShow" title="Title">
+            <div class="page">
+                <gap-component :value="'32px'"></gap-component>
+                <div class="record-header">Add Fields</div>
                 <van-cell-group class="shadow overflow-hidden br8">
                     <van-field
                         v-model="addLedgerName"
@@ -40,15 +31,14 @@
                     />
                 </van-cell-group>
                 <gap-component></gap-component>
-                <custom-button
+                <common-button
                     @click="submitAddLedger"
                     :disabled="addLedgerLoading"
                 >
-                    <template #default>{{ $t('save') }}</template>
-                </custom-button>
+                    <template #default>Submit</template>
+                </common-button>
             </div>
         </van-action-sheet>
-
         <div ref="page-main-frame" style="height: 100%">
             <div
                 class="page"
@@ -57,7 +47,7 @@
             >
                 <div class="modal-title">{{ $t('ledger_management') }}</div>
                 <gap-component :value="'55px'"></gap-component>
-                <div class="cells-block-title">{{ $t('ledger_list') }}</div>
+                <div class="record-header">Ledgers</div>
                 <van-cell-group class="shadow br15 overflow-hidden">
                     <van-swipe-cell v-for="ledger in ledgers">
                         <van-cell :border="false" :title="ledger.name" />
@@ -86,7 +76,7 @@
             >
                 <solid-icon
                     :clickable="true"
-                    icon-class="cw-icon-add-fat"
+                    icon-class="ali-international-icon-add-1"
                     @click.native="ff"
                 ></solid-icon>
             </div>
@@ -96,26 +86,26 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import ModalPresentationView from '@/components/ModalPresentation.vue';
+import ModalPresentationView from '@/views/components/ModalPresentation.vue';
 import { Notify } from 'vant';
 import { getHtmlElem } from '@/ts/vueUtils';
 import eventBus from '@/ts/EventBus';
-import Client from '@/request/client';
-import CustomButton from '@/components/CustomButton.vue';
+import Client from '@/ts/request/client';
+import CommonButton from '@/views/components/CommonButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import {
     disableBodyScroll,
     enableBodyScroll,
+    stripType,
     unmountComponent,
 } from '@/ts/utils';
 import SolidIcon from '@/views/components/SolidIcon.vue';
-
 let that: any;
 @Component({
     components: {
         SolidIcon,
         GapComponent,
-        CustomButton,
+        CommonButton,
         ModalPresentation: ModalPresentationView,
     },
 })
@@ -189,8 +179,6 @@ export default class ManageLedgerView extends Vue {
         console.log('destroyed');
     }
 
-    onclose() {}
-
     ledgers: any = [];
     varTable: any = {};
     show = false;
@@ -201,7 +189,6 @@ export default class ManageLedgerView extends Vue {
     addLedgerLoading = false;
     addLedgerShow = false;
     addLedgerName: string | null = '';
-    countxxx = 100;
 
     submitAddLedger() {
         let name = this.addLedgerName;
@@ -285,18 +272,9 @@ export default class ManageLedgerView extends Vue {
 
     ledgersLoading = false;
     modalLifeCycleHooks: any;
-
     created() {
-        // @ts-ignore
-        let mountProp = this.$options.$mountProp as any;
-
-        this.modalLifeCycleHooks = {
-            onOpen: mountProp.modalLifeCycleHooks.onOpen,
-            beforeSwipe: mountProp.modalLifeCycleHooks.beforeSwipe,
-            swiping: mountProp.modalLifeCycleHooks.swiping,
-            afterSwipe: mountProp.modalLifeCycleHooks.afterSwipe,
-            onClose: mountProp.modalLifeCycleHooks.onClose,
-        };
+        this.modalLifeCycleHooks =
+            stripType(this).$options.$mountProp.modalLifeCycleHooks;
 
         this.ledgersLoading = true;
         Client.getLedgerList()
@@ -312,6 +290,7 @@ export default class ManageLedgerView extends Vue {
 
     pageMainFrameHeight = 0;
     pageMainAreaHeight = 0;
+    pageRatio = 95;
 
     mounted() {
         let mainframe = getHtmlElem(this, 'page-main-frame');
@@ -336,6 +315,18 @@ export default class ManageLedgerView extends Vue {
 @import '~@/style/common-style';
 @import '~@/style/style-specification';
 
+//.page {
+//  padding: 0 8px 0 8px;
+//  background-color: #f7f8fa;
+//}
+
+.record-header {
+    padding: 16px 16px 8px;
+    color: #969799;
+    font-size: 14px;
+    line-height: 16px;
+}
+
 .bottom-bar {
     display: flex;
     align-items: center;
@@ -344,8 +335,6 @@ export default class ManageLedgerView extends Vue {
     height: 50px;
     width: 100%;
     border-top: 1px solid #ebecf0;
-
-    padding-left: 16px !important;
 
     background-color: white;
 

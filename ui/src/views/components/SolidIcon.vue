@@ -1,63 +1,31 @@
 <template>
     <div>
         <template v-if="clickable">
-            <div v-if="$store.getters.os === 'ios'">
-                <clickable
-                    @click.native="$emit('click', $event)"
-                    class="flex center"
-                    style="
-padding: 7.5px;
-                        color: #ffffff;
-                        background-color: #588cf3;
-                        border-radius: 10px;
-                    "
-                >
-                    <i :class="iconClass"></i>
-                </clickable>
-            </div>
-            <div v-else>
-                <clickable
-                    @click.native="$emit('click', $event)"
-                    class="flex center"
-                    style="
-                        padding: 7.5px;
-                        color: #ffffff;
-                        background-color: #588cf3;
-                        border-radius: 10px;
-                    "
-                >
-                    <i :class="iconClass"></i>
-                </clickable>
-            </div>
+            <clickable
+                @click.native="$emit('click', $event)"
+                class="flex center"
+                style="
+                    padding: 6px;
+                    color: #ffffff;
+                    background-color: #588cf3;
+                    border-radius: 10px;
+                "
+            >
+                <i :class="iconClass"></i>
+            </clickable>
         </template>
         <template v-else>
-            <div v-if="$store.getters.os === 'ios'">
-                <div
-                    @click.native="$emit('click', $event)"
-                    class="flex center"
-                    style="
-padding: 7.5px;
-                        color: #ffffff;
-                        background-color: #588cf3;
-                        border-radius: 10px;
-                    "
-                >
-                    <i :class="iconClass"></i>
-                </div>
-            </div>
-            <div v-else>
-                <div
-                    @click.native="$emit('click', $event)"
-                    class="flex center"
-                    style="
-                        padding: 7.5px;
-                        color: #ffffff;
-                        background-color: #588cf3;
-                        border-radius: 10px;
-                    "
-                >
-                    <i :class="iconClass"></i>
-                </div>
+            <div
+                @click.native="$emit('click', $event)"
+                class="flex center"
+                style="
+                    padding: 6px;
+                    color: #ffffff;
+                    background-color: #588cf3;
+                    border-radius: 10px;
+                "
+            >
+                <i :class="iconClass"></i>
             </div>
         </template>
     </div>

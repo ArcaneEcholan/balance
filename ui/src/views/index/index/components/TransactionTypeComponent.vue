@@ -20,24 +20,23 @@
         </div>
 
         <div class="flex">
-            <solid-icon
-                icon-class="cw-icon-add-fat"
+            <clickable
+                class="flex center"
+                style="
+                    padding: 6px;
+                    color: #ffffff;
+                    background-color: #588cf3;
+                    border-radius: 10px;
+                "
                 @click="onclickAddRecordTypeBtn"
-            ></solid-icon>
+            >
+                <i class="ali-international-icon-add-1 fs14 bold"></i>
+            </clickable>
         </div>
 
         <van-action-sheet v-model="addTypeShow">
             <div class="action-sheet-title">
-                <div style="height: 100%; width: 100%" class="flex">
-                    <div class="flexg1"></div>
-                    <div class="flexg1 flex center">Add record type</div>
-                    <div
-                        class="flexg1"
-                        style="text-align: right; padding-right: 10px"
-                    >
-                        {{ $t('save') }}
-                    </div>
-                </div>
+                {{ $t('add_record_type.title') }}
             </div>
             <div class="action-sheet-body">
                 <panel>
@@ -50,21 +49,15 @@
 
                 icon:
                 <div
+                    id="icon-panel"
                     class="flex"
                     style="justify-content: start; flex-wrap: wrap"
                 >
-                    <div v-for="i in 10" class="type-icon">
-                        <div
-                            class="flex center overflow-hidden"
-                            style="
-                                border-radius: 100px;
-                                width: 100%;
-                                height: 100%;
-                            "
-                        >
+                    <div v-for="icon in icons" class="type-icon-cell">
+                        <div class="flex flex-center column type-icon">
                             <i
-                                class="ali-international-icon-account"
-                                style="font-size: 30px"
+                                :class="icon.className"
+                                style="font-size: inherit"
                             ></i>
                         </div>
                     </div>
@@ -76,18 +69,18 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Client from '@/request/client';
+import Client from '@/ts/request/client';
 import Clickable from '@/views/components/Clickable.vue';
-import Panel from '@/components/Panel.vue';
-import SolidIcon from '@/views/components/SolidIcon.vue';
-import CustomButton from '@/components/CustomButton.vue';
+import Panel from '@/views/components/Panel.vue';
 
 @Component({
-    components: { CustomButton, SolidIcon, Panel, Clickable },
+    components: { Panel, Clickable },
 })
 export default class TransTypeComponent extends Vue {
     name = '';
     metrics: any[] = [];
+
+    icons: any[] = [];
 
     transactionCategories: any[] = [];
     addTypeShow = false;
@@ -98,6 +91,14 @@ export default class TransTypeComponent extends Vue {
 
     created() {
         this.initTransactionTypes();
+        this.icons.push(
+            {
+                className: 'ali-international-icon-home1',
+            },
+            {
+                className: 'ali-international-icon-home1',
+            },
+        );
     }
 
     initTransactionTypes() {
@@ -126,13 +127,19 @@ export default class TransTypeComponent extends Vue {
 @import '~@/style/common-style.scss';
 @import '~@/style/style-specification';
 
-.type-icon {
-    width: 71.67px;
-    height: 71.67px;
+.type-icon-cell {
+    width: 25%;
     box-sizing: border-box;
-    margin: 10px 10px;
-    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.type-icon {
+    font-size: 2em;
+    padding: 12px;
     border-radius: 100px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: $icon-bgc;
 }
 </style>
