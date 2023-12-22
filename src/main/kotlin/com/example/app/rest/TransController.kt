@@ -23,7 +23,7 @@ import javax.validation.constraints.Positive
 
 
 class SaveTranDTO {
-    @NotNull
+    @NotEmpty
     var categoryValue: String? = null
 
     @NotNull
@@ -102,8 +102,10 @@ class TransController {
 
 
     @PostMapping("/transactions/{ledger_name}")
-    fun saveTransactions(@PathVariable("ledger_name") ledgerName: String,
-                         @RequestBody @Valid transactionList: SaveTransDTO):
+    fun saveTransactions(
+        @PathVariable("ledger_name") ledgerName: String,
+        @RequestBody @Valid transactionList: SaveTransDTO,
+    ):
             ResponseEntity<*> {
         transactionList.transactionList!!.map {
             var cateId = categoryDao.getOneByMap("value", it.categoryValue)?.id
@@ -131,8 +133,10 @@ class TransController {
         @PathVariable("ledger_name") ledgerName: String,
         @Valid @NotNull month: String,
     ): ResponseEntity<List<TransactionVO>> {
-        val selectOne = ledgerMapper.selectOne(QueryWrapper<LedgerPO>()
-            .eq("name", ledgerName))
+        val selectOne = ledgerMapper.selectOne(
+            QueryWrapper<LedgerPO>()
+                .eq("name", ledgerName)
+        )
         if (selectOne == null) {
             return ResponseEntity.ok(listOf());
         }
