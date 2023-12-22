@@ -130,7 +130,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import VanCursorEditorComponent from '@/views/components/VanCursorEditor.vue';
-import { findWordInLine, replace, timeout } from '@/ts/utils';
+import { timeout } from '@/ts/utils';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { Notify } from 'vant';
 import Client from '@/ts/request/client';
@@ -585,17 +585,17 @@ export default class AddTransactionEditorComponent extends Vue {
         }
         let parseForms = this.newRecordRows;
         parseForms.forEach((item: any) => {
-            let categoryValue = item.type ?? '';
+            let categoryValue = item.type;
             let amount = item.amount;
             let count = item.count;
-            let description = item.desc;
 
-            // ensure no null
             if (
                 amount == null ||
                 amount == '' ||
                 count == null ||
-                count == ''
+                count == '' ||
+                categoryValue == null ||
+                categoryValue == ''
             ) {
                 throw new Error('Information not complete');
             }
