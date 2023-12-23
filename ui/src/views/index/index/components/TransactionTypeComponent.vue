@@ -52,11 +52,11 @@
                 <div class="action-sheet-body flex column">
                     <div class="flex">
                         <!--icon picked by user-->
-                        <div name="picked-icon">
-                            <div class="type-icon-cell" style="">
-                                <div class="flex flex-center column type-icon">
-                                    <i class="ali-international-icon-beer"></i>
-                                </div>
+                        <div name="picked-icon" class="type-icon-cell">
+                            <div
+                                class="flex flex-center column type-icon picked"
+                            >
+                                <i :class="pickedIcon.className"></i>
                             </div>
                         </div>
 
@@ -68,8 +68,10 @@
                         <gap-component></gap-component>
                     </div>
 
+                    <gap-component></gap-component>
+
+                    <!--preset type icons-->
                     <div style="overflow: auto">
-                        <!--preset type icons-->
                         <div
                             id="icon-panel"
                             class="flex"
@@ -79,8 +81,17 @@
                                 row-gap: 15px;
                             "
                         >
-                            <div v-for="icon in icons" class="type-icon-cell">
-                                <div class="flex flex-center column type-icon">
+                            <div
+                                :key="icon.id"
+                                v-for="icon in icons"
+                                :class="`type-icon-cell`"
+                                @click="pickNewIcon(icon)"
+                            >
+                                <div
+                                    :class="`flex flex-center column type-icon  ${
+                                        icon.active ? 'picked' : ''
+                                    }`"
+                                >
                                     <i
                                         :class="icon.className"
                                         style="font-size: inherit"
@@ -115,6 +126,13 @@ export default class TransTypeComponent extends Vue {
 
     transactionCategories: any[] = [];
     addTypeShow = false;
+    pickedIcon: any = {};
+
+    pickNewIcon(icon: any) {
+        this.pickedIcon = icon;
+        this.icons.forEach((it) => (it.active = false));
+        this.icons.filter((it) => it.id === icon.id)[0].active = true;
+    }
 
     onclickAddRecordTypeBtn() {
         this.addTypeShow = true;
@@ -169,7 +187,14 @@ export default class TransTypeComponent extends Vue {
                 className: 'ali-international-icon-transport',
             },
         );
+
+        this.icons[0].active = true;
+        this.icons.forEach((it) => (it.id = this.iconIdCounter++));
+        console.log(this.icons);
+        this.pickedIcon = this.icons[0];
     }
+
+    iconIdCounter = 0;
 
     initTransactionTypes() {
         Client.getTransactionCategories().then((resp) => {
@@ -204,11 +229,15 @@ export default class TransTypeComponent extends Vue {
     justify-content: center;
     align-items: center;
 
-    .type-icon {
+    & .type-icon {
         font-size: 1.2em;
         padding: 12px;
         border-radius: 100px;
         background-color: $icon-bgc;
+
+        &.picked {
+            background-color: red;
+        }
     }
 }
 </style>
