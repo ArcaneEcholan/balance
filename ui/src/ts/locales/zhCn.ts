@@ -24,4 +24,7 @@ export default {
     out_of_service: '定位仅支持中国大陆区域',
     unset: '未设置',
     unknown_record_type: '未知类型',
+    add_record_type: {
+        title: '添加类型',
+    },
 };

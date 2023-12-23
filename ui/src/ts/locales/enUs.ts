@@ -21,4 +21,7 @@ export default {
     },
     unset: 'unset',
     unknown_record_type: 'unknown type',
+    add_record_type: {
+        title: 'Add Record Type',
+    },
 };
