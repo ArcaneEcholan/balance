@@ -36,6 +36,7 @@
                 >
                     <van-swipe-cell style="height: 100%">
                         <div class="flex" style="height: 100%">
+                            <!--type picker-->
                             <clickable
                                 class="cell flexg1 flex center"
                                 style="
@@ -70,6 +71,7 @@
                                 </div>
                             </clickable>
 
+                            <!--amount input-->
                             <div
                                 @click="onTouchCell(recordRow, 'amount')"
                                 :ref="`${recordRow.id}-amount`"
@@ -80,6 +82,8 @@
                                     v-model="recordRow.amount"
                                 ></van-field>
                             </div>
+
+                            <!--count input-->
                             <div
                                 @click="onTouchCell(recordRow, 'count')"
                                 :ref="`${recordRow.id}-count`"
@@ -90,6 +94,8 @@
                                     v-model="recordRow.count"
                                 ></van-field>
                             </div>
+
+                            <!--desc input-->
                             <div
                                 @click="onTouchCell(recordRow, 'desc')"
                                 :ref="`${recordRow.id}-desc`"
@@ -105,7 +111,6 @@
                                 square
                                 text="Delete"
                                 type="danger"
-                                class="delete-button"
                             />
                         </template>
                     </van-swipe-cell>
@@ -708,15 +713,15 @@ export default class AddTransactionEditorComponent extends Vue {
         .cell {
             border-bottom: 3px solid #ffffff;
             margin: -0.5px;
-            border-right: 2px solid #ebecf0;
-        }
+            border-right: 2px solid $separator-color;
 
-        .cell.last {
-            border-right: none;
-        }
+            &.last {
+                border-right: none;
+            }
 
-        .cell.active-new-record-cell {
-            border-bottom: 3px solid #3369d6;
+            &.active-new-record-cell {
+                border-bottom: 3px solid #3369d6;
+            }
         }
     }
 }
