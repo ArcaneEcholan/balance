@@ -50,14 +50,20 @@
                 </div>
 
                 <div class="action-sheet-body flex column">
-                    <div>
-                        <panel>
+                    <div class="flex">
+                        <!--icon picked by user-->
+                        <div name="picked-icon">
+                            <div class="type-icon-cell" style="">
+                                <div class="flex flex-center column type-icon">
+                                    <i class="ali-international-icon-beer"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--name of new icon-->
+                        <panel class="flexg1">
                             <!--type name-->
-                            <van-field
-                                v-model="name"
-                                placeholder="name"
-                                label="name"
-                            ></van-field>
+                            <van-field v-model="name" label="name"></van-field>
                         </panel>
                         <gap-component></gap-component>
                     </div>
@@ -67,7 +73,11 @@
                         <div
                             id="icon-panel"
                             class="flex"
-                            style="justify-content: start; flex-wrap: wrap"
+                            style="
+                                justify-content: start;
+                                flex-wrap: wrap;
+                                row-gap: 15px;
+                            "
                         >
                             <div v-for="icon in icons" class="type-icon-cell">
                                 <div class="flex flex-center column type-icon">
@@ -193,7 +203,6 @@ export default class TransTypeComponent extends Vue {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 15px;
 
     .type-icon {
         font-size: 1.2em;
