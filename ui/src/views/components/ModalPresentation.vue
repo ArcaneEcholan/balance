@@ -76,19 +76,21 @@ export default class ModalPresentationView extends Vue {
         ];
 
         let hooksObj = this.hooks;
-        Object.keys(hooksObj).forEach((key) => {
-            requiredFuncs.forEach((name: string) => {
-                if (key === name) {
-                    if (typeof hooksObj[key] !== 'function') {
-                        throw new Error(`hook: ${key} must be a function`);
-                    }
+
+        requiredFuncs.forEach((it) => {
+            let hookPassedIn = hooksObj[it];
+            if (hookPassedIn != null) {
+                if (typeof hookPassedIn !== 'function') {
+                    throw new Error(`hook: ${it} must be a function`);
                 } else {
-                    console.debug(`hook: ${name} not exists`);
-                    this.hooks[name] = (arg: any) => {
-                        console.debug(`default impl of hook: ${name}`);
-                    };
+                    console.debug(`hook: ${it} exists`);
                 }
-            });
+            } else {
+                console.debug(`hook: ${it} not exists`);
+                hooksObj[it] = (arg: any) => {
+                    console.debug(`default impl of hook: ${it}`);
+                };
+            }
         });
     }
 
