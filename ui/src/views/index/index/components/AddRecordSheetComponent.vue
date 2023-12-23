@@ -428,7 +428,7 @@ export default class AddTransactionEditorComponent extends Vue {
         if (area == null) {
             throw new Error('area == null');
         }
-        this.increaseElemHeight(area, 54);
+        this.increaseElemHeight(area, 46);
     }
 
     clearAllRecords() {
@@ -449,7 +449,7 @@ export default class AddTransactionEditorComponent extends Vue {
         this.squashDivToExtremelyShort(div);
 
         let area = this.getNewRecordsAreaDiv();
-        this.increaseElemHeight(area, -54);
+        this.increaseElemHeight(area, -46);
 
         timeout(settings.animation.duration).then(() => {
             let curIndex = this.newRecordRows.findIndex(
@@ -706,7 +706,7 @@ export default class AddTransactionEditorComponent extends Vue {
 
     .new-record-row {
         animation: upDown var(--transition-duration) var(--transition-easing);
-        height: 54px;
+        height: 46px;
         transition: height var(--transition-duration) var(--transition-easing);
         overflow: hidden;
 
