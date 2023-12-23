@@ -36,7 +36,17 @@
                 v-model="addTypeShow"
             >
                 <div class="action-sheet-title">
-                    {{ $t('add_record_type.title') }}
+                    <div style="width: 100%" class="flex">
+                        <div style="width: 20%"></div>
+                        <div style="width: 60%" class="flex center">
+                            {{ $t('add_record_type.title') }}
+                        </div>
+                        <div style="width: 20%">
+                            <custom-button>
+                                {{ $t('save') }}
+                            </custom-button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="action-sheet-body flex column">
@@ -82,9 +92,10 @@ import Clickable from '@/views/components/Clickable.vue';
 import Panel from '@/views/components/Panel.vue';
 import SolidIcon from '@/views/components/SolidIcon.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
+import CustomButton from '@/views/components/CustomButton.vue';
 
 @Component({
-    components: { GapComponent, SolidIcon, Panel, Clickable },
+    components: { CustomButton, GapComponent, SolidIcon, Panel, Clickable },
 })
 export default class TransTypeComponent extends Vue {
     name = '';
