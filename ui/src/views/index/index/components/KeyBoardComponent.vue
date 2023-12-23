@@ -136,7 +136,7 @@ import Clickable from '@/views/components/Clickable.vue';
 import { Toast } from 'vant';
 
 import FastClick from 'fastclick';
-import { getVueEl } from '@/ts/vueUtils';
+import { getHtmlElem } from '@/ts/vueUtils';
 
 @Component({
     computed: {
@@ -148,7 +148,7 @@ import { getVueEl } from '@/ts/vueUtils';
 })
 export default class KeyBoardComponent extends Vue {
     mounted() {
-        let keyboardElem = getVueEl(this, 'keyboard');
+        let keyboardElem = getHtmlElem(this, 'keyboard');
 
         // use very carefully !!! Don't apply this function to document.body,
         // only apply it to the elements on demands, otherwise some components
