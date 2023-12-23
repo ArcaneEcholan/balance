@@ -10,6 +10,7 @@ import i18n from '@/ts/lang';
 
 Vue.config.productionTip = false;
 
+import '@/assets/custom-icon-fonts/icons.css';
 import 'vant/lib/index.css';
 import {
     ActionSheet,

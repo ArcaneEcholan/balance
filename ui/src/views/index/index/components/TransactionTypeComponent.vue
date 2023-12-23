@@ -20,18 +20,11 @@
         </div>
 
         <div class="flex">
-            <clickable
-                class="flex center"
-                style="
-                    padding: 6px;
-                    color: #ffffff;
-                    background-color: #588cf3;
-                    border-radius: 10px;
-                "
-                @click="onclickAddRecordTypeBtn"
-            >
-                <i class="ali-international-icon-add-1 fs14 bold"></i>
-            </clickable>
+            <solid-icon
+                :clickable="true"
+                icon-class="cw-icon-add-fat"
+                @click.native="onclickAddRecordTypeBtn"
+            ></solid-icon>
         </div>
 
         <van-action-sheet v-model="addTypeShow">
@@ -72,9 +65,10 @@ import { Component, Vue } from 'vue-property-decorator';
 import Client from '@/ts/request/client';
 import Clickable from '@/views/components/Clickable.vue';
 import Panel from '@/views/components/Panel.vue';
+import SolidIcon from '@/views/components/SolidIcon.vue';
 
 @Component({
-    components: { Panel, Clickable },
+    components: { SolidIcon, Panel, Clickable },
 })
 export default class TransTypeComponent extends Vue {
     name = '';
