@@ -27,7 +27,12 @@
             ></solid-icon>
         </div>
 
-        <van-action-sheet v-model="addTypeShow">
+        <van-action-sheet
+            get-container="#vant-sheet-mount-point"
+            ref="sheet"
+            style=""
+            v-model="addTypeShow"
+        >
             <div class="action-sheet-title">
                 {{ $t('add_record_type.title') }}
             </div>

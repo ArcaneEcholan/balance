@@ -3,6 +3,13 @@
         <div id="main-app-area">
             <router-view />
         </div>
+        <!--
+        This mount point is for fixing ios bugs.
+        The zindex property works not that well in ios, sometimes
+        works in a totally wrong behaviour.
+        So we need to make sure the action sheet is always on the same layer.
+        -->
+        <div id="vant-sheet-mount-point"></div>
     </div>
 </template>
 
