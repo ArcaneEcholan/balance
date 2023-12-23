@@ -42,7 +42,7 @@
                             {{ $t('add_record_type.title') }}
                         </div>
                         <div style="width: 20%">
-                            <custom-button>
+                            <custom-button type="inline">
                                 {{ $t('save') }}
                             </custom-button>
                         </div>
