@@ -16,7 +16,7 @@
             <gap-component></gap-component>
 
             <!--inputs-->
-            <div v-show="!showRegisterCodeInput">
+            <div>
                 <panel>
                     <van-cell-group>
                         <van-field
@@ -35,6 +35,7 @@
                 <gap-component></gap-component>
 
                 <custom-button
+                    v-show="pageState === 'inputting_username'"
                     :disabled="passwordset_checking"
                     @click="loginContinue"
                 >
@@ -44,6 +45,40 @@
                                 style="position: absolute; left: -16px"
                                 size="16px"
                                 v-show="passwordset_checking"
+                            ></van-loading>
+                            {{ $t('continue') }}
+                        </div>
+                    </div>
+                </custom-button>
+
+                <custom-button
+                    v-show="pageState === 'inputting_password'"
+                    :disabled="login_ing"
+                    @click="login"
+                >
+                    <div class="flex center">
+                        <div style="position: relative">
+                            <van-loading
+                                style="position: absolute; left: -16px"
+                                size="16px"
+                                v-show="login_ing"
+                            ></van-loading>
+                            {{ $t('continue') }}
+                        </div>
+                    </div>
+                </custom-button>
+
+                <custom-button
+                    v-show="pageState === 'inputting_register_code'"
+                    :disabled="login_ing"
+                    @click="loginWithEmailCode"
+                >
+                    <div class="flex center">
+                        <div style="position: relative">
+                            <van-loading
+                                style="position: absolute; left: -16px"
+                                size="16px"
+                                v-show="login_ing"
                             ></van-loading>
                             {{ $t('continue') }}
                         </div>
@@ -89,17 +124,46 @@ export default class LoginView extends Vue {
     password = '';
     registerCode = '';
     passwordset_checking = false;
-    login() {
+    pageState = 'inputting_username';
+    login_ing = false;
+    loginWithEmailCode() {
+        this.login_ing = true;
         request
             .post('/user/auth', {
+                type: 'email_code',
                 username: this.username,
-                password: this.password,
+                credential: this.registerCode,
             })
             .then((resp) => {
+                this.login_ing = false;
                 this.$store.commit('user/SET_TOKEN', resp.data.token);
                 this.$router.push('/home');
             })
             .catch((err) => {
+                this.login_ing = false;
+
+                Notify({
+                    type: 'danger',
+                    message: err.response.data,
+                });
+            });
+    }
+
+    login() {
+        this.login_ing = true;
+        request
+            .post('/user/auth', {
+                username: this.username,
+                credential: this.password,
+            })
+            .then((resp) => {
+                this.login_ing = false;
+                this.$store.commit('user/SET_TOKEN', resp.data.token);
+                this.$router.push('/home');
+            })
+            .catch((err) => {
+                this.login_ing = false;
+
                 Notify({
                     type: 'danger',
                     message: err.response.data,
@@ -109,26 +173,34 @@ export default class LoginView extends Vue {
     verifyLogin() {}
     loginContinue() {
         this.passwordset_checking = true;
-        request.get('/user/password_set').then((resp) => {
-            this.passwordset_checking = false;
-
-            let ex = resp.data.exist;
-            if (ex) {
-                this.showPasswordInput = true;
-            } else {
-                request
-                    .post('/mail_delivery/register_code')
-                    .then((resp) => {
-                        this.showRegisterCodeInput = true;
-                    })
-                    .catch((err) => {
-                        Notify({
-                            type: 'danger',
-                            message: err.response.data,
+        request
+            .get('/user/password_set')
+            .then((resp) => {
+                let ex = resp.data.exist;
+                if (ex) {
+                    this.passwordset_checking = false;
+                    this.showPasswordInput = true;
+                    this.pageState = 'inputting_password';
+                } else {
+                    request
+                        .post('/mail_delivery/register_code')
+                        .then((resp) => {
+                            this.pageState = 'inputting_register_code';
+                            this.passwordset_checking = false;
+                            this.showRegisterCodeInput = true;
+                        })
+                        .catch((err) => {
+                            this.passwordset_checking = false;
+                            Notify({
+                                type: 'danger',
+                                message: err.response.data,
+                            });
                         });
-                    });
-            }
-        });
+                }
+            })
+            .catch((err) => {
+                this.passwordset_checking = false;
+            });
     }
 }
 </script>
