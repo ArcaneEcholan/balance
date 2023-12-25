@@ -18,7 +18,18 @@ module.exports = [
     {
         url: '/user/auth',
         type: 'post',
-        response: (config) => {
+        response: (config, response) => {
+            response.status(500);
+            console.log(response);
+            return {
+                token: 'test_token',
+            };
+        },
+    },
+    {
+        url: '/user/generating',
+        type: 'post',
+        response: (config, response) => {
             return {
                 token: 'test_token',
             };

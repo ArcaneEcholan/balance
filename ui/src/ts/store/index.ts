@@ -22,6 +22,10 @@ export default new Vuex.Store({
             // @ts-ignore
             return state.user.token;
         },
+        username: (state) => {
+            // @ts-ignore
+            return state.user.username;
+        },
         scrollPosition: (state) => {
             // @ts-ignore
             return state.scrollPosition;

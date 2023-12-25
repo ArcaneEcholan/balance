@@ -1,18 +1,19 @@
 import axios from 'axios';
-import { PageLocation } from '@/ts/dynamicLocation';
 import { Notify } from 'vant';
 
 // create an axios instance
 const service = axios.create({
-    baseURL: 'http://localhost:9529/api',
+    baseURL: '/api',
     // baseURL: new PageLocation().baseURL, // url = base url + request url
     // withCredentials: true, // send cookies when cross-domain requests
     timeout: 5000, // request timeout
 });
+
 function sleep(ms = 500): Promise<void> {
     console.log('Kindly remember to remove `sleep`');
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
 // request interceptor
 service.interceptors.request.use(
     async (config) => {
@@ -42,6 +43,7 @@ service.interceptors.response.use(
         return Promise.resolve(response);
     },
     (error) => {
+        console.log(error);
         let response = error.response;
 
         if (response == null) {

@@ -93,22 +93,22 @@
                     </div>
                 </custom-button>
 
-                <custom-button
-                    v-show="pageState === 'inputting_register_code'"
-                    :disabled="login_ing"
-                    @click="loginWithEmailCode"
-                >
-                    <div class="flex center">
-                        <div style="position: relative">
-                            <van-loading
-                                style="position: absolute; left: -16px"
-                                size="16px"
-                                v-show="login_ing"
-                            ></van-loading>
-                            {{ $t('continue') }}
-                        </div>
-                    </div>
-                </custom-button>
+                <!--<custom-button-->
+                <!--    v-show="pageState === 'inputting_register_code'"-->
+                <!--    :disabled="login_ing"-->
+                <!--    @click="loginWithEmailCode"-->
+                <!--&gt;-->
+                <!--    <div class="flex center">-->
+                <!--        <div style="position: relative">-->
+                <!--            <van-loading-->
+                <!--                style="position: absolute; left: -16px"-->
+                <!--                size="16px"-->
+                <!--                v-show="login_ing"-->
+                <!--            ></van-loading>-->
+                <!--            {{ $t('continue') }}-->
+                <!--        </div>-->
+                <!--    </div>-->
+                <!--</custom-button>-->
             </div>
         </div>
     </div>
@@ -121,6 +121,7 @@ import CustomButton from '@/views/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import request from '@/ts/request';
 import { Notify } from 'vant';
+
 @Component({
     components: { GapComponent, CustomButton, Panel },
 })
@@ -133,12 +134,14 @@ export default class LoginView extends Vue {
     passwordset_checking = false;
     pageState = 'inputting_username';
     login_ing = false;
+
     validator(input: string) {
         let match = input.match(
             /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         );
         return match != null;
     }
+
     get inputtingCredential() {
         return (
             this.pageState === 'inputting_password' ||
@@ -161,10 +164,10 @@ export default class LoginView extends Vue {
             })
             .catch((err) => {
                 this.login_ing = false;
-
+                let msg = err?.response?.data?.message;
                 Notify({
                     type: 'danger',
-                    message: err.response.data,
+                    message: msg || 'auth error',
                 });
             });
     }
@@ -190,7 +193,9 @@ export default class LoginView extends Vue {
                 });
             });
     }
+
     verifyLogin() {}
+
     loginContinue() {
         // @ts-ignore
         this.$refs['email-input'].validate().then((validatorArg: any) => {
@@ -219,11 +224,18 @@ export default class LoginView extends Vue {
                         this.pageState = 'inputting_password';
                     } else {
                         request
-                            .post('/mail_delivery/register_code')
+                            .post('/user/generating')
                             .then((resp) => {
-                                this.pageState = 'inputting_register_code';
+                                this.$store.commit(
+                                    'user/SET_TOKEN',
+                                    resp.data.token,
+                                );
+                                this.$store.commit(
+                                    'user/SET_USERNAME',
+                                    this.username,
+                                );
+                                this.$router.push('/home');
                                 this.passwordset_checking = false;
-                                this.showRegisterCodeInput = true;
                             })
                             .catch((err) => {
                                 this.passwordset_checking = false;

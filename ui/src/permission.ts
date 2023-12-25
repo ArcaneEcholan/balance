@@ -1,4 +1,5 @@
 import router from '@/ts/router/index';
+import store from '@/ts/store';
 
 let count = 0;
 
@@ -7,6 +8,19 @@ function isThisTheFirstNav() {
 }
 
 router.beforeEach(async (to, from, next) => {
+    let whiteList = ['/login'];
+    if (whiteList.indexOf(to.path) !== -1) {
+        next();
+        return;
+    }
+
+    let token = store.getters.token;
+    let username = store.getters.username;
+    if (token == null || username == null) {
+        next('/login');
+        return;
+    }
+
     next();
     // // first nav means user refresh the page, which represent user closing the app
     // if (isThisTheFirstNav()) {
