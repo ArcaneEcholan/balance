@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import HomeIndexView from '@/views/index/index/index.vue';
 import IndexIndexView from '@/views/index/index.vue';
 import StatisticIndexView from '@/views/index/statictics/index.vue';
+import LoginView from '@/views/index/index/login.vue';
 
 Vue.use(VueRouter);
 
@@ -22,6 +23,11 @@ const routes: Array<RouteConfig> = [
                 component: StatisticIndexView,
             },
         ],
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: LoginView,
     },
 ];
 
