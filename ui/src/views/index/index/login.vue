@@ -21,11 +21,7 @@
                     class="prompt-text"
                     v-show="pageState === 'inputting_register_code'"
                 >
-                    {{
-                        $t('login_email_sent_prompt', {
-                            email: username,
-                        })
-                    }}
+                    {{ $t('login_email_sent_prompt') }}
                 </div>
 
                 <gap-component></gap-component>
