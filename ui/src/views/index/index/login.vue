@@ -29,15 +29,12 @@
                 <panel>
                     <van-cell-group>
                         <van-field
-                            :disabled="showPasswordInput"
+                            :disabled="inputtingCredential"
                             :label="$t('username')"
                             v-model="username"
                         />
                         <van-field
-                            v-show="
-                                pageState === 'inputting_password' ||
-                                pageState === 'inputting_register_code'
-                            "
+                            v-show="inputtingCredential"
                             :label="
                                 pageState === 'inputting_password'
                                     ? $t('password')
@@ -124,6 +121,14 @@ export default class LoginView extends Vue {
     passwordset_checking = false;
     pageState = 'inputting_username';
     login_ing = false;
+
+    get inputtingCredential() {
+        return (
+            this.pageState === 'inputting_password' ||
+            this.pageState === 'inputting_register_code'
+        );
+    }
+
     loginWithEmailCode() {
         this.login_ing = true;
         request
