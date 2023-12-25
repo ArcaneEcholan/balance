@@ -53,6 +53,9 @@ import {
     Vue.use(SwipeCell);
 }
 
+import '@/style/common-style.scss';
+import '@/style/style-specification.scss';
+
 import PageEventbusRegistrationMixin from '@/page-eventbus-registration-mixin';
 Vue.mixin(PageEventbusRegistrationMixin);
 
