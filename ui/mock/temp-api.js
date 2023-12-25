@@ -1,6 +1,6 @@
 module.exports = [
     {
-        url: '/username/existence',
+        url: '/user/password_set',
         type: 'get',
         response: (config) => {
             return {
