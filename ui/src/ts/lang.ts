@@ -53,6 +53,7 @@ let en = {
     login_greeting: 'Welcome to Ledger',
     login_email: 'email',
     login_email_placeholder: 'Please enter your email',
+    login_email_invalid_prompt: 'Please enter a valid email',
 };
 
 let zh = {
@@ -91,6 +92,7 @@ let zh = {
     login_email: '邮件',
     login_greeting: '欢迎使用记账本',
     login_email_placeholder: '请输入您的电子邮件',
+    login_email_invalid_prompt: '请输入有效的电子邮件',
 };
 
 const messages: any = {

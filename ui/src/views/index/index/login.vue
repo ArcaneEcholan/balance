@@ -30,10 +30,13 @@
                     <van-form>
                         <van-cell-group>
                             <van-field
+                                ref="email-input"
                                 :rules="[
                                     {
                                         validator,
-                                        message: '请输入正确的邮箱地址',
+                                        message: $t(
+                                            'login_email_invalid_prompt',
+                                        ),
                                     },
                                 ]"
                                 :disabled="inputtingCredential"
@@ -130,8 +133,11 @@ export default class LoginView extends Vue {
     passwordset_checking = false;
     pageState = 'inputting_username';
     login_ing = false;
-    validator() {
-        return 1 === 3;
+    validator(input: string) {
+        let match = input.match(
+            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        );
+        return match != null;
     }
     get inputtingCredential() {
         return (
@@ -186,35 +192,52 @@ export default class LoginView extends Vue {
     }
     verifyLogin() {}
     loginContinue() {
-        this.passwordset_checking = true;
-        request
-            .get('/user/password_set')
-            .then((resp) => {
-                let ex = resp.data.exist;
-                if (ex) {
-                    this.passwordset_checking = false;
-                    this.showPasswordInput = true;
-                    this.pageState = 'inputting_password';
-                } else {
-                    request
-                        .post('/mail_delivery/register_code')
-                        .then((resp) => {
-                            this.pageState = 'inputting_register_code';
-                            this.passwordset_checking = false;
-                            this.showRegisterCodeInput = true;
-                        })
-                        .catch((err) => {
-                            this.passwordset_checking = false;
-                            Notify({
-                                type: 'danger',
-                                message: err.response.data,
-                            });
-                        });
+        // @ts-ignore
+        this.$refs['email-input'].validate().then((validatorArg: any) => {
+            // TODO: may be we need to write a abstract layer for better compatibility
+            let vantIsValidAdaptor = (valid: any) => {
+                let isValid = false;
+                if (valid == null) {
+                    isValid = true;
                 }
-            })
-            .catch((err) => {
-                this.passwordset_checking = false;
-            });
+                return isValid;
+            };
+
+            let isValid = vantIsValidAdaptor(validatorArg);
+
+            if (!isValid) {
+                return;
+            }
+            this.passwordset_checking = true;
+            request
+                .get('/user/password_set')
+                .then((resp) => {
+                    let ex = resp.data.exist;
+                    if (ex) {
+                        this.passwordset_checking = false;
+                        this.showPasswordInput = true;
+                        this.pageState = 'inputting_password';
+                    } else {
+                        request
+                            .post('/mail_delivery/register_code')
+                            .then((resp) => {
+                                this.pageState = 'inputting_register_code';
+                                this.passwordset_checking = false;
+                                this.showRegisterCodeInput = true;
+                            })
+                            .catch((err) => {
+                                this.passwordset_checking = false;
+                                Notify({
+                                    type: 'danger',
+                                    message: err.response.data,
+                                });
+                            });
+                    }
+                })
+                .catch((err) => {
+                    this.passwordset_checking = false;
+                });
+        });
     }
 }
 </script>
