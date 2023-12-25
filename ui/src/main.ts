@@ -32,6 +32,7 @@ import {
     Tabbar,
     TabbarItem,
     Tag,
+    Form,
 } from 'vant';
 {
     Vue.use(DatetimePicker);
@@ -52,6 +53,7 @@ import {
     Vue.use(DropdownItem);
     Vue.use(ActionSheet);
     Vue.use(SwipeCell);
+    Vue.use(Form);
 }
 
 import '@/style/common-style.scss';

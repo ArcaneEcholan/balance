@@ -27,23 +27,31 @@
                 <gap-component></gap-component>
 
                 <panel>
-                    <van-cell-group>
-                        <van-field
-                            :disabled="inputtingCredential"
-                            :label="$t('login_email')"
-                            :placeholder="$t('login_email_placeholder')"
-                            v-model="username"
-                        />
-                        <van-field
-                            v-show="inputtingCredential"
-                            :label="
-                                pageState === 'inputting_password'
-                                    ? $t('password')
-                                    : $t('login_email_code')
-                            "
-                            v-model="password"
-                        ></van-field>
-                    </van-cell-group>
+                    <van-form>
+                        <van-cell-group>
+                            <van-field
+                                :rules="[
+                                    {
+                                        validator,
+                                        message: '请输入正确的邮箱地址',
+                                    },
+                                ]"
+                                :disabled="inputtingCredential"
+                                :label="$t('login_email')"
+                                :placeholder="$t('login_email_placeholder')"
+                                v-model="username"
+                            />
+                            <van-field
+                                v-show="inputtingCredential"
+                                :label="
+                                    pageState === 'inputting_password'
+                                        ? $t('password')
+                                        : $t('login_email_code')
+                                "
+                                v-model="password"
+                            ></van-field>
+                        </van-cell-group>
+                    </van-form>
                 </panel>
 
                 <gap-component></gap-component>
@@ -122,7 +130,9 @@ export default class LoginView extends Vue {
     passwordset_checking = false;
     pageState = 'inputting_username';
     login_ing = false;
-
+    validator() {
+        return 1 === 3;
+    }
     get inputtingCredential() {
         return (
             this.pageState === 'inputting_password' ||
