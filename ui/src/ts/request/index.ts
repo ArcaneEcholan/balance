@@ -4,7 +4,8 @@ import { Notify } from 'vant';
 
 // create an axios instance
 const service = axios.create({
-    baseURL: new PageLocation().baseURL, // url = base url + request url
+    baseURL: 'http://localhost:9529/api',
+    // baseURL: new PageLocation().baseURL, // url = base url + request url
     // withCredentials: true, // send cookies when cross-domain requests
     timeout: 5000, // request timeout
 });
@@ -43,7 +44,7 @@ service.interceptors.response.use(
         }
         let status = response.status;
         let data = response.data;
-        Notify({ type: 'danger', message: `${status}: ${data}` });
+        console.log({ type: 'danger', message: `${status}: ${data}` });
         return Promise.reject(error);
     },
 );
