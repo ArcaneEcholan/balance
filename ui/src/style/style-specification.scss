@@ -10,9 +10,22 @@ input {
 
 .van-field__label {
     display: flex;
-    align-items: center;
+    align-items: start;
     justify-content: start;
 }
+
+// fix van field validation bug
+.van-field__control {
+    color: #323233 !important;
+}
+.van-field__control:disabled {
+    color: #c8c9cc !important;
+}
+
+.van-field__control::placeholder {
+    color: #c8c9cc !important;
+}
+// fix van field validation bug
 
 body {
     background-color: $secondary-bgc;
