@@ -30,7 +30,8 @@
                     <van-cell-group>
                         <van-field
                             :disabled="inputtingCredential"
-                            :label="$t('username')"
+                            :label="$t('login_email')"
+                            :placeholder="$t('login_email_placeholder')"
                             v-model="username"
                         />
                         <van-field

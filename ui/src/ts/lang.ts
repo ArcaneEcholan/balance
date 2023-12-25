@@ -51,6 +51,8 @@ let en = {
     username: 'username',
     login_email_code: 'code',
     login_greeting: 'Welcome to Ledger',
+    login_email: 'email',
+    login_email_placeholder: 'Please enter your email',
 };
 
 let zh = {
@@ -86,7 +88,9 @@ let zh = {
         '我们已向您的电子邮件地址发送了一封电子邮件，请检查您的电子邮件并在下面填写验证码',
     username: '用户名',
     login_email_code: '验证码',
+    login_email: '邮件',
     login_greeting: '欢迎使用记账本',
+    login_email_placeholder: '请输入您的电子邮件',
 };
 
 const messages: any = {
