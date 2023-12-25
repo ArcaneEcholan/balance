@@ -50,6 +50,7 @@ let en = {
         "We've sent an email to your email address, please check your email and fill in the verification code below.",
     username: 'username',
     login_email_code: 'code',
+    login_greeting: 'Welcome to Ledger',
 };
 
 let zh = {
@@ -85,6 +86,7 @@ let zh = {
         '我们已向您的电子邮件地址发送了一封电子邮件，请检查您的电子邮件并在下面填写验证码',
     username: '用户名',
     login_email_code: '验证码',
+    login_greeting: '欢迎使用记账本',
 };
 
 const messages: any = {
