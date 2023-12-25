@@ -4,8 +4,15 @@ module.exports = [
         type: 'get',
         response: (config) => {
             return {
-                exist: true,
+                exist: false,
             };
+        },
+    },
+    {
+        url: '/mail_delivery/register_code',
+        type: 'post',
+        response: (config) => {
+            return {};
         },
     },
     {

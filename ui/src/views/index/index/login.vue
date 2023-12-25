@@ -17,6 +17,19 @@
 
             <!--inputs-->
             <div>
+                <div
+                    class="prompt-text"
+                    v-show="pageState === 'inputting_register_code'"
+                >
+                    {{
+                        $t('login_email_sent_prompt', {
+                            email: username,
+                        })
+                    }}
+                </div>
+
+                <gap-component></gap-component>
+
                 <panel>
                     <van-cell-group>
                         <van-field
@@ -25,8 +38,15 @@
                             v-model="username"
                         />
                         <van-field
-                            v-show="showPasswordInput"
-                            :label="$t('password')"
+                            v-show="
+                                pageState === 'inputting_password' ||
+                                pageState === 'inputting_register_code'
+                            "
+                            :label="
+                                pageState === 'inputting_password'
+                                    ? $t('password')
+                                    : $t('login_email_code')
+                            "
                             v-model="password"
                         ></van-field>
                     </van-cell-group>
@@ -84,24 +104,6 @@
                         </div>
                     </div>
                 </custom-button>
-            </div>
-
-            <div v-show="showRegisterCodeInput">
-                <div>We've sent you temp login code to {{ username }}.</div>
-                <panel>
-                    <van-cell-group>
-                        <van-field
-                            :label="$t('register_code')"
-                            v-model="registerCode"
-                        ></van-field>
-                    </van-cell-group>
-
-                    <gap-component></gap-component>
-
-                    <custom-button @click="verifyLogin">
-                        {{ $t('verify_login') }}
-                    </custom-button>
-                </panel>
             </div>
         </div>
     </div>
@@ -222,9 +224,9 @@ export default class LoginView extends Vue {
     }
 }
 
-.loading::before {
-    content: '';
-    display: inline-block;
-    position: absolute;
+.prompt-text {
+    text-align: center;
+    color: #bdbdbd;
+    font-size: 14px;
 }
 </style>

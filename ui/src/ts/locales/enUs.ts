@@ -24,4 +24,6 @@ export default {
     add_record_type: {
         title: 'Add Record Type',
     },
+    login_email_sent_prompt:
+        "We've sent an email to your email address, please check your email and fill in the verification code below.",
 };
