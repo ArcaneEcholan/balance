@@ -9,6 +9,7 @@ import '@/assets/icon-fonts/iconfont.css';
 import i18n from '@/ts/lang';
 
 Vue.config.productionTip = false;
+Vue.config.devtools = true;
 
 import '@/assets/custom-icon-fonts/icons.css';
 import 'vant/lib/index.css';
