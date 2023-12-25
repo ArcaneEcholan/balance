@@ -9,10 +9,16 @@ const service = axios.create({
     // withCredentials: true, // send cookies when cross-domain requests
     timeout: 5000, // request timeout
 });
-
+function sleep(ms = 500): Promise<void> {
+    console.log('Kindly remember to remove `sleep`');
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
 // request interceptor
 service.interceptors.request.use(
-    (config) => {
+    async (config) => {
+        if (process.env.NODE_ENV === 'development') {
+            await sleep();
+        }
         logRequest(config);
         return config;
     },
