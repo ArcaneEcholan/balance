@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import development from './modules/development';
+import user from '@/ts/store/modules/user';
 
 Vue.use(Vuex);
 
@@ -17,6 +18,10 @@ export default new Vuex.Store({
             // @ts-ignore
             return state.development.logEnabled;
         },
+        token: (state) => {
+            // @ts-ignore
+            return state.user.token;
+        },
         scrollPosition: (state) => {
             // @ts-ignore
             return state.scrollPosition;
@@ -30,5 +35,6 @@ export default new Vuex.Store({
     actions: {},
     modules: {
         development,
+        user,
     },
 });
