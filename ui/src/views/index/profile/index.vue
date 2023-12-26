@@ -13,10 +13,42 @@
                     clickable
                     @click="accountSettingShow = true"
                 ></van-cell>
+                <van-cell
+                    :title="$t('settings.language.title')"
+                    clickable
+                    @click="languagePickerShow = true"
+                ></van-cell>
             </van-cell-group>
         </panel>
 
         <div name="sheets">
+            <van-action-sheet
+                style="height: 80%"
+                name="language-picker-sheet"
+                v-model="languagePickerShow"
+                :closeable="false"
+            >
+                <div class="action-sheet-title">
+                    {{ $t('settings.language.title') }}
+                </div>
+                <div class="action-sheet-body">
+                    <panel>
+                        <van-cell-group>
+                            <van-cell
+                                clickable
+                                :value="'中文(简体)'"
+                                @click="changeLocale('chinese')"
+                            />
+                            <van-cell
+                                clickable
+                                :value="'English'"
+                                @click="changeLocale('english')"
+                            />
+                        </van-cell-group>
+                    </panel>
+                </div>
+            </van-action-sheet>
+
             <van-action-sheet
                 style="height: 80%"
                 name="account-setting-sheet"
@@ -120,6 +152,8 @@ import { Component, Vue } from 'vue-property-decorator';
 import Panel from '@/views/components/Panel.vue';
 import CustomButton from '@/views/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
+import { Locale, Notify } from 'vant';
+import { setLanguage } from '@/ts/lang';
 
 @Component({
     components: { GapComponent, CustomButton, Panel },
@@ -129,12 +163,39 @@ export default class ProfileIndexView extends Vue {
     accountSettingShow = false;
     password = '';
     password_repeat = '';
+    languagePickerShow = false;
 
     get changePasswordButtonDisabled() {
         return (
             !this.passwordValidator(this.password) ||
             !this.repeatPasswordValidator()
         );
+    }
+
+    changeLocale(name: string) {
+        if (name === 'chinese') {
+            let value = 'zh-CN';
+            // Vant basic
+            Locale.use(value, this.$i18n.messages[value]);
+            // Business component
+            this.$i18n.locale = value;
+            // Cookie
+            setLanguage(value);
+        } else if (name === 'english') {
+            let value = 'en-US';
+            // Vant basic
+            Locale.use(value, this.$i18n.messages[value]);
+            // Business component
+            this.$i18n.locale = value;
+            // Cookie
+            setLanguage(value);
+        }
+
+        Notify({
+            type: 'success',
+            message: this.$t('change_language_successfully') as string,
+            duration: 1000,
+        });
     }
 
     repeatPasswordValidator() {

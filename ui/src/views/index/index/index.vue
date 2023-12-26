@@ -39,12 +39,6 @@
                         </div>
                     </clickable>
 
-                    <clickable @click="onClickSettingIcon">
-                        <div class="mg20 flex align-center">
-                            <van-icon class="icon" name="setting-o"></van-icon>
-                        </div>
-                    </clickable>
-
                     <clickable @click="show = true">
                         <div class="mg20 flex align-center">
                             <i class="icon ali-international-icon-plus"></i>
@@ -104,7 +98,6 @@ import {
 } from '@/ts/utils';
 import EditRecordView from '@/views/index/index/modals/edit_record.vue';
 import ManageLedgerView from '@/views/index/index/modals/ledger.vue';
-import SettingsView from '@/views/index/index/modals/settings.vue';
 import Clickable from '@/views/components/Clickable.vue';
 
 (window as any)._AMapSecurityConfig = {
@@ -133,12 +126,6 @@ export default class IndexView extends Vue {
 
     showLedgerSwitcherSheet() {
         this.lwc.showSheet();
-    }
-
-    onClickSettingIcon() {
-        let arg: any = {};
-        arg.modalLifeCycleHooks = this.getModalLifeCycleHooks();
-        mountComponent(this.mountPointUid3, SettingsView, arg);
     }
 
     getModalLifeCycleHooks = () => {

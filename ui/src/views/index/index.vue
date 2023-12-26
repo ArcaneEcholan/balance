@@ -52,13 +52,11 @@
                     @click="onClickProfile"
                 >
                     <div>
-                        <span>
-                            <i class="icon ali-international-icon-profile"></i>
-                        </span>
+                        <van-icon class="icon" name="setting-o"></van-icon>
                     </div>
                     <div>
                         <span class="fs12" style="line-height: 1">
-                            {{ getI18nValue('profile') }}
+                            {{ getI18nValue('settings.title') }}
                         </span>
                     </div>
                 </div>

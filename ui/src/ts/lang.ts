@@ -23,6 +23,9 @@ let en = {
     language: 'language',
     settings: {
         title: 'Settings',
+        language: {
+            title: 'Language',
+        },
         profile: {
             title: 'Profile',
             reset_password: {
@@ -73,6 +76,9 @@ let zh = {
     language: '语言',
     settings: {
         title: '设置',
+        language: {
+            title: '语言',
+        },
         profile: {
             title: '个人资料',
             reset_password: {
