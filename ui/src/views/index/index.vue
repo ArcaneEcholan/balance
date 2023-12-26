@@ -44,6 +44,24 @@
                         </span>
                     </div>
                 </div>
+                <div
+                    :style="`${
+                        activeTabBar == 'profile' ? 'color: #1989fa;' : ''
+                    }`"
+                    class="flex column flex-center flexg1"
+                    @click="onClickProfile"
+                >
+                    <div>
+                        <span>
+                            <i class="icon ali-international-icon-profile"></i>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="fs12" style="line-height: 1">
+                            {{ getI18nValue('profile') }}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -71,6 +89,11 @@ export default class IndexIndexView extends Vue {
     onClickStatistics() {
         this.activeTabBar = 'statistics';
         this.$router.push({ name: 'statistics' });
+    }
+
+    onClickProfile() {
+        this.activeTabBar = 'profile';
+        this.$router.push({ name: 'profile' });
     }
 }
 </script>
