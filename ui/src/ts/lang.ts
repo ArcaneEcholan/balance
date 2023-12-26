@@ -1,15 +1,7 @@
 import Vue from 'vue'; // @ts-ignore
 import VueI18n from 'vue-i18n';
-
-const languageKey = 'language';
-
 // @ts-ignore
 import Cookies from 'js-cookie';
-
-export const getLanguage = () => Cookies.get(languageKey);
-export const setLanguage = (language: string) =>
-    Cookies.set(languageKey, language);
-
 // Vant built-in lang
 import { Locale } from 'vant';
 // @ts-ignore
@@ -18,12 +10,32 @@ import zhCN from 'vant/es/locale/lang/zh-CN'; // @ts-ignore
 import zhTW from 'vant/es/locale/lang/zh-TW'; // @ts-ignore
 import jaJP from 'vant/es/locale/lang/ja-JP';
 
+const languageKey = 'language';
+
+export const getLanguage = () => Cookies.get(languageKey);
+export const setLanguage = (language: string) =>
+    Cookies.set(languageKey, language);
+
 Vue.use(VueI18n);
 
 let en = {
     default: 'default',
     language: 'language',
-    settings: 'settings',
+    settings: {
+        title: 'Settings',
+        profile: {
+            title: 'Profile',
+            reset_password: {
+                title: 'Reset Password',
+                password: 'Password',
+                repeat: 'Repeat',
+                password_format_error_prompt:
+                    'Password must be at least 6 characters, numbers and letters only',
+                password_repeat_error_prompt: 'Password does not match',
+            },
+        },
+    },
+
     change_language_successfully: 'change language successfully',
     home: 'Home',
     statistics: 'Statistics',
@@ -59,7 +71,24 @@ let en = {
 let zh = {
     default: '默认',
     language: '语言',
-    settings: '设置',
+    settings: {
+        title: '设置',
+        profile: {
+            title: '个人资料',
+            reset_password: {
+                title: '重置密码',
+                password: '密码',
+                repeat: '重复',
+                password_format_error_prompt: '密码至少6位，仅支持数字和字母',
+                password_repeat_error_prompt: '两次密码不一致',
+            },
+        },
+    },
+
+    settings_profile: '个人资料',
+    settings_profile_title: '个人资料',
+    settings_profile_reset_password: '重置密码',
+
     change_language_successfully: '更改语言成功',
     home: '首页',
     statistics: '统计',
