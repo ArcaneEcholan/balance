@@ -1,5 +1,5 @@
 <template>
-    <div class="login-page">
+    <div id="login-page" class="login-page">
         <div class="main-area">
             <!--icon-->
             <van-icon name="bill-o" class="fs24"></van-icon>
@@ -121,6 +121,7 @@ import CustomButton from '@/views/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import request from '@/ts/request';
 import { Notify } from 'vant';
+import { getHtmlElem } from '@/ts/vueUtils';
 
 @Component({
     components: { GapComponent, CustomButton, Panel },
@@ -134,6 +135,18 @@ export default class LoginView extends Vue {
     passwordset_checking = false;
     pageState = 'inputting_username';
     login_ing = false;
+
+    mounted() {
+        // set element center in mobile can not be addressed by 100vh or 100%
+        // see this:https://stackoverflow.com/questions/37112218/css3-100vh-not-constant-in-mobile-browser
+        let ratio = 0.8;
+
+        let loginPage = document.getElementById('login-page') as HTMLElement;
+        let loginPageHeight = loginPage.clientHeight;
+        let windowHeight = window.innerHeight;
+        let loginPageTopMargin = (windowHeight - loginPageHeight) / 2;
+        loginPage.style.marginTop = loginPageTopMargin * ratio + 'px';
+    }
 
     validator(input: string) {
         let match = input.match(
@@ -260,7 +273,6 @@ export default class LoginView extends Vue {
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 100vh;
 
     .main-area {
         width: 80%;
