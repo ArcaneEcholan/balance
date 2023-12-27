@@ -228,16 +228,20 @@ export default class LoginView extends Vue {
             }
             this.passwordset_checking = true;
             request
-                .get('/user/password_set')
+                .post('/user/password_set', {
+                    username: this.username,
+                })
                 .then((resp) => {
-                    let ex = resp.data.exist;
+                    let ex = resp.data.set;
                     if (ex) {
                         this.passwordset_checking = false;
                         this.showPasswordInput = true;
                         this.pageState = 'inputting_password';
                     } else {
                         request
-                            .post('/user/generating')
+                            .post('/user/generating', {
+                                username: this.username,
+                            })
                             .then((resp) => {
                                 this.$store.commit(
                                     'user/SET_TOKEN',

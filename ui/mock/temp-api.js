@@ -1,10 +1,10 @@
 module.exports = [
     {
         url: '/user/password_set',
-        type: 'get',
+        type: 'post',
         response: (config) => {
             return {
-                exist: false,
+                set: false,
             };
         },
     },
@@ -27,7 +27,7 @@ module.exports = [
         },
     },
     {
-        url: '/user/generating',
+        url: 'c',
         type: 'post',
         response: (config, response) => {
             return {
