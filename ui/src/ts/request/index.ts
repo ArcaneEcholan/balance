@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { Notify } from 'vant';
+import { PageLocation } from '@/ts/dynamicLocation';
 
 // create an axios instance
 const service = axios.create({
-    baseURL: '/api',
-    // baseURL: new PageLocation().baseURL, // url = base url + request url
+    // baseURL: '/api',
+    baseURL: new PageLocation().baseURL, // url = base url + request url
     // withCredentials: true, // send cookies when cross-domain requests
-    timeout: 5000, // request timeout
+    timeout: 0, // request timeout
 });
 
 function sleep(ms = 500): Promise<void> {
