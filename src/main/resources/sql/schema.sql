@@ -59,7 +59,7 @@ create table if not exists ledger_transaction
     transaction_id int null
 );
 
-create table if not exists balance.user
+create table if not exists `user`
 (
     id       int auto_increment
     primary key,
@@ -67,3 +67,20 @@ create table if not exists balance.user
     password varchar(255) null,
     ctime    varchar(255) null
     );
+
+create table if not exists user_config
+(
+    id    int auto_increment
+    primary key,
+    `key` varchar(255) null,
+    `value` varchar(255) null
+    );
+
+create table if not exists user_user_config
+(
+    id             int auto_increment
+    primary key,
+    user_id        int null,
+    user_config_id int null
+);
+

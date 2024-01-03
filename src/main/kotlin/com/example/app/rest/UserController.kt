@@ -1,16 +1,18 @@
 package com.example.app.rest
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
-import com.example.app.dao.UserMapper
-import com.example.app.dao.UserPO
+import com.example.app.dao.*
+import com.example.app.rest.CommonConstant.ENTITY_TOKEN
 import com.example.app.rest.JWTProperties.JWTExpirationTimeUnits.DAY
 import com.example.app.rest.JWTProperties.JWTExpirationTimeUnits.HOUR
 import com.example.app.rest.JWTProperties.JWTExpirationTimeUnits.MINUTE
 import com.example.app.rest.JWTProperties.JWTExpirationTimeUnits.SECOND
 import com.example.app.rest.JWTProperties.JWTExpirationTimeUnits.WEEK
 import com.example.app.rest.JwtUtils.Companion.genToken
+import com.example.app.utils.VarCaseConvertUtils
 import io.jsonwebtoken.*
 import lombok.extern.slf4j.Slf4j
+import mu.KotlinLogging
 import org.passay.CharacterData
 import org.passay.CharacterRule
 import org.passay.EnglishCharacterData
@@ -18,6 +20,8 @@ import org.passay.PasswordGenerator
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.ApplicationContext
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -26,7 +30,15 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.method.HandlerMethod
+import org.springframework.web.servlet.HandlerInterceptor
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.util.*
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+import javax.validation.Valid
+import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotEmpty
 
 @RestController
@@ -60,6 +72,12 @@ class UserController {
         var password: String? = null
     }
 
+    @Autowired
+    lateinit var userConfigMapper: UserConfigMapper
+
+    @Autowired
+    lateinit var userUserConfigMapper: UserUserConfigMapper
+
     @PostMapping("/user/auth")
     fun auth(@RequestBody userAuthRequest: UserAuthRequest): Any {
         var username = userAuthRequest.username!!;
@@ -75,8 +93,19 @@ class UserController {
             })
         }
         var token = genToken(exists.id.toString(), EntityType.WEB_USER)
+
+        var configs = mutableListOf<UserConfigPO>();
+        var tempEnList = userUserConfigMapper.selectList(QueryWrapper<UserUserConfigPO>().eq("user_id", exists.id))
+        tempEnList.forEach {
+            var tempEn = userConfigMapper.selectById(it.userConfigId)
+            if (tempEn != null) {
+                configs.add(tempEn)
+            }
+        }
+
         return object {
             var token = token;
+            var configs = configs;
         }
     }
 
@@ -107,7 +136,118 @@ class UserController {
         }
     }
 
+    class UserConfigRequest {
+        @NotBlank
+        var key: String? = null;
+
+        @NotEmpty
+        var value: String? = null;
+    }
+
+    class UpdateUserConfigRequest {
+        @Valid
+        var configs: List< UserConfigRequest>? = null
+    }
+
+    @PostMapping("/user/configs")
+    @AuthLogin
+    fun updateUserConfig(@RequestBody @Valid updateUserConfigRequest: UpdateUserConfigRequest): Any {
+        println(requestCtx.get()["user"])
+        return object {
+            var configs = updateUserConfigRequest
+        }
+    }
+
 }
+
+
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
+@Retention(
+    AnnotationRetention.RUNTIME
+)
+@Component
+annotation class AuthLogin()
+
+
+object CommonConstant {
+    const val ENTITY_TOKEN = "entity-token"
+}
+
+val requestCtx = ThreadLocal<MutableMap<String, Any>>()
+
+
+@Component
+class AuthInterceptor : HandlerInterceptor {
+    private val log = KotlinLogging.logger {}
+
+    @Autowired
+    lateinit var userMapper: UserMapper;
+
+    override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
+
+        if (handler !is HandlerMethod) {
+            return true
+        }
+
+        log.info("get into AuthenticationInterceptor")
+
+        val method = handler.method
+        method.getAnnotation(AuthLogin::class.java) ?: return true
+
+        // ensure request is attached with token
+        val token = getTokenFromRequestQueryOrHeader(request)
+        token ?: throw RuntimeException("token missing")
+
+        requestCtx.set(mutableMapOf())
+
+        // validate jwt expiration and format
+        val claimsJws = JwtUtils.verifyJWTThrowBackendExceptions(token)
+
+        // validate user exists
+        val userId = JwtUtils.getUserIdFromToken(claimsJws.body) ?: throw RuntimeException("TOKEN_INVALID")
+        val userpo = userMapper.selectById(userId) ?: throw RuntimeException("TOKEN_INVALID")
+
+        val requestCtxMap = requestCtx.get()
+        requestCtxMap["user"] = userpo
+
+        return true;
+    }
+
+    private fun getTokenFromRequestQueryOrHeader(request: HttpServletRequest): String? {
+
+        // this code is used to be compatible with poor design of multiple entity token authentication
+        var entityTokenInQuery = request.getParameter(VarCaseConvertUtils.lowerHyphen2LowerCamel(ENTITY_TOKEN))
+        var entityTokenInHeader = request.getHeader(VarCaseConvertUtils.lowerHyphen2LowerCamel(ENTITY_TOKEN))
+
+        // these tryings are for compatibility of old design
+        entityTokenInQuery ?: run { entityTokenInQuery = request.getParameter(ENTITY_TOKEN) }
+        entityTokenInHeader ?: run { entityTokenInQuery = request.getHeader(ENTITY_TOKEN) }
+        return entityTokenInQuery ?: entityTokenInHeader
+    }
+
+}
+
+
+@Configuration
+class InterceptorConfig : WebMvcConfigurer {
+
+    @Autowired
+    var applicationContext: ApplicationContext? = null
+
+    override fun addInterceptors(registry: InterceptorRegistry) {
+        for (interceptorClass in youSeeAllInterceptors) {
+            registry.addInterceptor(applicationContext!!.getBean(interceptorClass))
+                .addPathPatterns("/**")
+        }
+    }
+
+    companion object {
+        private val youSeeAllInterceptors = listOf<Class<out HandlerInterceptor>>(
+            AuthInterceptor::class.java,
+        )
+    }
+}
+
 
 fun generatePassayPassword(): String {
     val gen = PasswordGenerator()
