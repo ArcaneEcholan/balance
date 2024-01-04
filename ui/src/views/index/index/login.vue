@@ -154,6 +154,7 @@ export default class LoginView extends Vue {
             .then((resp) => {
                 this.login_ing = false;
                 this.$store.commit('user/SET_TOKEN', resp.data.token);
+                this.$store.commit('user/SET_CONFIGS', resp.data.configs);
                 this.$router.push('/home');
             })
             .catch((err) => {
