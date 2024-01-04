@@ -29,6 +29,9 @@ import { provideListeners } from '@/page-eventbus-registration-mixin';
 import GapComponent from '@/views/components/GapComponent.vue';
 import CustomButton from '@/views/components/CustomButton.vue';
 import { getI18nValue } from '../../../../ts/utils';
+import store from '@/ts/store';
+import request from '@/ts/request';
+import { Toast } from 'vant';
 
 @Component({
     methods: { getI18nValue },
@@ -75,16 +78,45 @@ export default class LedgerSwitcherComponent extends Vue {
             },
         ]);
 
+        // set default ledger
+        {
+            let userConfigs = store.getters.userConfigs;
+            if (userConfigs == null) {
+                this.currentLedger = {
+                    name: 'default',
+                };
+            }
+            let defaultLedgerConfig = userConfigs.filter(
+                (it: any) => it.key === 'default_ledger',
+            );
+            if (
+                defaultLedgerConfig == null ||
+                defaultLedgerConfig.length === 0
+            ) {
+                this.currentLedger = {
+                    name: 'default',
+                };
+            }
+
+            this.currentLedger = {
+                name: defaultLedgerConfig[0].value,
+            };
+            console.log(defaultLedgerConfig);
+            console.log(this.currentLedger);
+
+            // broadcast current ledger
+            eventBus.$emit(
+                'on-cur-ledger-changed',
+                Object.assign({}, this.currentLedger),
+            );
+        }
+
         this.ledgersLoading = true;
         Client.getLedgerList()
             .then((resp: any) => {
                 this.ledgersLoading = false;
                 this.ledgerList = resp.data;
-                this.currentLedger = this.ledgerList[0];
-                eventBus.$emit(
-                    'on-cur-ledger-changed',
-                    Object.assign({}, this.currentLedger),
-                );
+
                 eventBus.$emit('ledges-changes', this.ledgerList);
             })
             .catch((err: any) => {
@@ -93,19 +125,43 @@ export default class LedgerSwitcherComponent extends Vue {
             });
     }
 
-    currentLedger: any = {
-        name: 'default',
-    };
+    currentLedger: any = {};
 
     ledgerList: any[] = [];
 
     onClickSwitchLedger(ledger: any) {
+        Toast.loading({
+            message: 'Loading...',
+            forbidClick: true,
+            duration: 0,
+        });
+
         this.currentLedger = ledger;
-        console.debug('current ledger changed to: ', ledger);
 
-        this.toggleLedgerSelection();
+        request({
+            url: '/user/configs',
+            method: 'post',
+            data: {
+                configs: [
+                    {
+                        key: 'default_ledger',
+                        value: ledger.name,
+                    },
+                ],
+            },
+            headers: {
+                'entity-token': store.getters.token,
+            },
+        }).then((resp) => {
+            console.log(resp);
+            console.debug('current ledger changed to: ', ledger);
 
-        eventBus.$emit('on-cur-ledger-changed', ledger);
+            this.toggleLedgerSelection();
+
+            eventBus.$emit('on-cur-ledger-changed', ledger);
+
+            Toast.clear();
+        });
     }
 
     onClickManageLedgerList() {

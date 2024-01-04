@@ -220,14 +220,33 @@ class UserController {
             )
         )
 
-
         var userConfigs1 = selectList1.map {
             userConfigMapper.selectById(it.userConfigId)
         }.toList()
 
-
         return object {
             var configs = userConfigs1
+        }
+    }
+
+    @GetMapping("/user/info")
+    @AuthLogin
+    fun getUserInfo(): Any {
+
+        var user = requestCtx.get()["user"] as UserPO
+
+        val selectList = userUserConfigMapper.selectList(
+            QueryWrapper<UserUserConfigPO>().eq(
+                "user_id", user.id
+            )
+        )
+
+        var userConfigs = selectList.map {
+            userConfigMapper.selectById(it.userConfigId)
+        }.toList()
+
+        return object {
+            var configs = userConfigs
         }
     }
 

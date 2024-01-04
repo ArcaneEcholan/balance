@@ -34,6 +34,7 @@ import {
     Tag,
     Form,
     Dialog,
+    Toast,
 } from 'vant';
 {
     Vue.use(DatetimePicker);
@@ -56,6 +57,7 @@ import {
     Vue.use(SwipeCell);
     Vue.use(Form);
     Vue.use(Dialog);
+    Vue.use(Toast);
 }
 
 import '@/style/common-style.scss';
