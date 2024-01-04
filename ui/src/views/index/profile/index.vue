@@ -68,6 +68,11 @@
                                 clickable
                                 @click="changePasswordShow = true"
                             ></van-cell>
+                            <van-cell
+                                :title="$t('settings.profile.logout.title')"
+                                clickable
+                                @click="onClickLogout"
+                            ></van-cell>
                         </van-cell-group>
                     </panel>
                 </div>
@@ -152,7 +157,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import Panel from '@/views/components/Panel.vue';
 import CustomButton from '@/views/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
-import { Locale, Notify } from 'vant';
+import { Dialog, Locale, Notify } from 'vant';
 import { setLanguage } from '@/ts/lang';
 
 @Component({
@@ -164,6 +169,18 @@ export default class ProfileIndexView extends Vue {
     password = '';
     password_repeat = '';
     languagePickerShow = false;
+
+    onClickLogout() {
+        Dialog.confirm({
+            title: this.$t('settings.profile.logout.title') as string,
+            message: this.$t('settings.profile.logout.prompt') as string,
+            confirmButtonText: this.$t('confirm') as string,
+            cancelButtonText: this.$t('cancel') as string,
+        }).then(() => {
+            this.$store.commit('user/LOGOUT');
+            this.$router.push('/login');
+        });
+    }
 
     get changePasswordButtonDisabled() {
         return (

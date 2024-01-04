@@ -92,23 +92,6 @@
                         </div>
                     </div>
                 </custom-button>
-
-                <!--<custom-button-->
-                <!--    v-show="pageState === 'inputting_register_code'"-->
-                <!--    :disabled="login_ing"-->
-                <!--    @click="loginWithEmailCode"-->
-                <!--&gt;-->
-                <!--    <div class="flex center">-->
-                <!--        <div style="position: relative">-->
-                <!--            <van-loading-->
-                <!--                style="position: absolute; left: -16px"-->
-                <!--                size="16px"-->
-                <!--                v-show="login_ing"-->
-                <!--            ></van-loading>-->
-                <!--            {{ $t('continue') }}-->
-                <!--        </div>-->
-                <!--    </div>-->
-                <!--</custom-button>-->
             </div>
         </div>
     </div>
@@ -121,7 +104,6 @@ import CustomButton from '@/views/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import request from '@/ts/request';
 import { Notify } from 'vant';
-import { getHtmlElem } from '@/ts/vueUtils';
 
 @Component({
     components: { GapComponent, CustomButton, Panel },
@@ -160,29 +142,6 @@ export default class LoginView extends Vue {
             this.pageState === 'inputting_password' ||
             this.pageState === 'inputting_register_code'
         );
-    }
-
-    loginWithEmailCode() {
-        this.login_ing = true;
-        request
-            .post('/user/auth', {
-                type: 'email_code',
-                username: this.username,
-                credential: this.registerCode,
-            })
-            .then((resp) => {
-                this.login_ing = false;
-                this.$store.commit('user/SET_TOKEN', resp.data.token);
-                this.$router.push('/home');
-            })
-            .catch((err) => {
-                this.login_ing = false;
-                let msg = err?.response?.data?.message;
-                Notify({
-                    type: 'danger',
-                    message: msg || 'auth error',
-                });
-            });
     }
 
     login() {

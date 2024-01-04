@@ -19,6 +19,7 @@ export const setLanguage = (language: string) =>
 Vue.use(VueI18n);
 
 let en = {
+    confirm: 'Confirm',
     default: 'default',
     language: 'language',
     settings: {
@@ -35,6 +36,10 @@ let en = {
                 password_format_error_prompt:
                     'Password must be at least 6 characters, numbers and letters only',
                 password_repeat_error_prompt: 'Password does not match',
+            },
+            logout: {
+                title: 'Logout',
+                prompt: 'Are you sure you want to logout?',
             },
         },
     },
@@ -72,6 +77,7 @@ let en = {
 };
 
 let zh = {
+    confirm: '确定',
     default: '默认',
     language: '语言',
     settings: {
@@ -87,6 +93,10 @@ let zh = {
                 repeat: '重复',
                 password_format_error_prompt: '密码至少6位，仅支持数字和字母',
                 password_repeat_error_prompt: '两次密码不一致',
+            },
+            logout: {
+                title: '退出',
+                prompt: '确定退出吗？',
             },
         },
     },

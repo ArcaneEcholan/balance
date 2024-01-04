@@ -45,7 +45,7 @@ class RequestCorsFilter {
         val config = CorsConfiguration()
         config.allowCredentials = true
         config.addAllowedOriginPattern("*")
-        config.allowedHeaders = Arrays.asList("Origin", "Content-Type", "Accept", "responseType", "Authorization")
+        config.allowedHeaders = Arrays.asList("Origin", "Content-Type", "Accept", "responseType", "Authorization", "entity-token")
         config.allowedMethods = Arrays.asList("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH")
         source.registerCorsConfiguration("/**", config)
         return CorsFilter(source)

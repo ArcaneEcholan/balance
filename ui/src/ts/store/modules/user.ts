@@ -7,13 +7,19 @@ const state = {
 };
 
 const mutations = {
-    SET_TOKEN(state: any, token: string) {
+    SET_TOKEN(state: any, token: string | null) {
         state.token = token;
         Cookies.set('token', token);
     },
-    SET_USERNAME(state: any, username: string) {
+    SET_USERNAME(state: any, username: string | null) {
         state.username = username;
         Cookies.set('username', username);
+    },
+    LOGOUT(state: any) {
+        state.token = null;
+        state.username = null;
+        Cookies.remove('token');
+        Cookies.remove('username');
     },
 };
 
