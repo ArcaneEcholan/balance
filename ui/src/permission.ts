@@ -1,5 +1,6 @@
 import router from '@/ts/router/index';
 import store from '@/ts/store';
+import request from '@/ts/request';
 
 router.beforeEach(async (to, from, next) => {
     let whiteList = ['/login'];
@@ -15,5 +16,15 @@ router.beforeEach(async (to, from, next) => {
         return;
     }
 
-    next();
+    // update user info
+    request({
+        url: '/user/info',
+        method: 'get',
+        headers: {
+            'entity-token': token,
+        },
+    }).then((resp) => {
+        store.commit('user/SET_CONFIGS', resp.data.configs);
+        next();
+    });
 });
