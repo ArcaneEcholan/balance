@@ -96,13 +96,11 @@ export default class LedgerSwitcherComponent extends Vue {
                 this.currentLedger = {
                     name: 'default',
                 };
+            } else {
+                this.currentLedger = {
+                    name: defaultLedgerConfig[0].value,
+                };
             }
-
-            this.currentLedger = {
-                name: defaultLedgerConfig[0].value,
-            };
-            console.log(defaultLedgerConfig);
-            console.log(this.currentLedger);
 
             // broadcast current ledger
             eventBus.$emit(
