@@ -26,10 +26,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
@@ -69,7 +66,7 @@ class UserController {
         var username: String? = null
 
         @NotEmpty
-        var password: String? = null
+        var credential: String? = null
     }
 
     @Autowired
@@ -81,7 +78,7 @@ class UserController {
     @PostMapping("/user/auth")
     fun auth(@RequestBody userAuthRequest: UserAuthRequest): Any {
         var username = userAuthRequest.username!!;
-        var password = userAuthRequest.password!!;
+        var password = userAuthRequest.credential!!;
         var exists = userDao.selectOne(
             QueryWrapper<UserPO>().eq("username", username)
                 .eq("password", password)
@@ -146,15 +143,91 @@ class UserController {
 
     class UpdateUserConfigRequest {
         @Valid
-        var configs: List< UserConfigRequest>? = null
+        var configs: List<UserConfigRequest> = mutableListOf()
+    }
+
+    @GetMapping("/user/configs")
+    @AuthLogin
+    fun getUserConfigs(): Any {
+
+        var user = requestCtx.get()["user"] as UserPO
+
+        val selectList = userUserConfigMapper.selectList(
+            QueryWrapper<UserUserConfigPO>().eq(
+                "user_id", user.id
+            )
+        )
+
+        var userConfigs = selectList.map {
+            userConfigMapper.selectById(it.userConfigId)
+        }.toList()
+
+        return userConfigs
     }
 
     @PostMapping("/user/configs")
     @AuthLogin
+    @Transactional
     fun updateUserConfig(@RequestBody @Valid updateUserConfigRequest: UpdateUserConfigRequest): Any {
-        println(requestCtx.get()["user"])
+
+        var user = requestCtx.get()["user"] as UserPO
+
+        val configs1 = updateUserConfigRequest.configs
+
+
+        val selectList = userUserConfigMapper.selectList(
+            QueryWrapper<UserUserConfigPO>().eq(
+                "user_id", user.id
+            )
+        )
+
+
+        var userConfigs = selectList.map {
+            userConfigMapper.selectById(it.userConfigId)
+        }.toList()
+
+        configs1.forEach {
+
+            var userConfig = userConfigs.find { userConfig -> userConfig.key == it.key }
+            if (userConfig == null) {
+                userConfig = UserConfigPO()
+                userConfig.key = it.key
+                userConfig.value = it.value
+                userConfigMapper.insert(userConfig)
+            } else {
+                userConfig.value = it.value
+                userConfigMapper.updateById(userConfig)
+            }
+
+            var userUserConfig = userUserConfigMapper.selectOne(
+                QueryWrapper<UserUserConfigPO>().eq(
+                    "user_id", user.id
+                ).eq(
+                    "user_config_id", userConfig.id
+                )
+            )
+            if (userUserConfig == null) {
+                userUserConfig = UserUserConfigPO()
+                userUserConfig.userConfigId = userConfig.id
+                userUserConfig.userId = user.id
+                userUserConfigMapper.insert(userUserConfig)
+            }
+        }
+
+        val selectList1 = userUserConfigMapper.selectList(
+            QueryWrapper<UserUserConfigPO>().eq(
+                "user_id", user.id
+            )
+        )
+
+
+        var userConfigs1 = selectList1.map {
+            userConfigMapper.selectById(it.userConfigId)
+        }.toList()
+
+
         return object {
-            var configs = updateUserConfigRequest
+            var configs = userConfigs1
         }
     }
 
