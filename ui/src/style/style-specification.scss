@@ -33,7 +33,8 @@ body {
 
 .page {
     box-sizing: border-box;
-    padding: $common-page-padding;
+    // the top has to be 0.5px, or settings page will be bugged to broken
+    padding: 0.5px $common-page-padding $common-page-padding $common-page-padding;
     background-color: $secondary-bgc;
     height: 100%;
 }

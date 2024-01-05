@@ -1,6 +1,6 @@
 <template>
     <!--list-->
-    <div class="">
+    <div class="" id="records-list" style="position: relative">
         <div v-for="day in recordsListByDay">
             <div class="record-header">{{ day.date }}</div>
             <panel>
@@ -89,6 +89,11 @@ export default class TransactionListComponent extends Vue {
     created() {
         this.prepareListeners();
         this.onRefreshTransactionList();
+    }
+
+    mounted() {
+        let height = $('#records-index-header').innerHeight();
+        $('#records-list').css('top', height + 'px');
     }
 
     prepareListeners() {

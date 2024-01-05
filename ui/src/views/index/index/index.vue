@@ -9,14 +9,16 @@
         <!-- page header ( fixed ) -->
         <div id="records-index-header">
             <div class="flex center">
-                <div class="current-ledger">{{ curLedger.name }}</div>
+                <div style="height: 28px" class="current-ledger">
+                    {{ curLedger.name }}
+                </div>
             </div>
 
             <main-page-current-date-picker-component></main-page-current-date-picker-component>
 
             <gap-component :value="'8px'"></gap-component>
 
-            <div class="fs16">
+            <div style="height: 35px" class="fs16">
                 <van-icon name="location-o"></van-icon>
                 {{
                     geoLocation.formattedName === 'out_of_service'
@@ -48,7 +50,7 @@
             </div>
         </div>
 
-        <gap-component :value="'140px'"></gap-component>
+        <!--<gap-component :value="'140px'"></gap-component>-->
 
         <!-- records list -->
         <transaction-list-component

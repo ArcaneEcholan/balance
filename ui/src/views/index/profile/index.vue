@@ -4,7 +4,7 @@
             {{ $t('settings.title') }}
         </div>
 
-        <gap-component value="55px"></gap-component>
+        <gap-component value="75px"></gap-component>
 
         <panel>
             <van-cell-group>
