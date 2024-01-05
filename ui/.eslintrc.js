@@ -1,8 +1,5 @@
 module.exports = {
     root: true,
-    env: {
-        node: true,
-    },
     parserOptions: {
         ecmaVersion: 2020,
         // if you don't turn this off, you can get wierd eslint errors everywhere
@@ -14,6 +11,7 @@ module.exports = {
         browser: true,
         node: true,
         es6: true,
+        jquery: true,
     },
     extends: [
         'plugin:vue/essential',

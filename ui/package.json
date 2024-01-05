@@ -14,6 +14,7 @@
     "dependencies": {
         "@amap/amap-jsapi-loader": "^1.0.1",
         "@types/fastclick": "^1.0.33",
+        "@types/jquery": "^3.5.29",
         "@types/js-cookie": "^3.0.6",
         "@types/uuid": "^9.0.2",
         "axios": "0.18.1",
