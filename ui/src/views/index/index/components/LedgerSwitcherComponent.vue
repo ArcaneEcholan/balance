@@ -1,14 +1,12 @@
 <template>
-    <van-action-sheet
-        style="height: 80%"
-        name="ledger-picker-sheet"
+    <common-action-sheet
+        :visible.sync="visible"
         @open="onLedgerPickerSheetOpen"
-        :closeable="false"
-        v-model="show"
     >
-        <div class="action-sheet-title">{{ $t('pick_a_ledger') }}</div>
-
-        <div class="action-sheet-body">
+        <template #header>
+            {{ $t('pick_a_ledger') }}
+        </template>
+        <template #body>
             <div v-if="ledgersLoading" class="flex center">
                 <van-loading></van-loading>
             </div>
@@ -29,8 +27,8 @@
                 </div>
                 <gap-component :value="'30px'"></gap-component>
             </div>
-        </div>
-    </van-action-sheet>
+        </template>
+    </common-action-sheet>
 </template>
 
 <script lang="ts">
@@ -45,15 +43,16 @@ import { getI18nValue } from '../../../../ts/utils';
 import store from '@/ts/store';
 import request from '@/ts/request';
 import { Toast } from 'vant';
+import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 
 @Component({
     methods: { getI18nValue },
-    components: { CustomButton, GapComponent, CommonButton },
+    components: { CommonActionSheet, CustomButton, GapComponent, CommonButton },
 })
 export default class LedgerSwitcherComponent extends Vue {
     ledgersListLoadedFirstTime = true;
 
-    show = false;
+    visible = false;
 
     ledgersLoading = false;
 
@@ -83,7 +82,7 @@ export default class LedgerSwitcherComponent extends Vue {
     }
 
     showSheet() {
-        this.show = true;
+        this.visible = true;
     }
 
     created() {
@@ -191,7 +190,7 @@ export default class LedgerSwitcherComponent extends Vue {
     }
 
     toggleLedgerSelection() {
-        this.show = !this.show;
+        this.visible = !this.visible;
     }
 }
 </script>
