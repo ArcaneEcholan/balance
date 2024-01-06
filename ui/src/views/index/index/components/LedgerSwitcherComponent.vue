@@ -1,21 +1,34 @@
 <template>
-    <van-action-sheet :closeable="false" v-model="show" title="">
+    <van-action-sheet
+        style="height: 80%"
+        name="ledger-picker-sheet"
+        @open="onLedgerPickerSheetOpen"
+        :closeable="false"
+        v-model="show"
+    >
         <div class="action-sheet-title">{{ $t('pick_a_ledger') }}</div>
+
         <div class="action-sheet-body">
-            <van-cell-group class="shadow br15 overflow-hidden">
-                <van-cell
-                    @click="onClickSwitchLedger(ledger)"
-                    v-for="ledger in ledgerList"
-                    :title="ledger.name"
-                ></van-cell>
-            </van-cell-group>
-            <gap-component :value="'30px'"></gap-component>
-            <div class="flex center">
-                <custom-button @click="onClickManageLedgerList">
-                    {{ $t('all_ledgers') }}
-                </custom-button>
+            <div v-if="ledgersLoading" class="flex center">
+                <van-loading></van-loading>
             </div>
-            <gap-component :value="'30px'"></gap-component>
+            <div v-else>
+                <van-cell-group class="shadow br15 overflow-hidden">
+                    <van-cell
+                        :key="ledger.name"
+                        @click="onClickSwitchLedger(ledger)"
+                        v-for="ledger in ledgerList"
+                        :title="ledger.name"
+                    ></van-cell>
+                </van-cell-group>
+                <gap-component :value="'30px'"></gap-component>
+                <div class="flex center">
+                    <custom-button @click="onClickManageLedgerList">
+                        {{ $t('all_ledgers') }}
+                    </custom-button>
+                </div>
+                <gap-component :value="'30px'"></gap-component>
+            </div>
         </div>
     </van-action-sheet>
 </template>
@@ -38,9 +51,36 @@ import { Toast } from 'vant';
     components: { CustomButton, GapComponent, CommonButton },
 })
 export default class LedgerSwitcherComponent extends Vue {
+    ledgersListLoadedFirstTime = true;
+
     show = false;
 
     ledgersLoading = false;
+
+    currentLedger: any = {};
+
+    ledgerList: any[] = [];
+
+    onLedgerPickerSheetOpen() {
+        // ensure the loading does not happen when user repeatly close and open the ledger
+        if (!this.ledgersListLoadedFirstTime) {
+            return;
+        }
+
+        this.ledgersLoading = true;
+        Client.getLedgerList()
+            .then((resp: any) => {
+                this.ledgersListLoadedFirstTime = false;
+                this.ledgersLoading = false;
+                this.ledgerList = resp.data;
+
+                eventBus.$emit('ledges-changes', this.ledgerList);
+            })
+            .catch((err: any) => {
+                this.ledgersLoading = false;
+                console.error(err);
+            });
+    }
 
     showSheet() {
         this.show = true;
@@ -108,24 +148,7 @@ export default class LedgerSwitcherComponent extends Vue {
                 Object.assign({}, this.currentLedger),
             );
         }
-
-        this.ledgersLoading = true;
-        Client.getLedgerList()
-            .then((resp: any) => {
-                this.ledgersLoading = false;
-                this.ledgerList = resp.data;
-
-                eventBus.$emit('ledges-changes', this.ledgerList);
-            })
-            .catch((err: any) => {
-                this.ledgersLoading = false;
-                console.error(err);
-            });
     }
-
-    currentLedger: any = {};
-
-    ledgerList: any[] = [];
 
     onClickSwitchLedger(ledger: any) {
         Toast.loading({
