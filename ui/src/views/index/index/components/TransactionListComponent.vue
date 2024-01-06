@@ -1,62 +1,82 @@
 <template>
     <!--list-->
-    <div class="" id="records-list" style="position: relative">
-        <div v-for="day in recordsListByDay">
-            <div class="record-header">{{ day.date }}</div>
-            <panel>
-                <div :key="record.id" v-for="record in day.records">
+    <div
+        class=""
+        id="records-list"
+        style="position: relative; padding-top: 16px"
+    >
+        <div v-if="recordsListLoading" class="flex center">
+            <van-loading></van-loading>
+        </div>
+        <div v-else>
+            <div
+                name="all-records-by-day"
+                :key="oneDayRecords.date"
+                v-for="oneDayRecords in recordsListByDay"
+            >
+                <div name="records-header" class="record-header">
+                    {{ oneDayRecords.date }}
+                </div>
+                <panel name="records-body">
                     <div
-                        class="record-row"
-                        @click="toEditTransactionPage(record.id)"
+                        name="records-in-one-day"
+                        :key="record.id"
+                        v-for="record in oneDayRecords.records"
                     >
-                        <!--card left-->
-                        <div class="flexg5">
-                            <div>
-                                <span class="pdr10">
+                        <div
+                            name="one-record"
+                            class="record-row"
+                            @click="toEditTransactionPage(record.id)"
+                        >
+                            <!--card left-->
+                            <div class="flexg5">
+                                <div>
+                                    <span class="pdr10">
+                                        {{
+                                            record.categoryValue == null
+                                                ? $t('unknown_record_type')
+                                                : record.categoryValue
+                                        }}
+                                    </span>
+                                    <span class="fs14 google-gray-400">
+                                        {{
+                                            record.location == null
+                                                ? $t('unset')
+                                                : $t(record.location)
+                                        }}
+                                    </span>
+                                </div>
+                                <div class="fs14">
+                                    <span class="google-gray-400">
+                                        {{
+                                            record.datetime |
+                                                formatTimeForRecordItem
+                                        }}
+                                    </span>
+                                    <span class="pd5 google-gray-300">|</span>
+                                    <span class="google-gray-400">
+                                        {{ record.description }}
+                                    </span>
+                                </div>
+                            </div>
+                            <!--card right-->
+                            <div class="flexg1 flex center">
+                                <span class="bold fs18">
+                                    {{ record.amount }}
                                     {{
-                                        record.categoryValue == null
-                                            ? $t('unknown_record_type')
-                                            : record.categoryValue
-                                    }}
-                                </span>
-                                <span class="fs14 google-gray-400">
-                                    {{
-                                        record.location == null
-                                            ? $t('unset')
-                                            : $t(record.location)
+                                        `${
+                                            record.count > 1
+                                                ? 'x ' + record.count
+                                                : ''
+                                        }`
                                     }}
                                 </span>
                             </div>
-                            <div class="fs14">
-                                <span class="google-gray-400">
-                                    {{
-                                        record.datetime |
-                                            formatTimeForRecordItem
-                                    }}
-                                </span>
-                                <span class="pd5 google-gray-300">|</span>
-                                <span class="google-gray-400">
-                                    {{ record.description }}
-                                </span>
-                            </div>
-                        </div>
-                        <!--card right-->
-                        <div class="flexg1 flex center">
-                            <span class="bold fs18">
-                                {{ record.amount }}
-                                {{
-                                    `${
-                                        record.count > 1
-                                            ? 'x ' + record.count
-                                            : ''
-                                    }`
-                                }}
-                            </span>
                         </div>
                     </div>
-                </div>
-            </panel>
-            <gap-component></gap-component>
+                </panel>
+                <gap-component></gap-component>
+            </div>
         </div>
     </div>
 </template>
@@ -85,7 +105,7 @@ import GapComponent from '@/views/components/GapComponent.vue';
 export default class TransactionListComponent extends Vue {
     transactionList: any[] = [];
     recordsListByDay: any[] = [];
-
+    recordsListLoading = false;
     created() {
         this.prepareListeners();
         this.onRefreshTransactionList();
@@ -139,11 +159,13 @@ export default class TransactionListComponent extends Vue {
         try {
             let currentLedgerName = this.getCurrentLedgerName();
             let currentDate = this.getCurrentDate();
+            this.recordsListLoading = true;
             Client.getTransactionListByLedgerName(
                 currentLedgerName,
                 currentDate,
             )
                 .then((res) => {
+                    this.recordsListLoading = false;
                     console.debug(res);
                     // sort records by day
                     let recordsByDay: any = {};
@@ -171,6 +193,7 @@ export default class TransactionListComponent extends Vue {
                     this.recordsListByDay = resultList;
                 })
                 .catch((err) => {
+                    this.recordsListLoading = false;
                     console.log(err);
                 });
         } catch (e) {
