@@ -6,19 +6,25 @@
             </van-button>
         </div>
         <div class="shadow br8 overflow-hidden">
-            <van-action-sheet :closeable="false" v-model="show" title="">
-                <van-datetime-picker
-                    @cancel="onCancel"
-                    @confirm="onPickDate"
-                    v-model="currentDate"
-                    title="Choose Year-Month"
-                    :min-date="minDate"
-                    :max-date="maxDate"
-                    :type="columnsType"
-                >
-                    <template #default></template>
-                </van-datetime-picker>
-            </van-action-sheet>
+            <common-action-sheet
+                :visible.sync="show"
+                :fit-content="true"
+                :plane-content="true"
+            >
+                <template #default>
+                    <van-datetime-picker
+                        @cancel="onCancel"
+                        @confirm="onPickDate"
+                        v-model="currentDate"
+                        title="Choose Year-Month"
+                        :min-date="minDate"
+                        :max-date="maxDate"
+                        :type="columnsType"
+                    >
+                        <template #default></template>
+                    </van-datetime-picker>
+                </template>
+            </common-action-sheet>
         </div>
 
         <gap-component></gap-component>
@@ -116,10 +122,17 @@ import Client from '@/ts/request/client';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { shallowMount } from '@vue/test-utils';
 import Panel from '@/views/components/Panel.vue';
+import AddRecordSheetComponent from '@/views/index/index/components/AddRecordSheetComponent.vue';
+import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 
 @Component({
     methods: { shallowMount },
-    components: { Panel, GapComponent },
+    components: {
+        CommonActionSheet,
+        AddRecordSheetComponent,
+        Panel,
+        GapComponent,
+    },
 })
 export default class StatisticIndexView extends Vue {
     show = false;

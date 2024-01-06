@@ -1,16 +1,15 @@
 <template>
     <div>
-        <van-action-sheet :closeable="false" v-model="chooseTypePanelShow">
-            <div class="action-sheet-title">
+        <common-action-sheet :visible.sync="chooseTypePanelShow">
+            <template #header>
                 {{ $t('add_record.choose_type.title') }}
-            </div>
-            <div class="action-sheet-body">
+            </template>
+            <template #body>
                 <transaction-type-component
                     @on-click-one-type="onClickOneType"
                 ></transaction-type-component>
-            </div>
-        </van-action-sheet>
-
+            </template>
+        </common-action-sheet>
         <div class="flex column">
             <div class="flex mgb15">
                 <div class="flexg1 flex center">
@@ -147,6 +146,7 @@ import Clickable from '@/views/components/Clickable.vue';
 import SolidIcon from '@/views/components/SolidIcon.vue';
 import KeyBoardComponent from '@/views/index/index/components/KeyBoardComponent.vue';
 import settings from '@/settings';
+import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 
 class FormItemField {
     value: string | null = null;
@@ -163,6 +163,7 @@ class FormItem {
 
 @Component({
     components: {
+        CommonActionSheet,
         KeyBoardComponent,
         SolidIcon,
         Clickable,

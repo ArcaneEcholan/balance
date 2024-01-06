@@ -22,16 +22,14 @@
         </panel>
 
         <div name="sheets">
-            <van-action-sheet
-                style="height: 80%"
+            <common-action-sheet
                 name="language-picker-sheet"
-                v-model="languagePickerShow"
-                :closeable="false"
+                :visible.sync="languagePickerShow"
             >
-                <div class="action-sheet-title">
+                <template #header>
                     {{ $t('settings.language.title') }}
-                </div>
-                <div class="action-sheet-body">
+                </template>
+                <template #body>
                     <panel>
                         <van-cell-group>
                             <van-cell
@@ -46,19 +44,17 @@
                             />
                         </van-cell-group>
                     </panel>
-                </div>
-            </van-action-sheet>
+                </template>
+            </common-action-sheet>
 
-            <van-action-sheet
-                style="height: 80%"
+            <common-action-sheet
                 name="account-setting-sheet"
-                v-model="accountSettingShow"
-                :closeable="false"
+                :visible.sync="accountSettingShow"
             >
-                <div class="action-sheet-title">
+                <template #header>
                     {{ $t('settings.profile.title') }}
-                </div>
-                <div class="action-sheet-body">
+                </template>
+                <template #body>
                     <panel>
                         <van-cell-group>
                             <van-cell
@@ -75,16 +71,14 @@
                             ></van-cell>
                         </van-cell-group>
                     </panel>
-                </div>
-            </van-action-sheet>
+                </template>
+            </common-action-sheet>
 
-            <van-action-sheet
-                style="height: 80%"
+            <common-action-sheet
                 name="change-password-sheet"
-                v-model="changePasswordShow"
-                :closeable="false"
+                :visible.sync="changePasswordShow"
             >
-                <div name="change-password-title" class="action-sheet-title">
+                <template #header>
                     <div style="width: 100%" class="flex">
                         <div style="width: 20%"></div>
                         <div style="width: 60%" class="flex center">
@@ -100,8 +94,8 @@
                             </custom-button>
                         </div>
                     </div>
-                </div>
-                <div class="action-sheet-body">
+                </template>
+                <template #body>
                     <div class="record-header">
                         {{ $t('settings.profile.reset_password.password') }}
                     </div>
@@ -146,8 +140,8 @@
                             </van-cell-group>
                         </van-form>
                     </panel>
-                </div>
-            </van-action-sheet>
+                </template>
+            </common-action-sheet>
         </div>
     </div>
 </template>
@@ -159,9 +153,17 @@ import CustomButton from '@/views/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { Dialog, Locale, Notify } from 'vant';
 import { setLanguage } from '@/ts/lang';
+import AddRecordSheetComponent from '@/views/index/index/components/AddRecordSheetComponent.vue';
+import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 
 @Component({
-    components: { GapComponent, CustomButton, Panel },
+    components: {
+        CommonActionSheet,
+        AddRecordSheetComponent,
+        GapComponent,
+        CustomButton,
+        Panel,
+    },
 })
 export default class ProfileIndexView extends Vue {
     changePasswordShow = false;

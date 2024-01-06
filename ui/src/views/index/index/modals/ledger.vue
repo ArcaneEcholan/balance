@@ -1,8 +1,9 @@
 <template>
     <modal-presentation :hooks="modalLifeCycleHooks" @closed="closed">
-        <van-action-sheet v-model="show">
-            <div class="page">
-                <div class="record-header">Edit Fields</div>
+        <common-action-sheet :visible.sync="show">
+            <template #header>Edit Ledger</template>
+            <template #body>
+                <div class="record-header"></div>
                 <van-cell-group class="shadow overflow-hidden br8">
                     <van-field
                         v-model="editLedgerName"
@@ -17,10 +18,11 @@
                 >
                     <template #default>Submit</template>
                 </common-button>
-            </div>
-        </van-action-sheet>
-        <van-action-sheet v-model="addLedgerShow" title="Title">
-            <div class="page">
+            </template>
+        </common-action-sheet>
+        <common-action-sheet :visible.sync="addLedgerShow">
+            <template #header>Add Ledger</template>
+            <template #body>
                 <gap-component :value="'32px'"></gap-component>
                 <div class="record-header">Add Fields</div>
                 <van-cell-group class="shadow overflow-hidden br8">
@@ -37,8 +39,9 @@
                 >
                     <template #default>Submit</template>
                 </common-button>
-            </div>
-        </van-action-sheet>
+            </template>
+        </common-action-sheet>
+
         <div ref="page-main-frame" style="height: 100%">
             <div
                 class="page"
@@ -100,9 +103,11 @@ import {
     unmountComponent,
 } from '@/ts/utils';
 import SolidIcon from '@/views/components/SolidIcon.vue';
+import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 let that: any;
 @Component({
     components: {
+        CommonActionSheet,
         SolidIcon,
         GapComponent,
         CommonButton,

@@ -29,13 +29,11 @@
 
         <div name="sheets">
             <!--add new types sheet-->
-            <van-action-sheet
-                :style="{ height: '80%' }"
-                get-container="#vant-sheet-mount-point"
-                ref="sheet"
-                v-model="addTypeShow"
+            <common-action-sheet
+                :mount-point="`#vant-sheet-mount-point`"
+                :visible.sync="addTypeShow"
             >
-                <div class="action-sheet-title">
+                <template #header>
                     <div style="width: 100%" class="flex">
                         <div style="width: 20%"></div>
                         <div style="width: 60%" class="flex center">
@@ -47,61 +45,66 @@
                             </custom-button>
                         </div>
                     </div>
-                </div>
+                </template>
 
-                <div class="action-sheet-body flex column">
-                    <div class="flex">
-                        <!--icon picked by user-->
-                        <div name="picked-icon" class="type-icon-cell">
-                            <div
-                                class="flex flex-center column type-icon picked"
-                            >
-                                <i :class="pickedIcon.className"></i>
+                <template #body>
+                    <div class="flex column">
+                        <div class="flex">
+                            <!--icon picked by user-->
+                            <div name="picked-icon" class="type-icon-cell">
+                                <div
+                                    class="flex flex-center column type-icon picked"
+                                >
+                                    <i :class="pickedIcon.className"></i>
+                                </div>
                             </div>
+
+                            <!--name of new icon-->
+                            <panel class="flexg1">
+                                <!--type name-->
+                                <van-field
+                                    v-model="name"
+                                    label="name"
+                                ></van-field>
+                            </panel>
+                            <gap-component></gap-component>
                         </div>
 
-                        <!--name of new icon-->
-                        <panel class="flexg1">
-                            <!--type name-->
-                            <van-field v-model="name" label="name"></van-field>
-                        </panel>
                         <gap-component></gap-component>
-                    </div>
 
-                    <gap-component></gap-component>
-
-                    <!--preset type icons-->
-                    <div style="overflow: auto">
-                        <div
-                            id="icon-panel"
-                            class="flex"
-                            style="
-                                justify-content: start;
-                                flex-wrap: wrap;
-                                row-gap: 15px;
-                            "
-                        >
+                        <!--preset type icons-->
+                        <div style="overflow: auto">
                             <div
-                                :key="icon.id"
-                                v-for="icon in icons"
-                                :class="`type-icon-cell`"
-                                @click="pickNewIcon(icon)"
+                                id="icon-panel"
+                                class="flex"
+                                style="
+                                    justify-content: start;
+                                    flex-wrap: wrap;
+                                    row-gap: 15px;
+                                "
                             >
                                 <div
-                                    :class="`flex flex-center column type-icon  ${
-                                        icon.active ? 'picked' : ''
-                                    }`"
+                                    :key="icon.id"
+                                    v-for="icon in icons"
+                                    :class="`type-icon-cell`"
+                                    @click="pickNewIcon(icon)"
                                 >
-                                    <i
-                                        :class="icon.className"
-                                        style="font-size: inherit"
-                                    ></i>
+                                    <div
+                                        :class="`flex flex-center column type-icon  ${
+                                            icon.active ? 'picked' : ''
+                                        }`"
+                                    >
+                                        <i
+                                            :class="icon.className"
+                                            style="font-size: inherit"
+                                        ></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </van-action-sheet>
+                </template>
+            </common-action-sheet>
         </div>
     </div>
 </template>
@@ -114,9 +117,17 @@ import Panel from '@/views/components/Panel.vue';
 import SolidIcon from '@/views/components/SolidIcon.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import CustomButton from '@/views/components/CustomButton.vue';
+import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 
 @Component({
-    components: { CustomButton, GapComponent, SolidIcon, Panel, Clickable },
+    components: {
+        CommonActionSheet,
+        CustomButton,
+        GapComponent,
+        SolidIcon,
+        Panel,
+        Clickable,
+    },
 })
 export default class TransTypeComponent extends Vue {
     name = '';

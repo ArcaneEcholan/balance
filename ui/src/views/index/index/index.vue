@@ -62,18 +62,16 @@
 
         <div name="sheets">
             <!-- where user add new records -->
-            <van-action-sheet :closeable="false" v-model="show">
-                <div class="page">
-                    <div class="action-sheet-title">
-                        {{ $t('add_record.title') }}
-                    </div>
-                    <div class="action-sheet-body">
-                        <add-record-sheet-component
-                            ref="add-transaction-editor-component"
-                        ></add-record-sheet-component>
-                    </div>
-                </div>
-            </van-action-sheet>
+            <common-action-sheet :visible.sync="show">
+                <template #header>
+                    {{ $t('add_record.title') }}
+                </template>
+                <template #body>
+                    <add-record-sheet-component
+                        ref="add-transaction-editor-component"
+                    ></add-record-sheet-component>
+                </template>
+            </common-action-sheet>
         </div>
     </div>
 </template>
@@ -101,6 +99,7 @@ import {
 import EditRecordView from '@/views/index/index/modals/edit_record.vue';
 import ManageLedgerView from '@/views/index/index/modals/ledger.vue';
 import Clickable from '@/views/components/Clickable.vue';
+import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -108,6 +107,7 @@ import Clickable from '@/views/components/Clickable.vue';
 
 @Component({
     components: {
+        CommonActionSheet,
         Clickable,
         AddRecordSheetComponent,
         CommonButton,
