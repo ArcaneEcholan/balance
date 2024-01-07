@@ -5,6 +5,14 @@ import request from '@/ts/request';
 router.beforeEach(async (to, from, next) => {
     let whiteList = ['/login'];
     if (whiteList.indexOf(to.path) !== -1) {
+        if (to.path === '/login') {
+            // if already login, redirect to home
+            let token = store.getters.token;
+            if (token != null) {
+                next('/home');
+                return;
+            }
+        }
         next();
         return;
     }
