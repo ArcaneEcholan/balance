@@ -10,8 +10,8 @@
                 ></transaction-type-component>
             </template>
         </common-action-sheet>
-        <div class="flex column">
-            <div class="flex mgb15">
+        <div name="new-records-area-body" class="flex column">
+            <div name="new-records-area-header" class="flex mgb15">
                 <div class="flexg1 flex center">
                     {{ $t('add_record.type') }}
                 </div>
@@ -26,7 +26,7 @@
                 </div>
             </div>
 
-            <div id="new-records-area" class="shadow br8 overflow-hidden">
+            <div id="new-records-area-body" class="shadow br8 overflow-hidden">
                 <div
                     :key="recordRow.id"
                     :id="formNewRecordRowId(recordRow)"
@@ -204,7 +204,7 @@ export default class AddTransactionEditorComponent extends Vue {
     }
 
     getNewRecordsAreaDiv() {
-        let area = document.getElementById('new-records-area');
+        let area = document.getElementById('new-records-area-body');
         if (area == null) {
             throw new Error('area == null');
         }
@@ -425,7 +425,7 @@ export default class AddTransactionEditorComponent extends Vue {
                 this.focusOnNewRecordCell(newRecord, 'amount');
             });
         }
-        let area = document.getElementById('new-records-area');
+        let area = document.getElementById('new-records-area-body');
         if (area == null) {
             throw new Error('area == null');
         }
@@ -434,7 +434,7 @@ export default class AddTransactionEditorComponent extends Vue {
 
     clearAllRecords() {
         this.clearingAllRecords = true;
-        let area = document.getElementById('new-records-area');
+        let area = document.getElementById('new-records-area-body');
         if (area == null) {
             throw new Error('area == null');
         }
@@ -701,7 +701,7 @@ export default class AddTransactionEditorComponent extends Vue {
     }
 }
 
-#new-records-area {
+#new-records-area-body {
     height: 0px;
     transition: all var(--transition-duration) var(--transition-easing);
 
