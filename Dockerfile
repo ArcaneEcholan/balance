@@ -1,5 +1,5 @@
 # Use a base image, like AdoptOpenJDK or OpenJDK, depending on your project's requirements
-FROM eclipse-temurin:11-alpine
+FROM eclipse-temurin:8-jre
 
 # Set the working directory in the container
 WORKDIR /app
