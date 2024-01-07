@@ -10,7 +10,7 @@
                 ></transaction-type-component>
             </template>
         </common-action-sheet>
-        <div name="new-records-area-body" class="flex column">
+        <div name="new-records-area" class="flex column">
             <div name="new-records-area-header" class="flex mgb15">
                 <div class="flexg1 flex center">
                     {{ $t('add_record.type') }}
@@ -136,7 +136,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import VanCursorEditorComponent from '@/views/components/VanCursorEditor.vue';
 import { timeout } from '@/ts/utils';
 import GapComponent from '@/views/components/GapComponent.vue';
-import { Notify } from 'vant';
+import { Notify, Toast } from 'vant';
 import Client from '@/ts/request/client';
 import eventBus from '@/ts/EventBus';
 import CommonButton from '@/views/components/CommonButton.vue';
@@ -174,6 +174,7 @@ class FormItem {
     },
 })
 export default class AddTransactionEditorComponent extends Vue {
+    addRecordsLoading = false;
     onTouchCell(recordRow: any, attrName: string) {
         let oldRecordRef = this.cursor.recordRef;
         let oldAttrName = this.cursor.attrName;
@@ -211,7 +212,7 @@ export default class AddTransactionEditorComponent extends Vue {
         return area;
     }
 
-    increaseElemHeight(element: HTMLElement, heightDelt: number) {
+    increaseElemHeightImmediately(element: HTMLElement, heightDelt: number) {
         let height = element.style.height
             ? Number(element.style.height.replace('px', ''))
             : 0;
@@ -410,38 +411,54 @@ export default class AddTransactionEditorComponent extends Vue {
             return;
         }
 
-        let newRecord = {
-            id: this.counter++,
-            type: '',
-            amount: '',
-            count: 1,
-            desc: '',
-        };
-        this.newRecordRows.push(newRecord);
-        if (this.newRecordRows.length === 1) {
-            this.cursor.recordRef = newRecord;
-            this.cursor.attrName = 'amount';
-            this.$nextTick(() => {
-                this.focusOnNewRecordCell(newRecord, 'amount');
-            });
+        // add one new record (note: this will take effect in the next tick)
+        {
+            let newRecord = {
+                id: this.counter++,
+                type: '',
+                amount: '',
+                count: 1,
+                desc: '',
+            };
+            this.newRecordRows.push(newRecord);
+            if (this.newRecordRows.length === 1) {
+                this.cursor.recordRef = newRecord;
+                this.cursor.attrName = 'amount';
+                this.$nextTick(() => {
+                    this.focusOnNewRecordCell(newRecord, 'amount');
+                });
+            }
         }
-        let area = document.getElementById('new-records-area-body');
-        if (area == null) {
-            throw new Error('area == null');
+
+        // spare some space for the new record, take effect immediately
+        {
+            let area = document.getElementById('new-records-area-body');
+            if (area == null) {
+                throw new Error('area == null');
+            }
+            this.increaseElemHeightImmediately(area, 46);
         }
-        this.increaseElemHeight(area, 46);
     }
 
     clearAllRecords() {
         this.clearingAllRecords = true;
-        let area = document.getElementById('new-records-area-body');
-        if (area == null) {
-            throw new Error('area == null');
+
+        // shrink add new records area to 0
+        {
+            let area = document.getElementById('new-records-area-body');
+            if (area == null) {
+                throw new Error('area == null');
+            }
+            area.style.height = 0 + 'px';
         }
-        area.style.height = 0 + 'px';
+
+        // async do some operations after the shrink animation
         setTimeout(() => {
             this.newRecordRows = [];
             this.clearingAllRecords = false;
+            this.addRecordRow();
+            this.addRecordsLoading = false;
+            Toast.clear();
         }, settings.animation.duration);
     }
 
@@ -450,7 +467,7 @@ export default class AddTransactionEditorComponent extends Vue {
         this.squashDivToExtremelyShort(div);
 
         let area = this.getNewRecordsAreaDiv();
-        this.increaseElemHeight(area, -46);
+        this.increaseElemHeightImmediately(area, -46);
 
         timeout(settings.animation.duration).then(() => {
             let curIndex = this.newRecordRows.findIndex(
@@ -506,6 +523,10 @@ export default class AddTransactionEditorComponent extends Vue {
             null,
         );
         this.curLedger = { name: ledgerName };
+    }
+
+    mounted() {
+        this.addRecordRow();
     }
 
     keyBoardTouched(keyObj: any) {
@@ -646,6 +667,12 @@ export default class AddTransactionEditorComponent extends Vue {
 
     // assemble Add Transaction Request
     addTransactionsByLedgerName(ledgerName: string, trans: any[]) {
+        this.addRecordsLoading = true;
+        Toast.loading({
+            message: 'Loading...',
+            forbidClick: true,
+            duration: 0,
+        });
         let loc = eventBus.$emitWithReturnValue('on-get-cur-location', null);
         if (loc == null) {
             loc = {
@@ -675,6 +702,8 @@ export default class AddTransactionEditorComponent extends Vue {
                 this.clearAllRecords();
             })
             .catch((resp) => {
+                Toast.clear();
+                this.addRecordsLoading = false;
                 console.log(resp);
             });
     }
