@@ -112,22 +112,31 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun otherException(req: HttpServletResponse, ex: Exception): ResponseEntity<*> {
-        if(ex is ApiException) {
+        if (ex is ApiException) {
             return logExAndAssembleResponse(ex)
         }
         if (ex is HttpMessageNotReadableException) {
             return logExAndAssembleResponse(
-                ApiException(HttpStatus.BAD_REQUEST, "Request paramater is invalid")
+                ApiException(
+                    ex.message,
+                    ex,
+                    HttpStatus.BAD_REQUEST, ex.message,
+                )
             )
         }
         if (ex is MissingServletRequestParameterException) {
             return logExAndAssembleResponse(
-                ApiException(HttpStatus.BAD_REQUEST, "Required request body is missing")
+                ApiException(
+                    ex.message,
+                    ex, HttpStatus.BAD_REQUEST, "Required request body is missing"
+                )
             )
         }
         if (ex is MaxUploadSizeExceededException) {
             return logExAndAssembleResponse(
                 ApiException(
+                    ex.message,
+                    ex,
                     HttpStatus.PAYLOAD_TOO_LARGE,
                     "Limitation: 100MB"
                 )
