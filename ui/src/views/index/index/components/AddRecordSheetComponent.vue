@@ -147,6 +147,7 @@ import SolidIcon from '@/views/components/SolidIcon.vue';
 import KeyBoardComponent from '@/views/index/index/components/KeyBoardComponent.vue';
 import settings from '@/settings';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
+import request from '@/ts/request';
 
 class FormItemField {
     value: string | null = null;
@@ -681,7 +682,7 @@ export default class AddTransactionEditorComponent extends Vue {
                 formattedName: null,
             };
         }
-        let request = trans.map((tran) => {
+        let requestTranList = trans.map((tran) => {
             return {
                 categoryValue: tran.type,
                 amount: tran.amount,
@@ -691,7 +692,14 @@ export default class AddTransactionEditorComponent extends Vue {
             };
         });
 
-        Client.saveTransactionsByLedgerName(ledgerName, request)
+        request({
+            url: `/transactions`,
+            method: 'post',
+            data: {
+                transactionList: requestTranList,
+                ledger_name: ledgerName,
+            },
+        })
             .then((resp) => {
                 Notify({
                     message: 'save successfully',

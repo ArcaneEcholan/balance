@@ -272,7 +272,7 @@ class TransactionServiceImpl : TransactionService {
         )
 
         if (ledger == null) {
-            throw ApiException(HttpStatus.NOT_FOUND, "ledger not found")
+            throw RuntimeException("ledger not found")
         }
 
         // save relation between transaction and ledger(whose name is default ledger)

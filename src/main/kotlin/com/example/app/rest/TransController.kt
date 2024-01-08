@@ -57,6 +57,9 @@ class SaveTransDTO {
     @NotNull
     @Valid
     var transactionList: List<SaveTranDTO>? = null
+
+    @NotEmpty
+    var ledger_name: String? = null
 }
 
 //     SaveTransDTO:
@@ -79,31 +82,30 @@ class TransController {
     @Autowired
     lateinit var categoryDao: TransactionCategoryDao
 
+    // @PostMapping("/transactions")
+    // fun saveTransactions(@RequestBody @Valid transactionList: SaveTransDTO):
+    //         ResponseEntity<*> {
+    //     transactionList.transactionList!!.map {
+    //         var cateId = categoryDao.getOneByMap("value", it.categoryValue)?.id
+    //
+    //         transactionService.insert(
+    //             amount = BigDecimal(it.amount),
+    //             categoryId = cateId ?: 0,
+    //             count = it.count!!,
+    //             description = it.description,
+    //             datetime = DateTime.now().toString(),
+    //             // leave location as empty, support it later
+    //             location = it.location ?: mapOf(
+    //             )
+    //         )
+    //     }.toList().apply {
+    //         return ResponseEntity.ok(this)
+    //     }
+    // }
+
+
     @PostMapping("/transactions")
-    fun saveTransactions(@RequestBody @Valid transactionList: SaveTransDTO):
-            ResponseEntity<*> {
-        transactionList.transactionList!!.map {
-            var cateId = categoryDao.getOneByMap("value", it.categoryValue)?.id
-
-            transactionService.insert(
-                amount = BigDecimal(it.amount),
-                categoryId = cateId ?: 0,
-                count = it.count!!,
-                description = it.description,
-                datetime = DateTime.now().toString(),
-                // leave location as empty, support it later
-                location = it.location ?: mapOf(
-                )
-            )
-        }.toList().apply {
-            return ResponseEntity.ok(this)
-        }
-    }
-
-
-    @PostMapping("/transactions/{ledger_name}")
     fun saveTransactions(
-        @PathVariable("ledger_name") ledgerName: String,
         @RequestBody @Valid transactionList: SaveTransDTO,
     ):
             ResponseEntity<*> {
@@ -111,7 +113,7 @@ class TransController {
             var cateId = categoryDao.getOneByMap("value", it.categoryValue)?.id
 
             transactionService.insert(
-                ledgerName = ledgerName,
+                ledgerName = transactionList.ledger_name!!,
                 amount = BigDecimal(it.amount),
                 categoryId = cateId ?: 0,
                 count = it.count!!,
@@ -128,9 +130,9 @@ class TransController {
     @Autowired
     lateinit var ledgerMapper: LedgerMapper
 
-    @GetMapping("/transactions/{ledger_name}")
+    @GetMapping("/transactions")
     fun getTransactions(
-        @PathVariable("ledger_name") ledgerName: String,
+        @RequestParam("ledger_name") ledgerName: String,
         @Valid @NotNull month: String,
     ): ResponseEntity<List<TransactionVO>> {
         val selectOne = ledgerMapper.selectOne(
@@ -142,21 +144,6 @@ class TransController {
         }
 
         return ResponseEntity.ok(transactionService.list(selectOne.id!!, month));
-    }
-
-    @GetMapping("/transactions")
-    fun getTransactions(
-        @Valid @NotNull month: String,
-    ): ResponseEntity<List<TransactionVO>> {
-        // pick the one with name "default"
-        val ledgerId = ledgerMapper.selectList(null).find { it.name == "default" }?.id
-
-        val selectById = ledgerMapper.selectById(ledgerId)
-        if (selectById == null) {
-            return ResponseEntity.notFound().build()
-        }
-
-        return ResponseEntity.ok(transactionService.list(ledgerId!!, month));
     }
 
     @PutMapping("/transaction")

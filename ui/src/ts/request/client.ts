@@ -99,9 +99,9 @@ class Client {
         yearHyphenMonth: string,
     ) {
         return request({
-            url: `/transactions/${encodeURIComponent(ledgerName)}`,
+            url: `/transactions`,
             method: 'get',
-            params: { month: yearHyphenMonth },
+            params: { month: yearHyphenMonth, ledger_name: ledgerName },
         });
     }
 
