@@ -77,6 +77,7 @@
                 </panel>
                 <gap-component></gap-component>
             </div>
+            <gap-component value="58px"></gap-component>
         </div>
     </div>
 </template>

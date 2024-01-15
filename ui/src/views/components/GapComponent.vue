@@ -1,5 +1,5 @@
 <template>
-    <div :style="`margin-top: ${value}`"></div>
+    <div :style="`height: ${value}`"></div>
 </template>
 
 <script lang="ts">
