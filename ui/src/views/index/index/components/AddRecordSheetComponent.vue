@@ -37,15 +37,17 @@
                         <div class="flex" style="height: 100%">
                             <!--type picker-->
                             <clickable
-                                class="cell flexg1 flex center"
+                                class="cell flexg1"
                                 style="
                                     height: 100%;
                                     word-break: break-word;
                                     background-color: white;
                                 "
+                                @click="onclickPickTypeBtn(recordRow)"
                             >
                                 <div
-                                    @click="onclickPickTypeBtn(recordRow)"
+                                    class="flex center"
+                                    style="height: 100%"
                                     v-if="
                                         recordRow.type == null ||
                                         recordRow.type === ''
@@ -54,14 +56,13 @@
                                     <van-icon class="fs24" name="question-o" />
                                 </div>
                                 <div
-                                    @click="onclickPickTypeBtn(recordRow)"
+                                    class="flex center"
                                     style="
-                                        padding-left: 5px;
+                                        height: 100%;
                                         font-size: 14px;
                                         text-overflow: ellipsis;
                                         -webkit-line-clamp: 2;
                                         overflow: hidden;
-                                        display: -webkit-box;
                                         -webkit-box-orient: vertical;
                                     "
                                     v-else
