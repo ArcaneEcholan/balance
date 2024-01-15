@@ -1,40 +1,39 @@
 // @ts-ignore
-import Cookies from 'js-cookie';
 
 const state = {
-    token: Cookies.get('token'),
-    username: Cookies.get('username'),
-    configs: Cookies.get('configs'),
+    token: localStorage.getItem('token'),
+    username: localStorage.getItem('username'),
+    configs: localStorage.getItem('configs'),
 };
 
-let setCookie = (key: string, value: any) => {
+let setLocalStorage = (key: string, value: any) => {
     if (value == null) {
-        Cookies.remove(key);
+        localStorage.removeItem(key);
     } else {
-        Cookies.set(key, value);
+        localStorage.setItem(key, value);
     }
 };
 
 const mutations = {
     SET_CONFIGS(state: any, configs: any) {
         state.configs = configs;
-        setCookie('configs', configs);
+        setLocalStorage('configs', configs);
     },
     SET_TOKEN(state: any, token: string | null) {
         state.token = token;
-        setCookie('token', token);
+        setLocalStorage('token', token);
     },
     SET_USERNAME(state: any, username: string | null) {
         state.username = username;
-        setCookie('username', username);
+        setLocalStorage('username', username);
     },
     LOGOUT(state: any) {
         state.token = null;
         state.username = null;
         state.configs = [];
-        Cookies.remove('token');
-        Cookies.remove('username');
-        Cookies.remove('configs');
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('configs');
     },
 };
 
