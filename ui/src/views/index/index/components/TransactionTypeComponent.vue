@@ -48,8 +48,12 @@
                 </template>
 
                 <template #body>
-                    <div class="flex column">
-                        <div class="flex">
+                    <div
+                        name="type-picker-main"
+                        style="height: 100%"
+                        class="flex column"
+                    >
+                        <div name="type-picker-head" class="flex">
                             <!--icon picked by user-->
                             <div name="picked-icon" class="type-icon-cell">
                                 <div
@@ -73,7 +77,16 @@
                         <gap-component></gap-component>
 
                         <!--preset type icons-->
-                        <div style="overflow: auto">
+                        <!--
+                        scroll must be put at the most outer cell
+                        of in a flex box, or undefined behaviour
+                        could happen
+                        -->
+                        <div
+                            name="type-picker-icons"
+                            class="flexg1"
+                            style="overflow-y: auto"
+                        >
                             <div
                                 id="icon-panel"
                                 class="flex"
