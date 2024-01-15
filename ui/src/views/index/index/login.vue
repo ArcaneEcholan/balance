@@ -159,10 +159,9 @@ export default class LoginView extends Vue {
             })
             .catch((err) => {
                 this.login_ing = false;
-
                 Notify({
                     type: 'danger',
-                    message: err.response.data,
+                    message: err.response.data.message,
                 });
             });
     }

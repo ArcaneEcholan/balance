@@ -1,6 +1,7 @@
 import router from '@/ts/router/index';
 import store from '@/ts/store';
 import request from '@/ts/request';
+import { Notify } from 'vant';
 
 router.beforeEach(async (to, from, next) => {
     let whiteList = ['/login'];
@@ -31,8 +32,17 @@ router.beforeEach(async (to, from, next) => {
         headers: {
             'entity-token': token,
         },
-    }).then((resp) => {
-        store.commit('user/SET_CONFIGS', resp.data.configs);
-        next();
-    });
+    })
+        .then((resp) => {
+            store.commit('user/SET_CONFIGS', resp.data.configs);
+            next();
+        })
+        .catch((err) => {
+            Notify({
+                message: err.response.data,
+                type: 'danger',
+            });
+            store.commit('user/LOGOUT');
+            next('/login');
+        });
 });
