@@ -36,9 +36,9 @@ create table if not exists transaction_category
 (
     id    int auto_increment
     primary key,
-    value varchar(255) null
+    value varchar(255) null,
+    icon  varchar(255) null
     );
-
 
 create table if not exists ledger
 (

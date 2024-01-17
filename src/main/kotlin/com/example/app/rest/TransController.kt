@@ -2,6 +2,7 @@ package com.example.app.rest
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.example.app.dao.TransactionCategoryDao
+import com.example.app.dao.TransactionCategoryPO
 import com.example.app.dao.mapper.LedgerMapper
 import com.example.app.dao.po.LedgerPO
 import com.example.app.service.TransactionCategoryService
@@ -12,6 +13,7 @@ import com.example.app.utils.DateTime
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
@@ -169,6 +171,63 @@ class TransController {
     @GetMapping("/transaction/category")
     fun getTransactionCategories(): List<TransactionCategoryVO> {
         return transactionCategoryService.getAll()
+    }
+
+    @Autowired
+    lateinit var transDao: TransactionCategoryDao
+
+
+    class CreateTransTypeReq {
+        @NotEmpty
+        var name: String? = null;
+
+        @NotEmpty
+        var icon: String? = null;
+    }
+
+    @AuthLogin
+    @PostMapping("/transaction/category")
+    @Transactional
+    fun createTransactionCategories(@RequestBody @Valid createTransTypeReq: CreateTransTypeReq): Any {
+
+        var iconList = listOf<String>(
+            "entertainment",
+            "mobile_phone",
+            "medical_care",
+            "furniture",
+            "tools_hardware",
+            "ice_cream",
+            "water_cup",
+            "others",
+            "beer",
+            "drinks",
+            "fruit",
+            "food_dish",
+            "transport",
+        )
+
+        var name = createTransTypeReq.name
+        var icon = createTransTypeReq.icon
+
+        if (!iconList.contains(icon)) {
+            return ResponseEntity.badRequest().body(object {
+                var message = "icon not found"
+            })
+        }
+
+        var oneByMap = transDao.getOneByMap("value", name)
+        if (oneByMap != null) {
+            return ResponseEntity.badRequest().body(object {
+                var message = "name already exists"
+            })
+        }
+
+        var newCat = TransactionCategoryPO(null, name, icon)
+        transDao.save(newCat)
+
+        return ResponseEntity.ok(object {
+            var id: Long = newCat.id!!
+        })
     }
 
 }

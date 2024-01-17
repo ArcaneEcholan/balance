@@ -11,9 +11,9 @@
                             word-break: break-word;
                             background-color: white;
                         "
-                        @click="onClickOneType(type.value)"
+                        @click="onClickOneType(type.name)"
                     >
-                        {{ type.value }}
+                        {{ type.name }}
                     </clickable>
                 </div>
             </div>
@@ -40,7 +40,10 @@
                             {{ $t('add_record_type.title') }}
                         </div>
                         <div style="width: 20%">
-                            <custom-button type="inline">
+                            <custom-button
+                                type="inline"
+                                @click="addNewRecordType"
+                            >
                                 {{ $t('save') }}
                             </custom-button>
                         </div>
@@ -131,6 +134,9 @@ import SolidIcon from '@/views/components/SolidIcon.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import CustomButton from '@/views/components/CustomButton.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
+import request from '@/ts/request';
+import { Notify } from 'vant';
+import store from '@/ts/store';
 
 @Component({
     components: {
@@ -164,57 +170,32 @@ export default class TransTypeComponent extends Vue {
 
     created() {
         this.initTransactionTypes();
-        for (let i = 1; i < 30; i++) {
+
+        const iconMap: any = {
+            entertainment: 'ali-international-icon-entertainment',
+            mobile_phone: 'ali-international-icon-mobile-phone',
+            medical_care: 'ali-international-icon-medical-care',
+            furniture: 'ali-international-icon-furniture',
+            tools_hardware: 'ali-international-icon-tools-hardware',
+            ice_cream: 'ali-international-icon-ice-cream',
+            water_cup: 'ali-international-icon-water_cup',
+            others: 'ali-international-icon-others',
+            beer: 'ali-international-icon-beer',
+            drinks: 'ali-international-icon-drinks',
+            fruit: 'ali-international-icon-fruit',
+            food_dish: 'ali-international-icon-food-dish',
+            transport: 'ali-international-icon-transport',
+        };
+
+        for (let iconMapKey in iconMap) {
             this.icons.push({
-                className: 'ali-international-icon-beer',
+                id: this.iconIdCounter++,
+                value: iconMapKey,
+                className: iconMap[iconMapKey],
             });
         }
 
-        this.icons.push(
-            {
-                className: 'ali-international-icon-entertainment',
-            },
-            {
-                className: 'ali-international-icon-mobile-phone',
-            },
-            {
-                className: 'ali-international-icon-medical-care',
-            },
-            {
-                className: 'ali-international-icon-furniture',
-            },
-            {
-                className: 'ali-international-icon-tools-hardware',
-            },
-            {
-                className: 'ali-international-icon-ice-cream',
-            },
-            {
-                className: 'ali-international-icon-water_cup',
-            },
-            {
-                className: 'ali-international-icon-others',
-            },
-            {
-                className: 'ali-international-icon-beer',
-            },
-            {
-                className: 'ali-international-icon-drinks',
-            },
-            {
-                className: 'ali-international-icon-fruit',
-            },
-            {
-                className: 'ali-international-icon-food-dish',
-            },
-            {
-                className: 'ali-international-icon-transport',
-            },
-        );
-
         this.icons[0].active = true;
-        this.icons.forEach((it) => (it.id = this.iconIdCounter++));
-        console.log(this.icons);
         this.pickedIcon = this.icons[0];
     }
 
@@ -226,6 +207,8 @@ export default class TransTypeComponent extends Vue {
             let countInOneRowOfMetrics = 4;
             let metrics = [];
             for (let i = 0; i < this.transactionCategories.length; i++) {
+                let cur = this.transactionCategories[i];
+                cur.name = cur.value;
                 if (i % countInOneRowOfMetrics === 0) {
                     metrics.push([]);
                 }
@@ -239,6 +222,34 @@ export default class TransTypeComponent extends Vue {
 
     onClickOneType(type: string) {
         this.$emit('on-click-one-type', type);
+    }
+
+    addNewRecordType() {
+        request({
+            method: 'post',
+            url: '/transaction/category',
+            data: {
+                name: this.name,
+                icon: this.pickedIcon.value,
+            },
+            headers: {
+                'entity-token': store.getters.token,
+            },
+        })
+            .then((resp) => {
+                Notify({
+                    type: 'success',
+                    message: this.$t('success') as any,
+                });
+                this.initTransactionTypes();
+            })
+            .catch((err) => {
+                debugger;
+                Notify({
+                    type: 'danger',
+                    message: err.response.data.message,
+                });
+            });
     }
 }
 </script>

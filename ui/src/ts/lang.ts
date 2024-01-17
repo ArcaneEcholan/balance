@@ -19,6 +19,7 @@ export const setLanguage = (language: string) =>
 Vue.use(VueI18n);
 
 let en = {
+    success: 'Success',
     confirm: 'Confirm',
     default: 'default',
     language: 'language',
@@ -61,11 +62,11 @@ let en = {
         comment: 'Comment',
         count: 'Count',
     },
-    unset: 'unset',
-    unknown_record_type: 'unknown type',
     add_record_type: {
         title: 'Add Record Type',
     },
+    unset: 'unset',
+    unknown_record_type: 'unknown type',
     login_email_sent_prompt:
         "We've sent an email to your email address, please check your email and fill in the verification code below.",
     username: 'username',
@@ -77,6 +78,7 @@ let en = {
 };
 
 let zh = {
+    success: '成功',
     confirm: '确定',
     default: '默认',
     language: '语言',
@@ -125,7 +127,6 @@ let zh = {
         },
     },
     out_of_service: '定位仅支持中国大陆区域',
-    unset: '未设置',
     unknown_record_type: '未知类型',
     add_record_type: {
         title: '添加类型',

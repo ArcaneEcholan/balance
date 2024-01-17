@@ -20,11 +20,10 @@ interface TransactionCategoryMapper : BaseMapper<TransactionCategoryPO> {
 data class TransactionCategoryPO (
     @TableId(value="id", type= IdType.AUTO)
     var id: Long ?,
-    var value: String ?
+    var value: String ?,
+    var icon: String ?
 )
     : Serializable
-
-
 
 interface TransactionCategoryDao : IBaseDao<TransactionCategoryPO> {
 }
