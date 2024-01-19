@@ -33,16 +33,12 @@
                     v-for="recordRow in newRecordRows"
                     class="new-record-row"
                 >
-                    <van-swipe-cell style="height: 100%">
-                        <div class="flex" style="height: 100%">
+                    <van-swipe-cell class="w100p" style="height: 100%">
+                        <div class="flex w100p" style="height: 100%">
                             <!--type picker-->
                             <clickable
-                                class="cell flexg1"
-                                style="
-                                    height: 100%;
-                                    word-break: break-word;
-                                    background-color: white;
-                                "
+                                class="cell h100p flex center"
+                                style="background-color: white; width: 25%"
                                 @click="onclickPickTypeBtn(recordRow)"
                             >
                                 <div
@@ -55,19 +51,31 @@
                                 >
                                     <van-icon class="fs24" name="question-o" />
                                 </div>
-                                <div
-                                    class="flex center"
-                                    style="
-                                        height: 100%;
-                                        font-size: 14px;
-                                        text-overflow: ellipsis;
-                                        -webkit-line-clamp: 2;
-                                        overflow: hidden;
-                                        -webkit-box-orient: vertical;
-                                    "
-                                    v-else
-                                >
-                                    {{ recordRow.type }}
+
+                                <div v-else class="type-icon-cell w100p">
+                                    <div class="flex column center w100p">
+                                        <div
+                                            :class="`flex flex-center type-icon`"
+                                        >
+                                            <i
+                                                :class="recordRow['type-icon']"
+                                                style="font-size: inherit"
+                                            ></i>
+                                        </div>
+                                        <div style="height: 4px"></div>
+                                        <div
+                                            class="w100p textcenter"
+                                            style="
+                                                font-size: 14px;
+                                                text-overflow: ellipsis;
+                                                -webkit-line-clamp: 1;
+                                                overflow: hidden;
+                                                -webkit-box-orient: vertical;
+                                            "
+                                        >
+                                            {{ recordRow['type'] }}
+                                        </div>
+                                    </div>
                                 </div>
                             </clickable>
 
@@ -75,7 +83,7 @@
                             <div
                                 @click="onTouchCell(recordRow, 'amount')"
                                 :ref="`${recordRow.id}-amount`"
-                                class="flexg2 cell"
+                                class="cell"
                             >
                                 <van-field
                                     readonly
@@ -87,7 +95,7 @@
                             <div
                                 @click="onTouchCell(recordRow, 'count')"
                                 :ref="`${recordRow.id}-count`"
-                                class="flexg2 cell"
+                                class="cell"
                             >
                                 <van-field
                                     readonly
@@ -99,7 +107,7 @@
                             <div
                                 @click="onTouchCell(recordRow, 'desc')"
                                 :ref="`${recordRow.id}-desc`"
-                                class="flexg2 cell last"
+                                class="cell last"
                             >
                                 <van-field v-model="recordRow.desc"></van-field>
                             </div>
@@ -189,8 +197,9 @@ export default class AddTransactionEditorComponent extends Vue {
 
     chooseTypePanelShow = false;
 
-    onClickOneType(type: string) {
-        this.chooseTypeRecordRow['type'] = type;
+    onClickOneType(type: any) {
+        this.chooseTypeRecordRow['type'] = type.value;
+        this.chooseTypeRecordRow['type-icon'] = type.icon;
         this.chooseTypePanelShow = false;
     }
 
@@ -750,6 +759,7 @@ export default class AddTransactionEditorComponent extends Vue {
         overflow: hidden;
 
         .cell {
+            width: 25%;
             border-bottom: 3px solid #ffffff;
             margin: -0.5px;
             border-right: 2px solid $separator-color;

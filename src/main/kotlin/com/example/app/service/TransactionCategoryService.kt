@@ -11,6 +11,7 @@ interface TransactionCategoryService {
 data class TransactionCategoryVO(
     val id: Long?,
     val value: String?,
+    val icon: String?
 )
 @Service
 class TransactionCategoryServiceImpl : TransactionCategoryService {
@@ -19,7 +20,7 @@ class TransactionCategoryServiceImpl : TransactionCategoryService {
 
     override fun getAll(): List<TransactionCategoryVO> {
         return categoryDao.list().map {
-            TransactionCategoryVO(it.id, it.value)
+            TransactionCategoryVO(it.id, it.value, it.icon)
         }
     }
 }

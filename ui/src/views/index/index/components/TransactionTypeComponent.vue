@@ -1,23 +1,37 @@
 <template>
     <div>
-        <div class="flex column">
-            <div v-for="row in metrics">
-                <div class="flex">
-                    <clickable
-                        v-for="type in row"
-                        class="flex center shadow br8 flexg1 mg8 pd8"
+        <div
+            class="flex"
+            style="justify-content: start; flex-wrap: wrap; row-gap: 15px"
+        >
+            <div
+                :key="icon.value"
+                v-for="icon in metrics"
+                class="type-icon-cell"
+                @click="onClickOneType(icon)"
+            >
+                <div class="flex column center w100p">
+                    <div :class="`flex flex-center type-icon`">
+                        <i :class="icon.icon" style="font-size: inherit"></i>
+                    </div>
+                    <div style="height: 4px"></div>
+                    <div
+                        class="w100p textcenter"
                         style="
-                            line-height: 24px;
-                            word-break: break-word;
-                            background-color: white;
+                            font-size: 14px;
+                            text-overflow: ellipsis;
+                            -webkit-line-clamp: 1;
+                            overflow: hidden;
+                            -webkit-box-orient: vertical;
                         "
-                        @click="onClickOneType(type.name)"
                     >
-                        {{ type.name }}
-                    </clickable>
+                        {{ icon.value }}
+                    </div>
                 </div>
             </div>
         </div>
+
+        <gap-component></gap-component>
 
         <div class="flex">
             <solid-icon
@@ -172,19 +186,21 @@ export default class TransTypeComponent extends Vue {
         this.initTransactionTypes();
 
         const iconMap: any = {
-            entertainment: 'ali-international-icon-entertainment',
-            mobile_phone: 'ali-international-icon-mobile-phone',
-            medical_care: 'ali-international-icon-medical-care',
-            furniture: 'ali-international-icon-furniture',
-            tools_hardware: 'ali-international-icon-tools-hardware',
-            ice_cream: 'ali-international-icon-ice-cream',
-            water_cup: 'ali-international-icon-water_cup',
-            others: 'ali-international-icon-others',
-            beer: 'ali-international-icon-beer',
-            drinks: 'ali-international-icon-drinks',
+            daily: 'ali-international-icon-daily',
+            food: 'ali-international-icon-food_dish',
             fruit: 'ali-international-icon-fruit',
-            food_dish: 'ali-international-icon-food-dish',
-            transport: 'ali-international-icon-transport',
+            drinks: 'ali-international-icon-drinks',
+            alcohol: 'ali-international-icon-beer',
+            transportation: 'ali-international-icon-transport',
+            entertainment: 'ali-international-icon-entertainment',
+            others: 'ali-international-icon-others',
+            water: 'ali-international-icon-water_cup',
+            snack: 'ali-international-icon-icecream',
+            electronic: 'ali-international-icon-mobile_phone',
+            med: 'ali-international-icon-medical_care',
+            maintenance: 'ali-international-icon-tools_hardware',
+            productivity: 'ali-international-icon-productivity',
+            furniture: 'ali-international-icon-furniture',
         };
 
         for (let iconMapKey in iconMap) {
@@ -203,24 +219,11 @@ export default class TransTypeComponent extends Vue {
 
     initTransactionTypes() {
         Client.getTransactionCategories().then((resp) => {
-            this.transactionCategories = resp.data;
-            let countInOneRowOfMetrics = 4;
-            let metrics = [];
-            for (let i = 0; i < this.transactionCategories.length; i++) {
-                let cur = this.transactionCategories[i];
-                cur.name = cur.value;
-                if (i % countInOneRowOfMetrics === 0) {
-                    metrics.push([]);
-                }
-                // @ts-ignore
-                metrics[metrics.length - 1].push(this.transactionCategories[i]);
-            }
-            console.log(metrics);
-            this.metrics = metrics;
+            this.metrics = resp.data;
         });
     }
 
-    onClickOneType(type: string) {
+    onClickOneType(type: any) {
         this.$emit('on-click-one-type', type);
     }
 
@@ -265,7 +268,7 @@ export default class TransTypeComponent extends Vue {
     align-items: center;
 
     & .type-icon {
-        font-size: 1.2em;
+        //font-size: 1.2em;
         padding: 12px;
         border-radius: 100px;
         background-color: $icon-bgc;
