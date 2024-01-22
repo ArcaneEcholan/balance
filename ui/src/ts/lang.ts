@@ -62,6 +62,18 @@ let en = {
         comment: 'Comment',
         count: 'Count',
     },
+    edit_record: {
+        title: 'Edit Record',
+        ledger: 'Ledger',
+        select_ledger: {
+            title: 'Select Ledger',
+        },
+        type: 'Type',
+        amount: 'Amount',
+        datetime: 'Date Time',
+        count: 'Count',
+        comment: 'Description',
+    },
     add_record_type: {
         title: 'Add Record Type',
     },
@@ -125,6 +137,19 @@ let zh = {
         choose_type: {
             title: '选择类型',
         },
+    },
+    edit_record: {
+        title: '编辑记录',
+
+        select_ledger: {
+            title: '选择账本',
+        },
+        ledger: '账本',
+        type: '类型',
+        amount: '金额',
+        datetime: '日期时间',
+        count: '数量',
+        comment: '备注',
     },
     out_of_service: '定位仅支持中国大陆区域',
     unknown_record_type: '未知类型',

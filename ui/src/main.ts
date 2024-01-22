@@ -36,7 +36,10 @@ import {
     Dialog,
     Toast,
 } from 'vant';
+import { Checkbox, CheckboxGroup } from 'vant';
 {
+    Vue.use(Checkbox);
+    Vue.use(CheckboxGroup);
     Vue.use(DatetimePicker);
     Vue.use(Loading);
     Vue.use(Tabbar);

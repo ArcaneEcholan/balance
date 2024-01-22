@@ -9,12 +9,57 @@
         @swiping="modalLifeCycleHooks.swiping"
         @after-swipe="modalLifeCycleHooks.afterSwipe"
     >
-        <div class="page" id="aaa" style="overflow: auto">
-            <div class="modal-title">Edit Record</div>
+        <div class="page" style="overflow: auto">
+            <div class="modal-title">{{ $t('edit_record.title') }}</div>
             <gap-component :value="'55px'"></gap-component>
+
             <div class="record-header">Edit Fields</div>
             <panel>
                 <van-cell-group>
+                    <van-cell
+                        clickable
+                        :title="$t('edit_record.ledger')"
+                        @click="ledgerPickerShow = true"
+                    />
+
+                    <common-action-sheet :visible.sync="ledgerPickerShow">
+                        <template #header>
+                            <div style="width: 100%" class="flex">
+                                <div style="width: 20%"></div>
+                                <div style="width: 60%" class="flex center">
+                                    {{ $t('edit_record.select_ledger.title') }}
+                                </div>
+                                <div style="width: 20%">
+                                    <custom-button
+                                        @click="onClickEditRecordLedgers"
+                                        type="inline"
+                                    >
+                                        {{ $t('save') }}
+                                    </custom-button>
+                                </div>
+                            </div>
+                        </template>
+                        <template #body>
+                            <van-cell-group>
+                                <van-cell
+                                    v-for="(ledger, index) in ledgerList"
+                                    clickable
+                                    :key="ledger.name"
+                                    :title="`${ledger.name}`"
+                                    @click="toggle(index)"
+                                >
+                                    <template #right-icon>
+                                        <van-checkbox
+                                            :name="ledger.name"
+                                            v-model="ledger.checked"
+                                            ref="checkboxes"
+                                        />
+                                    </template>
+                                </van-cell>
+                            </van-cell-group>
+                        </template>
+                    </common-action-sheet>
+
                     <van-field
                         v-model="categoryValue"
                         type="string"
@@ -58,9 +103,12 @@ import eventBus from '@/ts/EventBus';
 import CustomButton from '@/views/components/CustomButton.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import Panel from '@/views/components/Panel.vue';
+import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
+import request from '@/ts/request';
 
 @Component({
     components: {
+        CommonActionSheet,
         Panel,
         GapComponent,
         CustomButton,
@@ -69,6 +117,38 @@ import Panel from '@/views/components/Panel.vue';
 })
 export default class EditRecordView extends Vue {
     modalLifeCycleHooks: any;
+    pickedLedgers: any[] = [];
+    ledgerList: any[] = [];
+    onClickEditRecordLedgers() {
+        request({
+            url: '/record/ledgers',
+            method: 'put',
+            data: {
+                record_id: this.recordId,
+                ledger_ids: this.ledgerList
+                    .filter((it) => it.checked)
+                    .map((it) => it.id),
+            },
+        }).then((resp) => {
+            Notify({
+                type: 'success',
+                message: this.$t('success') as string,
+            });
+        });
+    }
+    toggle(index: any) {
+        let ledger = this.ledgerList[index];
+        // @ts-ignore
+        let it = this.$refs.checkboxes[index];
+        it.toggle(!ledger.checked);
+        ledger.checked = !ledger.checked;
+        let pickedLedgersId = this.ledgerList
+            .filter((it) => it.checked)
+            .map((it) => it.id);
+        console.log(pickedLedgersId);
+    }
+
+    ledgerPickerShow = false;
 
     beforeDestroy() {
         console.log('destroyed');
@@ -205,6 +285,37 @@ export default class EditRecordView extends Vue {
         this.count = mountProp.count;
         this.categoryValue = mountProp.categoryValue;
         this.description = mountProp.description;
+
+        request({
+            url: '/ledgers',
+            method: 'get',
+            params: {
+                record_id: this.recordId,
+            },
+        }).then((resp: any) => {
+            this.ledgerList = [
+                {
+                    id: 1,
+                    name: 'est',
+                    related: false,
+                },
+                {
+                    id: 2,
+                    name: 'dsest',
+                    related: true,
+                },
+            ];
+            console.log(resp.data);
+            let ledgerList = resp.data;
+            ledgerList.forEach((it: any) => {
+                it.checked = it.related;
+            });
+
+            this.ledgerList = ledgerList;
+        });
+        setInterval(() => {
+            console.log(this.ledgerList);
+        }, 1000);
     }
 }
 </script>
