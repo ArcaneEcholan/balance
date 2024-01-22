@@ -5,6 +5,44 @@
         id="records-list"
         style="position: relative; padding-top: 16px"
     >
+        <common-action-sheet :visible.sync="ledgerPickerShow">
+            <template #header>
+                <div style="width: 100%" class="flex">
+                    <div style="width: 20%"></div>
+                    <div style="width: 60%" class="flex center">
+                        {{ $t('edit_record.select_ledger.title') }}
+                    </div>
+                    <div style="width: 20%">
+                        <custom-button
+                            @click="onClickEditRecordLedgers"
+                            type="inline"
+                        >
+                            {{ $t('save') }}
+                        </custom-button>
+                    </div>
+                </div>
+            </template>
+            <template #body>
+                <van-cell-group>
+                    <van-cell
+                        v-for="(ledger, index) in ledgerList"
+                        clickable
+                        :key="ledger.name"
+                        :title="`${ledger.name}`"
+                        @click="toggle(index)"
+                    >
+                        <template #right-icon>
+                            <van-checkbox
+                                :name="ledger.name"
+                                v-model="ledger.checked"
+                                ref="checkboxes"
+                            />
+                        </template>
+                    </van-cell>
+                </van-cell-group>
+            </template>
+        </common-action-sheet>
+
         <div v-if="recordsListLoading" class="flex center">
             <van-loading></van-loading>
         </div>
@@ -24,60 +62,93 @@
                         v-for="record in oneDayRecords.records"
                     >
                         <div
-                            name="one-record"
-                            class="record-row"
+                            class="flex"
                             @click="toEditTransactionPage(record.id)"
                         >
-                            <!--card left-->
-                            <div class="flexg5">
-                                <div>
-                                    <span class="pdr10">
-                                        {{
-                                            record.categoryValue == null
-                                                ? $t('unknown_record_type')
-                                                : record.categoryValue
-                                        }}
-                                    </span>
-                                    <span class="fs14 google-gray-400">
-                                        {{
-                                            record.location == null
-                                                ? $t('unset')
-                                                : $t(record.location)
-                                        }}
-                                    </span>
-                                </div>
-                                <div class="fs14">
-                                    <span class="google-gray-400">
-                                        {{
-                                            record.datetime |
-                                                formatTimeForRecordItem
-                                        }}
-                                    </span>
-                                    <span class="pd5 google-gray-300">|</span>
-                                    <span class="google-gray-400">
-                                        {{ record.description }}
-                                    </span>
-                                </div>
+                            <div
+                                v-show="selectMode"
+                                class="flex center bg-white"
+                                style="width: 15%"
+                            >
+                                <van-checkbox
+                                    v-model="record.selected"
+                                ></van-checkbox>
                             </div>
-                            <!--card right-->
-                            <div class="flexg1 flex center">
-                                <span class="bold fs18">
-                                    {{ record.amount }}
-                                    {{
-                                        `${
-                                            record.count > 1
-                                                ? 'x ' + record.count
-                                                : ''
-                                        }`
-                                    }}
-                                </span>
+                            <div
+                                :ref="`record-${record.id}`"
+                                :style="`${
+                                    selectMode ? 'width: 85%' : 'width: 100%'
+                                };`"
+                                name="one-record"
+                                class="record-row"
+                            >
+                                <!--card left-->
+                                <div class="flexg5">
+                                    <div>
+                                        <span class="pdr10">
+                                            {{
+                                                record.categoryValue == null
+                                                    ? $t('unknown_record_type')
+                                                    : record.categoryValue
+                                            }}
+                                        </span>
+                                        <span class="fs14 google-gray-400">
+                                            {{
+                                                record.location == null
+                                                    ? $t('unset')
+                                                    : $t(record.location)
+                                            }}
+                                        </span>
+                                    </div>
+                                    <div class="fs14">
+                                        <span class="google-gray-400">
+                                            {{
+                                                record.datetime |
+                                                    formatTimeForRecordItem
+                                            }}
+                                        </span>
+                                        <span class="pd5 google-gray-300">
+                                            |
+                                        </span>
+                                        <span class="google-gray-400">
+                                            {{ record.description }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <!--card right-->
+                                <div class="flexg1 flex center">
+                                    <span class="bold fs18">
+                                        {{ record.amount }}
+                                        {{
+                                            `${
+                                                record.count > 1
+                                                    ? 'x ' + record.count
+                                                    : ''
+                                            }`
+                                        }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </panel>
                 <gap-component></gap-component>
             </div>
-            <gap-component value="58px"></gap-component>
+
+            <div v-if="selectMode">
+                <gap-component :value="`${27 * 3}px`"></gap-component>
+            </div>
+            <div v-else>
+                <gap-component :value="`${27 * 2}px`"></gap-component>
+            </div>
+        </div>
+
+        <div v-show="selectMode" class="select-tool-bar">
+            <div class="flex w100p h100p">
+                <div @click="highlightSelectedRecords">highlight</div>
+                <div @click="onClickUpdateLedger">ledger</div>
+                <div @click="closeSelectBar">cancel</div>
+            </div>
         </div>
     </div>
 </template>
@@ -91,9 +162,13 @@ import { Notify } from 'vant';
 import { provideListeners } from '@/page-eventbus-registration-mixin';
 import Panel from '@/views/components/Panel.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
+import request from '@/ts/request';
+import CustomButton from '@/views/components/CustomButton.vue';
+import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
+import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 
 @Component({
-    components: { GapComponent, Panel },
+    components: { CommonActionSheet, CustomButton, GapComponent, Panel },
     filters: {
         formatTimeForRecordItem: function (timeString: string | null) {
             if (!timeString) {
@@ -104,9 +179,87 @@ import GapComponent from '@/views/components/GapComponent.vue';
     },
 })
 export default class TransactionListComponent extends Vue {
+    ledgerPickerShow = false;
+    selectMode = false;
     transactionList: any[] = [];
     recordsListByDay: any[] = [];
     recordsListLoading = false;
+    ledgerList: any[] = [];
+
+    toggle(index: any) {
+        // let ledger = this.ledgerList[index];
+        // // @ts-ignore
+        // let it = this.$refs.checkboxes[index];
+        // it.toggle(!ledger.checked);
+        // ledger.checked = !ledger.checked;
+    }
+
+    onClickEditRecordLedgers() {
+        let recordIds = this.flatMapRecordsForSearching()
+            .filter((it) => it.selected)
+            .map((it) => it.id);
+        globalLoadingStart();
+        request({
+            url: '/record/ledgers',
+            method: 'put',
+            data: {
+                record_ids: recordIds,
+                ledger_ids: this.ledgerList
+                    .filter((it) => it.checked)
+                    .map((it) => it.id),
+            },
+        })
+            .then((resp) => {
+                globalLoadingStop();
+                Notify({
+                    type: 'success',
+                    message: this.$t('success') as string,
+                });
+                this.ledgerPickerShow = false;
+            })
+            .catch((resp) => {
+                globalLoadingStop();
+            });
+    }
+    onClickUpdateLedger() {
+        globalLoadingStart();
+        request({
+            url: '/ledgers',
+            method: 'get',
+        })
+            .then((resp: any) => {
+                this.ledgerPickerShow = true;
+                let ledgerList = resp.data;
+                ledgerList.forEach((it: any) => {
+                    it.checked = it.related;
+                });
+
+                this.ledgerList = ledgerList;
+                globalLoadingStop();
+            })
+            .catch((resp) => {
+                globalLoadingStop();
+            });
+    }
+    // this function is for test usage
+    highlightSelectedRecords() {
+        this.flatMapRecordsForSearching().forEach((it) => {
+            // @ts-ignore
+            let ref = this.$refs[`record-${it.id}`][0];
+            if (it.selected) {
+                ref.style.backgroundColor = '#f5f5f5';
+            } else {
+                ref.style.backgroundColor = 'white';
+            }
+        });
+        setTimeout(() => {
+            this.flatMapRecordsForSearching().forEach((it) => {
+                // @ts-ignore
+                let ref = this.$refs[`record-${it.id}`][0];
+                ref.style.backgroundColor = 'white';
+            });
+        }, 500);
+    }
     created() {
         this.prepareListeners();
         this.onRefreshTransactionList();
@@ -135,6 +288,12 @@ export default class TransactionListComponent extends Vue {
             {
                 eventName: 'refresh-transaction-list',
                 handler: () => this.onRefreshTransactionList(),
+            },
+            {
+                eventName: 'on-record-list-select',
+                handler: () => {
+                    this.selectMode = true;
+                },
             },
         ]);
     }
@@ -167,11 +326,10 @@ export default class TransactionListComponent extends Vue {
             )
                 .then((res) => {
                     this.recordsListLoading = false;
-                    console.debug(res);
                     // sort records by day
                     let recordsByDay: any = {};
                     res.data.forEach((it: any) => {
-                        console.debug(it.datetime);
+                        it.selected = false;
                         let date = it.datetime.split(' ')[0];
                         if (!recordsByDay[date]) {
                             recordsByDay[date] = [];
@@ -226,12 +384,34 @@ export default class TransactionListComponent extends Vue {
         return currentDate;
     }
 
-    getAndUpdateTransListByLedgerNameAndMonth(
-        ledgerName: any,
-        yearHyphenMonth: string,
-    ) {}
+    showSelectBar() {
+        this.selectMode = true;
+    }
+
+    closeSelectBar() {
+        this.selectMode = false;
+        this.flatMapRecordsForSearching().forEach((it) => {
+            it.selected = false;
+        });
+    }
+
+    selectOneRecord(recordId: any) {
+        let recordRecord = this.flatMapRecordsForSearching().find((item) => {
+            return item.id === recordId;
+        });
+
+        if (recordRecord) {
+            recordRecord.selected = !recordRecord.selected;
+        } else {
+            throw new Error('record not found');
+        }
+    }
 
     toEditTransactionPage(recordId: string | number) {
+        if (this.selectMode) {
+            this.selectOneRecord(recordId);
+            return;
+        }
         // find the record
         let foundTrans = this.flatMapRecordsForSearching().find((item) => {
             return item.id === recordId;
@@ -255,4 +435,13 @@ export default class TransactionListComponent extends Vue {
 <style lang="scss" scoped>
 @import '~@/style/common-style.scss';
 @import '~@/style/style-specification';
+
+.select-tool-bar {
+    position: fixed;
+    bottom: 58px;
+    left: 0;
+    right: 0;
+    height: 27px;
+    background-color: white;
+}
 </style>

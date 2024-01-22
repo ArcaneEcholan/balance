@@ -126,7 +126,7 @@ export default class EditRecordView extends Vue {
             url: '/record/ledgers',
             method: 'put',
             data: {
-                record_id: this.recordId,
+                record_ids: [this.recordId],
                 ledger_ids: this.ledgerList
                     .filter((it) => it.checked)
                     .map((it) => it.id),
@@ -321,9 +321,6 @@ export default class EditRecordView extends Vue {
 
             this.ledgerList = ledgerList;
         });
-        setInterval(() => {
-            console.log(this.ledgerList);
-        }, 1000);
     }
 }
 </script>

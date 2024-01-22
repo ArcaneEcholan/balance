@@ -46,6 +46,14 @@
                             <i class="icon ali-international-icon-plus"></i>
                         </div>
                     </clickable>
+
+                    <clickable @click="onRecordListSelect">
+                        <div class="mg20 flex align-center">
+                            <i
+                                class="icon ali-international-icon-multi_selection"
+                            ></i>
+                        </div>
+                    </clickable>
                 </div>
             </div>
         </div>
@@ -100,6 +108,7 @@ import EditRecordView from '@/views/index/index/modals/edit_record.vue';
 import ManageLedgerView from '@/views/index/index/modals/ledger.vue';
 import Clickable from '@/views/components/Clickable.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
+import eventBus from '@/ts/EventBus';
 
 (window as any)._AMapSecurityConfig = {
     securityJsCode: '172c59e3fd1b621adddca8f268ff879a',
@@ -120,6 +129,9 @@ import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
     },
 })
 export default class IndexView extends Vue {
+    onRecordListSelect() {
+        eventBus.$emit('on-record-list-select', null);
+    }
     lwc: any | null = null;
     settingShow = false;
     mountPointUid = generateMountPointUid();

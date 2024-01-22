@@ -14,7 +14,6 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
-import javax.validation.constraints.NotNull
 
 class CreateLedgerDTO {
     @NotEmpty
@@ -90,7 +89,7 @@ class LedgerCongroller {
     lateinit var ledgerTransactionMapper: LedgerTransactionMapper
 
     @GetMapping("/ledgers")
-    fun getLedgers(@RequestParam("record_id") recordId: Long?): ResponseEntity<Any> {
+    fun getLedgers(@RequestParam(value = "record_id", required = false) recordId: Long?): ResponseEntity<Any> {
 
         var allLedgers = ledgerMapper.selectList(null)
 
@@ -125,8 +124,9 @@ class LedgerCongroller {
     }
 
     class UpdateRecordLedgersReq {
-        @NotNull
-        var record_id: Long? = null
+
+        @Valid
+        var record_ids: List<Long>? = null
 
         @Valid
         var ledger_ids: List<Long>? = null
@@ -141,10 +141,19 @@ class LedgerCongroller {
             }));
         }
 
-        ledgerTransactionMapper.deleteByMap(mapOf("transaction_id" to updateRecordLedgersReq.record_id))
-        updateRecordLedgersReq.ledger_ids!!.forEach {
-            ledgerTransactionMapper.insert(LedgerTransactionPO(null, it, updateRecordLedgersReq.record_id ))
+        if(updateRecordLedgersReq.record_ids!!.filterNotNull().size < updateRecordLedgersReq.record_ids!!.size){
+            return ResponseEntity.badRequest().body(objectMapper.writeValueAsString(object {
+                var message = "record id can not be null"
+            }));
         }
+
+        updateRecordLedgersReq.record_ids!!.forEach { recordId ->
+            ledgerTransactionMapper.deleteByMap(mapOf("transaction_id" to recordId))
+            updateRecordLedgersReq.ledger_ids!!.forEach {
+                ledgerTransactionMapper.insert(LedgerTransactionPO(null, it, recordId ))
+            }
+        }
+
         return ResponseEntity.ok().body(object {})
     }
 }
