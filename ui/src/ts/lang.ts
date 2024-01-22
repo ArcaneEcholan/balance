@@ -19,6 +19,9 @@ export const setLanguage = (language: string) =>
 Vue.use(VueI18n);
 
 let en = {
+    toast: {
+        loading: 'Loading...',
+    },
     success: 'Success',
     confirm: 'Confirm',
     default: 'default',
@@ -90,6 +93,9 @@ let en = {
 };
 
 let zh = {
+    toast: {
+        loading: '加载中...',
+    },
     success: '成功',
     confirm: '确定',
     default: '默认',

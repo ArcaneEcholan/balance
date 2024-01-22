@@ -105,6 +105,7 @@ import GapComponent from '@/views/components/GapComponent.vue';
 import Panel from '@/views/components/Panel.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import request from '@/ts/request';
+import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 
 @Component({
     components: {
@@ -120,6 +121,7 @@ export default class EditRecordView extends Vue {
     pickedLedgers: any[] = [];
     ledgerList: any[] = [];
     onClickEditRecordLedgers() {
+        globalLoadingStart();
         request({
             url: '/record/ledgers',
             method: 'put',
@@ -129,12 +131,18 @@ export default class EditRecordView extends Vue {
                     .filter((it) => it.checked)
                     .map((it) => it.id),
             },
-        }).then((resp) => {
-            Notify({
-                type: 'success',
-                message: this.$t('success') as string,
+        })
+            .then((resp) => {
+                globalLoadingStop();
+                Notify({
+                    type: 'success',
+                    message: this.$t('success') as string,
+                });
+                this.ledgerPickerShow = false;
+            })
+            .catch((resp) => {
+                globalLoadingStop();
             });
-        });
     }
     toggle(index: any) {
         let ledger = this.ledgerList[index];
