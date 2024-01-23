@@ -35,19 +35,25 @@
                         ref="ledger-switcher-component"
                     ></ledger-switcher-component>
 
-                    <clickable @click="showLedgerSwitcherSheet">
+                    <clickable
+                        :disabled="selectMode"
+                        @click="showLedgerSwitcherSheet"
+                    >
                         <div class="mg20 flex align-center">
                             <i class="icon ali-international-icon-log"></i>
                         </div>
                     </clickable>
 
-                    <clickable @click="show = true">
+                    <clickable :disabled="selectMode" @click="show = true">
                         <div class="mg20 flex align-center">
                             <i class="icon ali-international-icon-plus"></i>
                         </div>
                     </clickable>
 
-                    <clickable @click="onRecordListSelect">
+                    <clickable
+                        :disabled="selectMode"
+                        @click="onRecordListSelect"
+                    >
                         <div class="mg20 flex align-center">
                             <i
                                 class="icon ali-international-icon-multi_selection"
@@ -129,7 +135,9 @@ import eventBus from '@/ts/EventBus';
     },
 })
 export default class IndexView extends Vue {
+    selectMode = false;
     onRecordListSelect() {
+        this.selectMode = true;
         eventBus.$emit('on-record-list-select', null);
     }
     lwc: any | null = null;
@@ -268,6 +276,12 @@ export default class IndexView extends Vue {
                 eventName: 'on-get-cur-location',
                 handler: () => {
                     return this.geoLocation;
+                },
+            },
+            {
+                eventName: 'on-record-list-select-cancel',
+                handler: () => {
+                    this.selectMode = false;
                 },
             },
         ]);

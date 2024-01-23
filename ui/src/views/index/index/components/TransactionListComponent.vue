@@ -393,6 +393,7 @@ export default class TransactionListComponent extends Vue {
         this.flatMapRecordsForSearching().forEach((it) => {
             it.selected = false;
         });
+        eventBus.$emit('on-record-list-select-cancel', null);
     }
 
     selectOneRecord(recordId: any) {
