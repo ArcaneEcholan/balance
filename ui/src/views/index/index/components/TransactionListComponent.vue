@@ -23,23 +23,20 @@
                 </div>
             </template>
             <template #body>
-                <van-cell-group>
-                    <van-cell
-                        v-for="(ledger, index) in ledgerList"
-                        clickable
-                        :key="ledger.name"
-                        :title="`${ledger.name}`"
-                        @click="toggle(index)"
-                    >
-                        <template #right-icon>
-                            <van-checkbox
-                                :name="ledger.name"
-                                v-model="ledger.checked"
-                                ref="checkboxes"
-                            />
-                        </template>
-                    </van-cell>
-                </van-cell-group>
+                <van-radio-group v-model="pickedLedgerName">
+                    <van-cell-group>
+                        <van-cell
+                            v-for="ledger in ledgerList"
+                            clickable
+                            :key="ledger.name"
+                            :title="`${ledger.name}`"
+                        >
+                            <template #right-icon>
+                                <van-radio :name="ledger.name" ref="radios" />
+                            </template>
+                        </van-cell>
+                    </van-cell-group>
+                </van-radio-group>
             </template>
         </common-action-sheet>
 
@@ -193,28 +190,36 @@ export default class TransactionListComponent extends Vue {
     recordsListByDay: any[] = [];
     recordsListLoading = false;
     ledgerList: any[] = [];
-
+    pickedLedgerName = '';
     toggle(index: any) {
-        // let ledger = this.ledgerList[index];
-        // // @ts-ignore
-        // let it = this.$refs.checkboxes[index];
-        // it.toggle(!ledger.checked);
-        // ledger.checked = !ledger.checked;
+        let ledger = this.ledgerList[index];
+        if (ledger.checked) {
+            return;
+        }
+        ledger.checked = !ledger.checked;
     }
 
     onClickEditRecordLedgers() {
         let recordIds = this.flatMapRecordsForSearching()
             .filter((it) => it.selected)
             .map((it) => it.id);
+
+        let ledgerName = this.pickedLedgerName;
+        if (ledgerName === this.getCurrentLedgerName()) {
+            Notify({
+                type: 'success',
+                message: this.$t('success') as string,
+            });
+            return;
+        }
+        let ledger = this.ledgerList.find((it) => it.name === ledgerName);
         globalLoadingStart();
         request({
             url: '/record/ledgers',
             method: 'put',
             data: {
                 record_ids: recordIds,
-                ledger_ids: this.ledgerList
-                    .filter((it) => it.checked)
-                    .map((it) => it.id),
+                ledger_ids: [ledger.id],
             },
         })
             .then((resp) => {
@@ -238,15 +243,8 @@ export default class TransactionListComponent extends Vue {
             .then((resp: any) => {
                 this.ledgerPickerShow = true;
                 let ledgerList = resp.data;
-                ledgerList.forEach((it: any) => {
-                    it.checked = it.related;
-                });
 
-                let curLedgerName = this.getCurrentLedgerName();
-                ledgerList = ledgerList.filter(
-                    (it: any) => it.name !== curLedgerName,
-                );
-
+                this.pickedLedgerName = this.getCurrentLedgerName();
                 this.ledgerList = ledgerList;
                 globalLoadingStop();
             })

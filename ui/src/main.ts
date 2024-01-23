@@ -37,7 +37,10 @@ import {
     Toast,
 } from 'vant';
 import { Checkbox, CheckboxGroup } from 'vant';
+import { RadioGroup, Radio } from 'vant';
 {
+    Vue.use(Radio);
+    Vue.use(RadioGroup);
     Vue.use(Checkbox);
     Vue.use(CheckboxGroup);
     Vue.use(DatetimePicker);
