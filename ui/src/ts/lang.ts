@@ -64,6 +64,9 @@ let en = {
         amount: 'Amount',
         comment: 'Comment',
         count: 'Count',
+        choose_type: {
+            title: 'Choose Type',
+        },
     },
     edit_record: {
         title: 'Edit Record',
@@ -76,6 +79,9 @@ let en = {
         datetime: 'Date Time',
         count: 'Count',
         comment: 'Description',
+    },
+    add_type: {
+        name: 'Name',
     },
     add_record_type: {
         title: 'Add Record Type',
@@ -143,6 +149,9 @@ let zh = {
         choose_type: {
             title: '选择类型',
         },
+    },
+    add_type: {
+        name: '名称',
     },
     edit_record: {
         title: '编辑记录',

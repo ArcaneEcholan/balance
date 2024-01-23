@@ -88,7 +88,7 @@
                                 <!--type name-->
                                 <van-field
                                     v-model="name"
-                                    label="name"
+                                    :label="$t('add_type.name')"
                                 ></van-field>
                             </panel>
                             <gap-component></gap-component>
