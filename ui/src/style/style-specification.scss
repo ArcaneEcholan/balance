@@ -2,6 +2,11 @@ $secondary-bgc: #F7F8FA;
 $common-page-padding: 16px;
 $icon-bgc: #fdfdfd;
 $separator-color: #ebecf0;
+$button-color: #3574f0;
+
+.button-color {
+    color: $button-color;
+}
 
 input {
     font-size: 14px !important;

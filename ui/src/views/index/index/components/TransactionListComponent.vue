@@ -144,10 +144,18 @@
         </div>
 
         <div v-show="selectMode" class="select-tool-bar">
-            <div class="flex w100p h100p">
-                <div @click="highlightSelectedRecords">highlight</div>
-                <div @click="onClickUpdateLedger">ledger</div>
-                <div @click="closeSelectBar">cancel</div>
+            <div class="flex justify-between w100p h100p">
+                <!--<div @click="highlightSelectedRecords">highlight</div>-->
+                <div class="flex align-center h100p">
+                    <div @click="onClickUpdateLedger" class="mgl8">
+                        <i class="ali-international-icon-log"></i>
+                    </div>
+                </div>
+                <div class="flex align-center h100p">
+                    <div @click="closeSelectBar" class="button-color mgr8">
+                        {{ $t('cancel') }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

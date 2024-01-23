@@ -25,6 +25,8 @@ export default class CommonButtonComponent extends Vue {
 }
 </script>
 <style lang="scss" scoped>
+@import '~@/style/style-specification';
+
 .confirm-btn {
     background: none;
     border: none;
@@ -35,7 +37,7 @@ export default class CommonButtonComponent extends Vue {
 
     border-radius: 10px;
     padding: 10px 18px;
-    background-color: #3574f0;
+    background-color: $button-color;
 
     font-size: 16px;
     font-weight: 600;
