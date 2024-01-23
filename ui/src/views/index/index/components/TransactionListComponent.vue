@@ -229,6 +229,7 @@ export default class TransactionListComponent extends Vue {
                     message: this.$t('success') as string,
                 });
                 this.ledgerPickerShow = false;
+                this.closeSelectBar();
             })
             .catch((resp) => {
                 globalLoadingStop();
