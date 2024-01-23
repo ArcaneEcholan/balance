@@ -134,14 +134,25 @@
             </div>
 
             <div v-if="selectMode">
-                <gap-component :value="`${29 * 3}px`"></gap-component>
+                <gap-component
+                    :value="`${halfHeightOfTabbar * 3}px`"
+                ></gap-component>
             </div>
             <div v-else>
-                <gap-component :value="`${29 * 2}px`"></gap-component>
+                <gap-component
+                    :value="`${halfHeightOfTabbar * 2}px`"
+                ></gap-component>
             </div>
         </div>
 
-        <div v-show="selectMode" class="select-tool-bar">
+        <div
+            v-show="selectMode"
+            :style="`bottom: ${
+                halfHeightOfTabbar * 2
+            }px; height: ${halfHeightOfTabbar}px;`"
+            class="select-tool-bar"
+            ref="select-tool-bar"
+        >
             <div class="flex justify-between w100p h100p">
                 <!--<div @click="highlightSelectedRecords">highlight</div>-->
                 <div class="flex align-center h100p">
@@ -196,6 +207,7 @@ export default class TransactionListComponent extends Vue {
     recordsListLoading = false;
     ledgerList: any[] = [];
     pickedLedgerName = '';
+
     onSelectLedger(ledger) {
         this.pickedLedgerName = ledger.name;
     }
@@ -264,6 +276,7 @@ export default class TransactionListComponent extends Vue {
                 globalLoadingStop();
             });
     }
+
     onClickUpdateLedgerButton() {
         if (!this.updateLedgerButtonEnable()) {
             return;
@@ -285,6 +298,7 @@ export default class TransactionListComponent extends Vue {
                 globalLoadingStop();
             });
     }
+
     // this function is for test usage
     highlightSelectedRecords() {
         this.flatMapRecordsForSearching().forEach((it) => {
@@ -304,14 +318,23 @@ export default class TransactionListComponent extends Vue {
             });
         }, 500);
     }
+
     created() {
         this.prepareListeners();
         this.onRefreshTransactionList();
     }
-
+    halfHeightOfTabbar = 29;
     mounted() {
         let height = $('#records-index-header').innerHeight();
         $('#records-list').css('top', height + 'px');
+
+        let ii = setInterval(() => {
+            let tarbar = $('#tabbar-area')[0];
+            if (tarbar != null) {
+                this.halfHeightOfTabbar = tarbar.clientHeight / 2;
+                clearInterval(ii);
+            }
+        }, 100);
     }
 
     prepareListeners() {
@@ -336,7 +359,7 @@ export default class TransactionListComponent extends Vue {
             {
                 eventName: 'on-record-list-select',
                 handler: () => {
-                    this.selectMode = true;
+                    this.showSelectBar();
                 },
             },
         ]);
@@ -429,6 +452,15 @@ export default class TransactionListComponent extends Vue {
     }
 
     showSelectBar() {
+        // let ii = setInterval(() => {
+        //     let stb = this.$refs['select-tool-bar'] as HTMLElement;
+        //     if (stb != null) {
+        //         let tarbar = $('#tabbar-area')[0];
+        //         if (tarbar != null) {
+        //             clearInterval(ii);
+        //         }
+        //     }
+        // }, 100);
         this.selectMode = true;
     }
 
