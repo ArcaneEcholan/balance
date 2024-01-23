@@ -1,6 +1,8 @@
 package com.example.app.rest
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.example.app.dao.UserPO
+import com.example.app.dao.UserUserConfigMapper
 import com.example.app.dao.mapper.LedgerMapper
 import com.example.app.dao.po.LedgerPO
 import com.example.app.exception.ApiException
@@ -28,16 +30,27 @@ class StatisticsController {
     @Autowired
     lateinit var ledgerMapper: LedgerMapper
 
+    @Autowired
+    lateinit var userUserConfigMapper: UserUserConfigMapper
+
     @GetMapping("/statistics")
-    fun s(
-        @NotEmpty
-        month: String,
-        ledger_name: String?,
-    ): ResponseEntity<Any> {
+    @AuthLogin
+    fun s(@NotEmpty month: String): ResponseEntity<Any> {
 
-        var ledgerName = ledger_name ?: "default"
+        var user = requestCtx.get()["user"] as UserPO
+        var userDefaultLedger = userUserConfigMapper.getUserConfigByKey(user.id!!, "default_ledger")
+        if (userDefaultLedger == null) {
+            throw ApiException(HttpStatus.NOT_FOUND, "Ledger not found")
+        }
 
-        var ledger = checkLedgerExist(ledgerName)
+        var ledgerName = userDefaultLedger.value
+
+        val selectOne = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("name", ledgerName))
+        if (selectOne == null) {
+            throw ApiException(HttpStatus.NOT_FOUND, "Ledger not found")
+        }
+
+        var ledger = selectOne
 
         var ledgerId = ledger.id
 

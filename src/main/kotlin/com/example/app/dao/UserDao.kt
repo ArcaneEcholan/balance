@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import org.apache.ibatis.annotations.Mapper
+import org.apache.ibatis.annotations.Param
 import org.springframework.stereotype.Repository
 import java.io.Serializable
 
@@ -65,8 +66,19 @@ data class UserUserConfigPO(
 
 @Mapper
 interface UserUserConfigMapper : BaseMapper<UserUserConfigPO> {
+    fun getUserConfigByKey(@Param("userId") userId: Long, @Param("key") key: String): UserConfigMapperResult?
 }
 
 @Repository
 class UserUserConfigDao {
+}
+
+class UserConfigMapperResult {
+    var key: String? = null
+    var value: String? = null
+    var userId: Long? = null
+    var userConfigId: Long? = null
+    override fun toString(): String {
+        return "UserConfigMapperResult(key=$key, value=$value, userId=$userId, userConfigId=$userConfigId)"
+    }
 }

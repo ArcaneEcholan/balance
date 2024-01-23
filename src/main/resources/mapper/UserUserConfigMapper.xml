@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.app.dao.UserUserConfigMapper">
+    <select id="getUserConfigByKey" resultType="com.example.app.dao.UserConfigMapperResult">
+        SELECT user_config.key, user_config.value, user_user_config.user_id AS userId, user_user_config.id AS user_config_id
+        FROM user_config
+                 JOIN user_user_config ON user_config.id = user_user_config.user_config_id
+                 JOIN user ON user_user_config.user_id = user.id
+        WHERE user.id = #{userId}
+          AND user_config.`key` = #{key}
+    </select>
+</mapper>

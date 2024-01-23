@@ -1,5 +1,6 @@
 import request from '@/ts/request/index';
 import { AxiosPromise } from 'axios';
+import store from '@/ts/store';
 
 class Client {
     static saveTransactions(trans: any[]) {
@@ -163,6 +164,9 @@ class Client {
             url: `/statistics`,
             method: 'get',
             params: { month: currentMonth },
+            headers: {
+                'entity-token': store.getters.token,
+            },
         });
     }
 }

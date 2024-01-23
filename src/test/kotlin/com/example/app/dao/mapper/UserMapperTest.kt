@@ -25,4 +25,13 @@ class UserMapperTest {
         println(userUserConfigMapper.selectList(null))
     }
 
+    @Test
+    fun select_specific_user_config_test() {
+        var result = userUserConfigMapper.getUserConfigByKey(1, "default_ledger")
+        println(result)
+
+        result = userUserConfigMapper.getUserConfigByKey(1, "default_ledge")
+        println(result)
+    }
+
 }
