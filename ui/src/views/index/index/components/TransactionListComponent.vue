@@ -234,6 +234,11 @@ export default class TransactionListComponent extends Vue {
                     it.checked = it.related;
                 });
 
+                let curLedgerName = this.getCurrentLedgerName();
+                ledgerList = ledgerList.filter(
+                    (it: any) => it.name !== curLedgerName,
+                );
+
                 this.ledgerList = ledgerList;
                 globalLoadingStop();
             })
