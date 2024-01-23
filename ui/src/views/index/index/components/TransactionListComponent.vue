@@ -30,6 +30,7 @@
                             clickable
                             :key="ledger.name"
                             :title="`${ledger.name}`"
+                            @click="onSelectLedger(ledger)"
                         >
                             <template #right-icon>
                                 <van-radio :name="ledger.name" ref="radios" />
@@ -195,6 +196,9 @@ export default class TransactionListComponent extends Vue {
     recordsListLoading = false;
     ledgerList: any[] = [];
     pickedLedgerName = '';
+    onSelectLedger(ledger) {
+        this.pickedLedgerName = ledger.name;
+    }
 
     updateLedgerButtonEnable() {
         return this.getSelectedRecords.length > 0;
