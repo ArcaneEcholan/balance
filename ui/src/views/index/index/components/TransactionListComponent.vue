@@ -134,10 +134,10 @@
             </div>
 
             <div v-if="selectMode">
-                <gap-component :value="`${27 * 3}px`"></gap-component>
+                <gap-component :value="`${29 * 3}px`"></gap-component>
             </div>
             <div v-else>
-                <gap-component :value="`${27 * 2}px`"></gap-component>
+                <gap-component :value="`${29 * 2}px`"></gap-component>
             </div>
         </div>
 
@@ -480,7 +480,8 @@ export default class TransactionListComponent extends Vue {
     bottom: 58px;
     left: 0;
     right: 0;
-    height: 27px;
+    height: 29px;
     background-color: white;
+    border-top: 1px solid $separator-color;
 }
 </style>
