@@ -262,9 +262,12 @@ export default class TransTypeComponent extends Vue {
     }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 @import '~@/style/common-style.scss';
 @import '~@/style/style-specification';
+.van-cell__title.van-field__label {
+    width: auto !important;
+}
 
 .type-icon-cell {
     width: 20%;
