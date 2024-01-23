@@ -50,7 +50,10 @@ let en = {
 
     change_language_successfully: 'change language successfully',
     home: 'Home',
-    statistics: 'Statistics',
+    statistics: {
+        title: 'Statistics',
+        date_picker: 'DateTime',
+    },
     pick_a_ledger: 'Pick a Ledger',
     all_ledgers: 'All Ledgers',
     ledger_management: 'Ledger Management',
@@ -133,7 +136,10 @@ let zh = {
 
     change_language_successfully: '更改语言成功',
     home: '首页',
-    statistics: '统计',
+    statistics: {
+        title: '统计',
+        date_picker: '日期',
+    },
     pick_a_ledger: '选择账本',
     all_ledgers: '所有账本',
     ledger_management: '账本管理',

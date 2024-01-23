@@ -4,13 +4,26 @@ $icon-bgc: #fdfdfd;
 $separator-color: #ebecf0;
 $button-color: #3574f0;
 $disable-color: #A8ADBD;
+$selection-active-color: #d4e2ff;
+
+.white-color {
+    color: white;
+}
 
 .button-color {
     color: $button-color;
 }
 
+.button-bgc {
+    background-color: $button-color;
+}
+
 .disable-color {
     color: $disable-color;
+}
+
+.select-color {
+    color: $selection-active-color;
 }
 
 input {

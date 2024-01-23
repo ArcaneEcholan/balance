@@ -40,7 +40,7 @@
                     </div>
                     <div>
                         <span class="fs12" style="line-height: 1">
-                            {{ getI18nValue('statistics') }}
+                            {{ getI18nValue('statistics.title') }}
                         </span>
                     </div>
                 </div>

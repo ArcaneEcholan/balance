@@ -1,10 +1,26 @@
 <template>
-    <div class="page">
-        <div>
-            <van-button plain type="info " @click="show = true">
-                month
-            </van-button>
+    <div class="page" style="padding-bottom: 66px; overflow: auto">
+        <div id="statistics-tab-title" class="tab-title">
+            <div class="flex column w100p">
+                <div class="w100p flex center">Statistics</div>
+                <div class="flex fs14">
+                    <div
+                        style="border-radius: 100px"
+                        class="button-bgc white-color pd4 mgr8"
+                        @click="show = true"
+                    >
+                        {{ $t('statistics.date_picker') }}
+                    </div>
+                    <div
+                        style="border-radius: 100px"
+                        class="button-bgc white-color pd4 pdr8"
+                    >
+                        ledger
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div class="shadow br8 overflow-hidden">
             <common-action-sheet
                 :visible.sync="show"
@@ -27,7 +43,7 @@
             </common-action-sheet>
         </div>
 
-        <gap-component></gap-component>
+        <gap-component :value="`${headerHeight}px`"></gap-component>
 
         <div class="record-header">
             {{ $t('sibling_month_expense_compare') }}
@@ -151,6 +167,8 @@ export default class StatisticIndexView extends Vue {
     percent1 = '';
     percent2 = '';
 
+    headerHeight = 0;
+
     onPickDate() {
         this.init();
         this.show = false;
@@ -267,6 +285,13 @@ export default class StatisticIndexView extends Vue {
             c.style.backgroundColor = 'white';
             c.style.padding = '8px';
         }
+
+        let header = document.getElementById(
+            'statistics-tab-title',
+        ) as HTMLElement;
+        let headerHeight = header.clientHeight;
+
+        this.headerHeight = headerHeight;
     }
 }
 </script>
@@ -274,4 +299,19 @@ export default class StatisticIndexView extends Vue {
 @import '~@/style/common-style.scss';
 @import '~@/style/style-specification';
 @import '~@/assets/custom-icon.css';
+
+.tab-title {
+    z-index: 100;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 18px;
+}
 </style>
