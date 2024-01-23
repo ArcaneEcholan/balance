@@ -246,6 +246,12 @@ export default class TransactionListComponent extends Vue {
             },
         })
             .then((resp) => {
+                this.recordsListByDay.forEach((it) => {
+                    it.records = it.records.filter((item) => {
+                        return !recordIds.includes(item.id);
+                    });
+                });
+
                 globalLoadingStop();
                 Notify({
                     type: 'success',
