@@ -3,9 +3,14 @@ $common-page-padding: 16px;
 $icon-bgc: #fdfdfd;
 $separator-color: #ebecf0;
 $button-color: #3574f0;
+$disable-color: #A8ADBD;
 
 .button-color {
     color: $button-color;
+}
+
+.disable-color {
+    color: $disable-color;
 }
 
 input {

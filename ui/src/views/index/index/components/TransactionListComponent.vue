@@ -144,7 +144,11 @@
             <div class="flex justify-between w100p h100p">
                 <!--<div @click="highlightSelectedRecords">highlight</div>-->
                 <div class="flex align-center h100p">
-                    <div @click="onClickUpdateLedger" class="mgl8">
+                    <div
+                        @click="onClickUpdateLedgerButton"
+                        class="mgl8"
+                        :class="[updateLedgerButtonActiveClass]"
+                    >
                         <i class="ali-international-icon-log"></i>
                     </div>
                 </div>
@@ -191,6 +195,23 @@ export default class TransactionListComponent extends Vue {
     recordsListLoading = false;
     ledgerList: any[] = [];
     pickedLedgerName = '';
+
+    updateLedgerButtonEnable() {
+        return this.getSelectedRecords.length > 0;
+    }
+
+    get updateLedgerButtonActiveClass() {
+        if (this.updateLedgerButtonEnable()) {
+            return 'button-color';
+        }
+
+        return 'disable-color';
+    }
+
+    get getSelectedRecords() {
+        return this.flatMapRecordsForSearching().filter((it) => it.selected);
+    }
+
     toggle(index: any) {
         let ledger = this.ledgerList[index];
         if (ledger.checked) {
@@ -200,9 +221,7 @@ export default class TransactionListComponent extends Vue {
     }
 
     onClickEditRecordLedgers() {
-        let recordIds = this.flatMapRecordsForSearching()
-            .filter((it) => it.selected)
-            .map((it) => it.id);
+        let recordIds = this.getSelectedRecords.map((it) => it.id);
 
         let ledgerName = this.pickedLedgerName;
         if (ledgerName === this.getCurrentLedgerName()) {
@@ -235,7 +254,10 @@ export default class TransactionListComponent extends Vue {
                 globalLoadingStop();
             });
     }
-    onClickUpdateLedger() {
+    onClickUpdateLedgerButton() {
+        if (!this.updateLedgerButtonEnable()) {
+            return;
+        }
         globalLoadingStart();
         request({
             url: '/ledgers',
