@@ -12,7 +12,10 @@
             >
                 <div class="flex column center w100p">
                     <div :class="`flex flex-center type-icon`">
-                        <i :class="icon.icon" style="font-size: inherit"></i>
+                        <i
+                            :class="icon.className"
+                            style="font-size: inherit"
+                        ></i>
                     </div>
                     <div style="height: 4px"></div>
                     <div
@@ -181,33 +184,32 @@ export default class TransTypeComponent extends Vue {
     onclickAddRecordTypeBtn() {
         this.addTypeShow = true;
     }
-
+    iconMap: any = {
+        daily: 'ali-international-icon-daily',
+        food_dish: 'ali-international-icon-food_dish',
+        fruit: 'ali-international-icon-fruit',
+        drinks: 'ali-international-icon-drinks',
+        beer: 'ali-international-icon-beer',
+        transport: 'ali-international-icon-transport',
+        entertainment: 'ali-international-icon-entertainment',
+        others: 'ali-international-icon-others',
+        water_cup: 'ali-international-icon-water_cup',
+        icecream: 'ali-international-icon-icecream',
+        mobile_phone: 'ali-international-icon-mobile_phone',
+        medical_care: 'ali-international-icon-medical_care',
+        tools_hardware: 'ali-international-icon-tools_hardware',
+        productivity: 'ali-international-icon-productivity',
+        furniture: 'ali-international-icon-furniture',
+    };
     created() {
         this.initTransactionTypes();
 
-        const iconMap: any = {
-            daily: 'ali-international-icon-daily',
-            food: 'ali-international-icon-food_dish',
-            fruit: 'ali-international-icon-fruit',
-            drinks: 'ali-international-icon-drinks',
-            alcohol: 'ali-international-icon-beer',
-            transportation: 'ali-international-icon-transport',
-            entertainment: 'ali-international-icon-entertainment',
-            others: 'ali-international-icon-others',
-            water: 'ali-international-icon-water_cup',
-            snack: 'ali-international-icon-icecream',
-            electronic: 'ali-international-icon-mobile_phone',
-            med: 'ali-international-icon-medical_care',
-            maintenance: 'ali-international-icon-tools_hardware',
-            productivity: 'ali-international-icon-productivity',
-            furniture: 'ali-international-icon-furniture',
-        };
-
-        for (let iconMapKey in iconMap) {
+        for (let iconMapKey in this.iconMap) {
             this.icons.push({
                 id: this.iconIdCounter++,
                 value: iconMapKey,
-                className: iconMap[iconMapKey],
+                icon: iconMapKey,
+                className: this.iconMap[iconMapKey],
             });
         }
 
@@ -219,7 +221,11 @@ export default class TransTypeComponent extends Vue {
 
     initTransactionTypes() {
         Client.getTransactionCategories().then((resp) => {
-            this.metrics = resp.data;
+            let types = resp.data;
+            types.forEach((it) => {
+                it.className = this.iconMap[it.icon];
+            });
+            this.metrics = types;
         });
     }
 
@@ -274,7 +280,7 @@ export default class TransTypeComponent extends Vue {
         background-color: $icon-bgc;
 
         &.picked {
-            background-color: red;
+            background-color: #d4e2ff;
         }
     }
 }

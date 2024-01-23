@@ -199,7 +199,7 @@ export default class AddTransactionEditorComponent extends Vue {
 
     onClickOneType(type: any) {
         this.chooseTypeRecordRow['type'] = type.value;
-        this.chooseTypeRecordRow['type-icon'] = type.icon;
+        this.chooseTypeRecordRow['type-icon'] = type.className;
         this.chooseTypePanelShow = false;
     }
 

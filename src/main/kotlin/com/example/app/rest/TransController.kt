@@ -190,26 +190,28 @@ class TransController {
     @Transactional
     fun createTransactionCategories(@RequestBody @Valid createTransTypeReq: CreateTransTypeReq): Any {
 
-        var iconList = listOf<String>(
-            "entertainment",
-            "mobile_phone",
-            "medical_care",
-            "furniture",
-            "tools_hardware",
-            "ice_cream",
-            "water_cup",
-            "others",
-            "beer",
-            "drinks",
-            "fruit",
-            "food_dish",
-            "transport",
+        var iconList = mapOf<String, String>(
+            "daily" to "ali-international-icon-daily",
+            "food_dish" to "ali-international-icon-food_dish",
+            "fruit" to "ali-international-icon-fruit",
+            "drinks" to "ali-international-icon-drinks",
+            "beer" to "ali-international-icon-beer",
+            "transport" to "ali-international-icon-transport",
+            "entertainment" to "ali-international-icon-entertainment",
+            "others" to "ali-international-icon-others",
+            "water_cup" to "ali-international-icon-water_cup",
+            "icecream" to "ali-international-icon-icecream",
+            "mobile_phone" to "ali-international-icon-mobile_phone",
+            "medical_care" to "ali-international-icon-medical_care",
+            "tools_hardware" to "ali-international-icon-tools_hardware",
+            "productivity" to "ali-international-icon-productivity",
+            "furniture" to "ali-international-icon-furniture",
         )
 
         var name = createTransTypeReq.name
         var icon = createTransTypeReq.icon
 
-        if (!iconList.contains(icon)) {
+        if (!iconList.containsKey(icon)) {
             return ResponseEntity.badRequest().body(object {
                 var message = "icon not found"
             })
