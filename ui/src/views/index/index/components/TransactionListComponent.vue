@@ -64,21 +64,18 @@
                             @click="toEditTransactionPage(record.id)"
                         >
                             <div
-                                v-show="selectMode"
-                                class="flex center bg-white"
-                                style="width: 15%"
+                                class="flex center bg-white transition"
+                                style="width: 0px"
+                                ref="checkboxes"
                             >
                                 <van-checkbox
                                     v-model="record.selected"
                                 ></van-checkbox>
                             </div>
                             <div
-                                :ref="`record-${record.id}`"
-                                :style="`${
-                                    selectMode ? 'width: 85%' : 'width: 100%'
-                                };`"
+                                :ref="`records`"
                                 name="one-record"
-                                class="record-row"
+                                class="record-row w100p transition"
                             >
                                 <!--card left-->
                                 <div class="flexg5">
@@ -299,26 +296,6 @@ export default class TransactionListComponent extends Vue {
             });
     }
 
-    // this function is for test usage
-    highlightSelectedRecords() {
-        this.flatMapRecordsForSearching().forEach((it) => {
-            // @ts-ignore
-            let ref = this.$refs[`record-${it.id}`][0];
-            if (it.selected) {
-                ref.style.backgroundColor = '#f5f5f5';
-            } else {
-                ref.style.backgroundColor = 'white';
-            }
-        });
-        setTimeout(() => {
-            this.flatMapRecordsForSearching().forEach((it) => {
-                // @ts-ignore
-                let ref = this.$refs[`record-${it.id}`][0];
-                ref.style.backgroundColor = 'white';
-            });
-        }, 500);
-    }
-
     created() {
         this.prepareListeners();
         this.onRefreshTransactionList();
@@ -452,15 +429,20 @@ export default class TransactionListComponent extends Vue {
     }
 
     showSelectBar() {
-        // let ii = setInterval(() => {
-        //     let stb = this.$refs['select-tool-bar'] as HTMLElement;
-        //     if (stb != null) {
-        //         let tarbar = $('#tabbar-area')[0];
-        //         if (tarbar != null) {
-        //             clearInterval(ii);
-        //         }
-        //     }
-        // }, 100);
+        if (this.flatMapRecordsForSearching().length === 0) {
+            return;
+        }
+        let ii = setInterval(() => {
+            let cbs = this.$refs['checkboxes'];
+            if (cbs != null) {
+                // @ts-ignore
+                cbs.forEach((it) => {
+                    // @ts-ignore
+                    it.style.width = '15%';
+                });
+                clearInterval(ii);
+            }
+        }, 100);
         this.selectMode = true;
     }
 
@@ -469,6 +451,19 @@ export default class TransactionListComponent extends Vue {
         this.flatMapRecordsForSearching().forEach((it) => {
             it.selected = false;
         });
+
+        // @ts-ignore
+        this.$refs['checkboxes'].forEach((it) => {
+            // @ts-ignore
+            it.style.width = '0px';
+        });
+
+        // @ts-ignore
+        this.$refs['records'].forEach((it) => {
+            // @ts-ignore
+            it.style.width = '100%';
+        });
+
         eventBus.$emit('on-record-list-select-cancel', null);
     }
 
@@ -512,6 +507,10 @@ export default class TransactionListComponent extends Vue {
 <style lang="scss" scoped>
 @import '~@/style/common-style.scss';
 @import '~@/style/style-specification';
+
+.transition {
+    transition: width var(--transition-duration) var(--transition-easing);
+}
 
 .select-tool-bar {
     position: fixed;
