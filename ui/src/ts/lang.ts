@@ -53,6 +53,18 @@ let en = {
     statistics: {
         title: 'Statistics',
         date_picker: 'DateTime',
+        ledger_picker: {
+            title: 'Ledger',
+        },
+        exp_ranking: {
+            type: 'Expense Ranking By Class',
+            record: 'Expense Ranking',
+        },
+        sibling_month_compare: {
+            title: 'Compare with Last Month',
+            last_month: 'Last Month',
+            this_month: 'This Month',
+        },
     },
     pick_a_ledger: 'Pick a Ledger',
     all_ledgers: 'All Ledgers',
@@ -139,6 +151,18 @@ let zh = {
     statistics: {
         title: '统计',
         date_picker: '日期',
+        ledger_picker: {
+            title: '选择账本',
+        },
+        exp_ranking: {
+            type: '分类消费排行',
+            record: '消费排行',
+        },
+        sibling_month_compare: {
+            title: '对比上月',
+            last_month: '上月',
+            this_month: '本月',
+        },
     },
     pick_a_ledger: '选择账本',
     all_ledgers: '所有账本',

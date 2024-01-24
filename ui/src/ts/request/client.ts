@@ -159,11 +159,11 @@ class Client {
         });
     }
 
-    static getStatisticsData(currentMonth: string) {
+    static getStatisticsData(currentMonth: string, ledgerId: number | null) {
         return request({
             url: `/statistics`,
             method: 'get',
-            params: { month: currentMonth },
+            params: { month: currentMonth, ledger_id: ledgerId },
             headers: {
                 'entity-token': store.getters.token,
             },

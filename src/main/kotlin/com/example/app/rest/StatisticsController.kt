@@ -12,6 +12,7 @@ import com.example.app.utils.getLastMonth
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -35,24 +36,36 @@ class StatisticsController {
 
     @GetMapping("/statistics")
     @AuthLogin
-    fun s(@NotEmpty month: String): ResponseEntity<Any> {
+    @Transactional
+    fun s(@NotEmpty month: String, ledger_id: Long?): ResponseEntity<Any> {
 
-        var user = requestCtx.get()["user"] as UserPO
-        var userDefaultLedger = userUserConfigMapper.getUserConfigByKey(user.id!!, "default_ledger")
-        if (userDefaultLedger == null) {
-            throw ApiException(HttpStatus.NOT_FOUND, "Ledger not found")
+        var ledgerId: Long = 0;
+
+        if (ledger_id != null) {
+            // TODO ledger query should be carried out with user id
+            var ledger = ledgerMapper.selectById(ledger_id)
+            if (ledger == null) {
+                throw ApiException(HttpStatus.NOT_FOUND, "Ledger not found")
+            }
+            ledgerId = ledger_id
+        } else {
+            var user = requestCtx.get()["user"] as UserPO
+            var userDefaultLedger = userUserConfigMapper.getUserConfigByKey(user.id!!, "default_ledger")
+            if (userDefaultLedger == null) {
+                throw ApiException(HttpStatus.NOT_FOUND, "Ledger not found")
+            }
+
+            var ledgerName = userDefaultLedger.value
+
+            val selectOne = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("name", ledgerName))
+            if (selectOne == null) {
+                throw ApiException(HttpStatus.NOT_FOUND, "Ledger not found")
+            }
+
+            var ledger = selectOne
+
+            ledgerId = ledger.id!!
         }
-
-        var ledgerName = userDefaultLedger.value
-
-        val selectOne = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("name", ledgerName))
-        if (selectOne == null) {
-            throw ApiException(HttpStatus.NOT_FOUND, "Ledger not found")
-        }
-
-        var ledger = selectOne
-
-        var ledgerId = ledger.id
 
         val thisMonthTrans = transactionService.list(ledgerId!!, month)
 

@@ -14,39 +14,71 @@
                     <div
                         style="border-radius: 100px"
                         class="button-bgc white-color pd4 pdr8"
+                        @click="onClickPickLedger"
                     >
-                        ledger
+                        {{ $t('statistics.ledger_picker.title') }}
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="shadow br8 overflow-hidden">
-            <common-action-sheet
-                :visible.sync="show"
-                :fit-content="true"
-                :plane-content="true"
-            >
-                <template #default>
-                    <van-datetime-picker
-                        @cancel="onCancel"
-                        @confirm="onPickDate"
-                        v-model="currentDate"
-                        title="Choose Year-Month"
-                        :min-date="minDate"
-                        :max-date="maxDate"
-                        :type="columnsType"
-                    >
-                        <template #default></template>
-                    </van-datetime-picker>
-                </template>
-            </common-action-sheet>
-        </div>
+        <common-action-sheet
+            :visible.sync="show"
+            :fit-content="true"
+            :plane-content="true"
+        >
+            <template #default>
+                <van-datetime-picker
+                    @cancel="onCancel"
+                    @confirm="onPickDate"
+                    v-model="currentDate"
+                    title="Choose Year-Month"
+                    :min-date="minDate"
+                    :max-date="maxDate"
+                    :type="columnsType"
+                >
+                    <template #default></template>
+                </van-datetime-picker>
+            </template>
+        </common-action-sheet>
+
+        <common-action-sheet :visible.sync="ledgerPickerShow">
+            <template #header>
+                <div style="width: 100%" class="flex">
+                    <div style="width: 20%"></div>
+                    <div style="width: 60%" class="flex center">
+                        {{ $t('statistics.ledger_picker.title') }}
+                    </div>
+                    <div style="width: 20%">
+                        <custom-button @click="pickLedger" type="inline">
+                            {{ $t('save') }}
+                        </custom-button>
+                    </div>
+                </div>
+            </template>
+            <template #body>
+                <van-radio-group v-model="pickedLedgerName">
+                    <van-cell-group>
+                        <van-cell
+                            v-for="ledger in ledgerList"
+                            clickable
+                            :key="ledger.name"
+                            :title="`${ledger.name}`"
+                            @click="onSelectLedger(ledger)"
+                        >
+                            <template #right-icon>
+                                <van-radio :name="ledger.name" ref="radios" />
+                            </template>
+                        </van-cell>
+                    </van-cell-group>
+                </van-radio-group>
+            </template>
+        </common-action-sheet>
 
         <gap-component :value="`${headerHeight}px`"></gap-component>
 
         <div class="record-header">
-            {{ $t('sibling_month_expense_compare') }}
+            {{ $t('statistics.sibling_month_compare.title') }}
         </div>
 
         <panel>
@@ -66,7 +98,10 @@
                     </div>
                 </div>
                 <div class="flexg1" id="compare-detail">
-                    <div>last month: {{ lastMonthTotal }}</div>
+                    <div>
+                        {{ $t('statistics.sibling_month_compare.last_month') }}:
+                        {{ lastMonthTotal }}
+                    </div>
                     <div :style="`width: ${percent1}`">
                         <div
                             style="
@@ -77,7 +112,10 @@
                             "
                         ></div>
                     </div>
-                    <div>this month: {{ thisMonthTotal }}</div>
+                    <div>
+                        {{ $t('statistics.sibling_month_compare.this_month') }}:
+                        {{ thisMonthTotal }}
+                    </div>
                     <div :style="`width: ${percent2}`">
                         <div
                             style="
@@ -92,7 +130,7 @@
             </div>
         </panel>
 
-        <div class="record-header">{{ $t('expense_type_ranking') }}</div>
+        <div class="record-header">{{ $t('statistics.exp_ranking.type') }}</div>
 
         <panel>
             <div v-for="i in typeRankList" class="record-row">
@@ -111,7 +149,9 @@
 
         <gap-component></gap-component>
 
-        <div class="record-header">{{ $t('expense_single_ranking') }}</div>
+        <div class="record-header">
+            {{ $t('statistics.exp_ranking.record') }}
+        </div>
 
         <panel>
             <div v-for="i in rankList" class="record-row">
@@ -140,10 +180,14 @@ import { shallowMount } from '@vue/test-utils';
 import Panel from '@/views/components/Panel.vue';
 import AddRecordSheetComponent from '@/views/index/index/components/AddRecordSheetComponent.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
+import CustomButton from '@/views/components/CustomButton.vue';
+import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
+import request from '@/ts/request';
 
 @Component({
     methods: { shallowMount },
     components: {
+        CustomButton,
         CommonActionSheet,
         AddRecordSheetComponent,
         Panel,
@@ -151,6 +195,27 @@ import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
     },
 })
 export default class StatisticIndexView extends Vue {
+    pickLedger() {
+        globalLoadingStart();
+        Client.getStatisticsData(this.getCurrentDate(), this.pickedLedger!.id)
+            .then((resp: any) => {
+                resp = resp.data;
+                this.percent = resp.percent;
+                this.lastMonthTotal = resp.last_month_total;
+                this.thisMonthTotal = resp.this_month_total;
+                this.typeRankList = resp.type_rank_list;
+                this.rankList = resp.rank_list;
+                this.getPercent();
+                this.$nextTick(() => {
+                    this.centerPercentText();
+                });
+                this.ledgerPickerShow = false;
+                globalLoadingStop();
+            })
+            .catch((resp) => {
+                globalLoadingStop();
+            });
+    }
     show = false;
     minDate = new Date(2020, 0, 1);
     maxDate = new Date(2100, 0, 1);
@@ -168,6 +233,40 @@ export default class StatisticIndexView extends Vue {
     percent2 = '';
 
     headerHeight = 0;
+
+    ledgerPickerShow = false;
+
+    ledgerList: any[] = [];
+    pickedLedgerName = '';
+    pickedLedger: any = null;
+    onSelectLedger(ledger) {
+        this.pickedLedgerName = ledger.name;
+        this.pickedLedger = ledger;
+    }
+    onClickPickLedger() {
+        globalLoadingStart();
+        request({
+            url: '/ledgers',
+            method: 'get',
+        })
+            .then((resp: any) => {
+                this.ledgerPickerShow = true;
+                let ledgerList = resp.data;
+                this.ledgerList = ledgerList;
+                let userconfigs = this.$store.getters.userConfigs;
+                let defaultLedgerName = userconfigs.find(
+                    (it) => it.key === 'default_ledger',
+                );
+                this.pickedLedgerName = defaultLedgerName.value;
+                this.pickedLedger = ledgerList.find(
+                    (i) => i.name === defaultLedgerName.value,
+                );
+                globalLoadingStop();
+            })
+            .catch((resp) => {
+                globalLoadingStop();
+            });
+    }
 
     onPickDate() {
         this.init();
@@ -204,18 +303,20 @@ export default class StatisticIndexView extends Vue {
     }
 
     init() {
-        Client.getStatisticsData(this.getCurrentDate()).then((resp: any) => {
-            resp = resp.data;
-            this.percent = resp.percent;
-            this.lastMonthTotal = resp.last_month_total;
-            this.thisMonthTotal = resp.this_month_total;
-            this.typeRankList = resp.type_rank_list;
-            this.rankList = resp.rank_list;
-            this.getPercent();
-            this.$nextTick(() => {
-                this.centerPercentText();
-            });
-        });
+        Client.getStatisticsData(this.getCurrentDate(), null).then(
+            (resp: any) => {
+                resp = resp.data;
+                this.percent = resp.percent;
+                this.lastMonthTotal = resp.last_month_total;
+                this.thisMonthTotal = resp.this_month_total;
+                this.typeRankList = resp.type_rank_list;
+                this.rankList = resp.rank_list;
+                this.getPercent();
+                this.$nextTick(() => {
+                    this.centerPercentText();
+                });
+            },
+        );
     }
 
     format() {
@@ -248,6 +349,7 @@ export default class StatisticIndexView extends Vue {
             i.className = 'arrow-down-svg green-svg-color';
             e.style.color = 'green';
         } else if (this.percent === 'infinite') {
+            this.percent = '';
             i.className = '';
             i.className = 'minus-svg gray-svg-color';
             e.style.color = 'gray';
