@@ -374,15 +374,39 @@ export default class TransactionListComponent extends Vue {
     }
 
     updateTransaction(newTransaction: any) {
+        let updateFunc = (record, newRecord) => {
+            record.amount = newRecord.amount;
+            record.categoryValue = newRecord.categoryValue;
+            record.count = newRecord.count;
+            record.datetime = newRecord.datetime;
+            record.description = newRecord.description;
+        };
         let found = this.flatMapRecordsForSearching().find((item) => {
             return item.id === newTransaction.id;
         });
         if (found) {
-            found.amount = newTransaction.amount;
-            found.categoryValue = newTransaction.categoryValue;
-            found.count = newTransaction.count;
-            found.datetime = newTransaction.datetime;
-            found.description = newTransaction.description;
+            // update view
+            updateFunc(found, newTransaction);
+
+            // update cache
+            let cacheKey = `transaction_list_${this.getCurrentLedgerName()}_${this.getCurrentDate()}`;
+            Cache.getItem(cacheKey)
+                .then((cachedData: any) => {
+                    if (cachedData) {
+                        let tranList = JSON.parse(cachedData);
+                        tranList.forEach((it: any) => {
+                            if (it.id === newTransaction.id) {
+                                updateFunc(it, newTransaction);
+                            }
+                        });
+
+                        // update the cache
+                        Cache.setItem(cacheKey, tranList);
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
         }
     }
 
@@ -425,7 +449,7 @@ export default class TransactionListComponent extends Vue {
             Cache.getItem(cacheKey)
                 .then((cachedData: any) => {
                     if (cachedData) {
-                        let tranList = JSON.parse(cachedData.value);
+                        let tranList = JSON.parse(cachedData);
                         this.postProcessFetchTranList(this, tranList);
                     } else {
                         Client.getTransactionListByLedgerName(

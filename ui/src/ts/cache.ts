@@ -42,7 +42,7 @@ class Cache {
 
                 getRequest.onsuccess = function (event) {
                     if (event.target.result) {
-                        resolve(event.target.result);
+                        resolve(event.target.result.value);
                     } else {
                         resolve(null); // Resolve with null if no data is found
                     }
@@ -64,19 +64,73 @@ class Cache {
                     key: key,
                     value: JSON.stringify(value),
                 };
-                let request = store.add(data);
+                let request = store.put(data);
 
                 request.onsuccess = function () {
                     resolve(null);
-                    console.log('Data added to the database');
+                    console.log('Data set to the database');
                 };
 
                 request.onerror = function (errEvn) {
                     reject(
                         new Error(
-                            `Error adding data to the database: ${errEvn.target.error.message}`,
+                            `Error setting data to the database: ${errEvn.target.error.message}`,
                         ),
                     );
+                };
+            };
+        });
+    }
+
+    getAllKeys(): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            let openRequest = this.whoKnowsTheName(reject);
+            openRequest.onsuccess = function (event) {
+                // @ts-ignore
+                let db = event.target.result;
+
+                let transaction = db.transaction(['caches'], 'readonly');
+                let store = transaction.objectStore('caches');
+                let request = store.getAllKeys();
+
+                request.onerror = function (event) {
+                    reject(
+                        new Error(
+                            'Error retrieving keys from the database: ' +
+                                event.target.error.message,
+                        ),
+                    );
+                };
+
+                request.onsuccess = function (event) {
+                    resolve(event.target.result);
+                };
+            };
+        });
+    }
+
+    removeItem(key) {
+        return new Promise<void>((resolve, reject) => {
+            let openRequest = this.whoKnowsTheName(reject);
+            openRequest.onsuccess = function (event) {
+                // @ts-ignore
+                let db = event.target.result;
+
+                let transaction = db.transaction(['caches'], 'readwrite');
+                let store = transaction.objectStore('caches');
+                let request = store.delete(key);
+
+                request.onerror = function (event) {
+                    reject(
+                        new Error(
+                            'Error deleting item from the database: ' +
+                                event.target.error.message,
+                        ),
+                    );
+                };
+
+                request.onsuccess = function () {
+                    resolve();
                 };
             };
         });

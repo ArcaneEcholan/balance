@@ -27,11 +27,11 @@
                             <div style="width: 100%" class="flex">
                                 <div style="width: 20%"></div>
                                 <div style="width: 60%" class="flex center">
-                                    {{ $t('edit_record.select_ledger.title') }}
+                                    {{ $t('statistics.ledger_picker.title') }}
                                 </div>
                                 <div style="width: 20%">
                                     <custom-button
-                                        @click="onClickEditRecordLedgers"
+                                        @click="pickLedger"
                                         type="inline"
                                     >
                                         {{ $t('save') }}
@@ -40,23 +40,24 @@
                             </div>
                         </template>
                         <template #body>
-                            <van-cell-group>
-                                <van-cell
-                                    v-for="(ledger, index) in ledgerList"
-                                    clickable
-                                    :key="ledger.name"
-                                    :title="`${ledger.name}`"
-                                    @click="toggle(index)"
-                                >
-                                    <template #right-icon>
-                                        <van-checkbox
-                                            :name="ledger.name"
-                                            v-model="ledger.checked"
-                                            ref="checkboxes"
-                                        />
-                                    </template>
-                                </van-cell>
-                            </van-cell-group>
+                            <van-radio-group v-model="pickedLedgerName">
+                                <van-cell-group>
+                                    <van-cell
+                                        v-for="ledger in ledgerList"
+                                        clickable
+                                        :key="ledger.name"
+                                        :title="`${ledger.name}`"
+                                        @click="onSelectLedger(ledger)"
+                                    >
+                                        <template #right-icon>
+                                            <van-radio
+                                                :name="ledger.name"
+                                                ref="radios"
+                                            />
+                                        </template>
+                                    </van-cell>
+                                </van-cell-group>
+                            </van-radio-group>
                         </template>
                     </common-action-sheet>
 
@@ -106,7 +107,7 @@ import Panel from '@/views/components/Panel.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import request from '@/ts/request';
 import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
-
+import Cache from '@/ts/cache';
 @Component({
     components: {
         CommonActionSheet,
@@ -118,21 +119,27 @@ import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 })
 export default class EditRecordView extends Vue {
     modalLifeCycleHooks: any;
-    pickedLedgers: any[] = [];
     ledgerList: any[] = [];
-    onClickEditRecordLedgers() {
+    pickedLedgerName = '';
+    pickedLedger: any = {};
+    pickLedger() {
         globalLoadingStart();
         request({
             url: '/record/ledgers',
             method: 'put',
             data: {
                 record_ids: [this.recordId],
-                ledger_ids: this.ledgerList
-                    .filter((it) => it.checked)
-                    .map((it) => it.id),
+                ledger_ids: [this.pickedLedger.id],
             },
         })
             .then((resp) => {
+                Cache.getAllKeys().then((keys: any[]) => {
+                    keys.forEach((it) => {
+                        if (it.startsWith('transaction_list_')) {
+                            Cache.removeItem(it);
+                        }
+                    });
+                });
                 globalLoadingStop();
                 Notify({
                     type: 'success',
@@ -144,16 +151,10 @@ export default class EditRecordView extends Vue {
                 globalLoadingStop();
             });
     }
-    toggle(index: any) {
-        let ledger = this.ledgerList[index];
-        // @ts-ignore
-        let it = this.$refs.checkboxes[index];
-        it.toggle(!ledger.checked);
-        ledger.checked = !ledger.checked;
-        let pickedLedgersId = this.ledgerList
-            .filter((it) => it.checked)
-            .map((it) => it.id);
-        console.log(pickedLedgersId);
+
+    onSelectLedger(ledger) {
+        this.pickedLedgerName = ledger.name;
+        this.pickedLedger = ledger;
     }
 
     ledgerPickerShow = false;
