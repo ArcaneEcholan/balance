@@ -185,6 +185,7 @@ import request from '@/ts/request';
 import CustomButton from '@/views/components/CustomButton.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
+import Cache from '@/ts/cache';
 
 @Component({
     components: { CommonActionSheet, CustomButton, GapComponent, Panel },
@@ -385,10 +386,30 @@ export default class TransactionListComponent extends Vue {
         }
     }
 
-    deepClone(obj) {
-        if (obj) {
-            return JSON.parse(JSON.stringify(obj));
-        }
+    postProcessFetchTranList(vue, res) {
+        vue.recordsListLoading = false;
+        let recordsByDay: any = {};
+        res.forEach((it: any) => {
+            it.selected = false;
+            let date = it.datetime.split(' ')[0];
+            if (!recordsByDay[date]) {
+                recordsByDay[date] = [];
+            }
+            recordsByDay[date].push(it);
+        });
+
+        console.debug(recordsByDay);
+
+        // convert map to list for view rendering
+        let resultList: any[] = [];
+        Object.keys(recordsByDay).forEach((it) => {
+            resultList.push({
+                date: it,
+                records: recordsByDay[it],
+            });
+        });
+        console.debug(resultList);
+        vue.recordsListByDay = resultList;
     }
 
     onRefreshTransactionList() {
@@ -397,155 +418,33 @@ export default class TransactionListComponent extends Vue {
             let currentDate = this.getCurrentDate();
             this.recordsListLoading = true;
 
-            let db;
-            let request = indexedDB.open('site_idb', 1);
-            request.onerror = function (event) {
-                console.error(
-                    // @ts-ignore
-                    'Open Database error: ' + event.target.error.message,
-                );
-            };
+            let ledgerName = currentLedgerName;
+            let date = currentDate;
+            let cacheKey = `transaction_list_${ledgerName}_${date}`;
 
-            let vue = this;
-
-            request.onupgradeneeded = function (event) {
-                // @ts-ignore
-                let db = event.target.result;
-
-                // Create an objectStore for this database
-                db.createObjectStore('caches', {
-                    keyPath: 'key',
-                });
-            };
-
-            request.onsuccess = function (event) {
-                // @ts-ignore
-                db = event.target.result;
-
-                let transaction = db.transaction(['caches']);
-                let objectStore = transaction.objectStore('caches');
-                let request = objectStore.get('transaction_list');
-
-                request.onerror = function (errEvn) {
-                    console.error(
-                        `Error reading data from the database: ${errEvn.target.error.message}`,
-                    );
-                };
-
-                request.onsuccess = function (event) {
-                    if (event.target.result) {
-                        vue.recordsListLoading = false;
-                        let tranList = JSON.parse(event.target.result.value);
-                        let recordsByDay: any = {};
-                        tranList.forEach((it: any) => {
-                            it.selected = false;
-                            let date = it.datetime.split(' ')[0];
-                            if (!recordsByDay[date]) {
-                                recordsByDay[date] = [];
-                            }
-                            recordsByDay[date].push(it);
-                        });
-
-                        console.debug(recordsByDay);
-
-                        // convert map to list for view rendering
-                        let resultList: any[] = [];
-                        Object.keys(recordsByDay).forEach((it) => {
-                            resultList.push({
-                                date: it,
-                                records: recordsByDay[it],
-                            });
-                        });
-                        console.debug(resultList);
-                        vue.recordsListByDay = resultList;
+            Cache.getItem(cacheKey)
+                .then((cachedData: any) => {
+                    if (cachedData) {
+                        let tranList = JSON.parse(cachedData.value);
+                        this.postProcessFetchTranList(this, tranList);
                     } else {
-                        console.log('No data found');
                         Client.getTransactionListByLedgerName(
                             currentLedgerName,
                             currentDate,
                         )
                             .then((res) => {
-                                vue.recordsListLoading = false;
-                                // sort records by day
-                                let recordsByDay: any = {};
-                                res.data.forEach((it: any) => {
-                                    it.selected = false;
-                                    let date = it.datetime.split(' ')[0];
-                                    if (!recordsByDay[date]) {
-                                        recordsByDay[date] = [];
-                                    }
-                                    recordsByDay[date].push(it);
-                                });
-
-                                console.debug(recordsByDay);
-
-                                // convert map to list for view rendering
-                                let resultList: any[] = [];
-                                Object.keys(recordsByDay).forEach((it) => {
-                                    resultList.push({
-                                        date: it,
-                                        records: recordsByDay[it],
-                                    });
-                                });
-                                console.debug(resultList);
-                                vue.recordsListByDay = resultList;
-
-                                let db;
-                                let request = indexedDB.open('site_idb', 1);
-                                request.onerror = function (event) {
-                                    console.error(
-                                        'Open Database error: ' +
-                                            // @ts-ignore
-                                            event.target.error.message,
-                                    );
-                                };
-
-                                request.onupgradeneeded = function (event) {
-                                    // @ts-ignore
-                                    let db = event.target.result;
-
-                                    // Create an objectStore for this database
-                                    db.createObjectStore('caches', {
-                                        keyPath: 'key',
-                                    });
-                                };
-
-                                request.onsuccess = function (event) {
-                                    // @ts-ignore
-                                    db = event.target.result;
-                                    let transaction = db.transaction(
-                                        ['caches'],
-                                        'readwrite',
-                                    );
-                                    let store =
-                                        transaction.objectStore('caches');
-
-                                    let data = {
-                                        key: 'transaction_list',
-                                        value: JSON.stringify(res.data),
-                                    };
-                                    let request = store.add(data);
-
-                                    request.onsuccess = function () {
-                                        console.log(
-                                            'Data added to the database',
-                                        );
-                                    };
-
-                                    request.onerror = function (errEvn) {
-                                        console.log(
-                                            `Error adding data to the database: ${errEvn.target.error.message}`,
-                                        );
-                                    };
-                                };
+                                this.postProcessFetchTranList(this, res.data);
+                                Cache.setItem(cacheKey, res.data);
                             })
                             .catch((err) => {
-                                vue.recordsListLoading = false;
+                                this.recordsListLoading = false;
                                 console.log(err);
                             });
                     }
-                };
-            };
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
         } catch (e) {
             console.log(e);
         }
