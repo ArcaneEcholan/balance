@@ -81,11 +81,12 @@
                                 <div class="flexg5">
                                     <div>
                                         <span class="pdr10">
-                                            {{
-                                                record.categoryValue == null
-                                                    ? $t('unknown_record_type')
-                                                    : record.categoryValue
-                                            }}
+                                            <i
+                                                :class="
+                                                    record.categoryIcon
+                                                        | mapTypeIcon2Class
+                                                "
+                                            ></i>
                                         </span>
                                         <span class="fs14 google-gray-400">
                                             {{
@@ -193,6 +194,29 @@ import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
                 return 'unknown datetime';
             }
             return getTimeOnly(timeString);
+        },
+        mapTypeIcon2Class: function (iconName: string | null) {
+            let iconMap: any = {
+                daily: 'ali-international-icon-daily',
+                food_dish: 'ali-international-icon-food_dish',
+                fruit: 'ali-international-icon-fruit',
+                drinks: 'ali-international-icon-drinks',
+                beer: 'ali-international-icon-beer',
+                transport: 'ali-international-icon-transport',
+                entertainment: 'ali-international-icon-entertainment',
+                others: 'ali-international-icon-others',
+                water_cup: 'ali-international-icon-water_cup',
+                icecream: 'ali-international-icon-icecream',
+                mobile_phone: 'ali-international-icon-mobile_phone',
+                medical_care: 'ali-international-icon-medical_care',
+                tools_hardware: 'ali-international-icon-tools_hardware',
+                productivity: 'ali-international-icon-productivity',
+                furniture: 'ali-international-icon-furniture',
+            };
+            if (!iconName) {
+                return this.$t('unknown_record_type');
+            }
+            return iconMap[iconName];
         },
     },
 })

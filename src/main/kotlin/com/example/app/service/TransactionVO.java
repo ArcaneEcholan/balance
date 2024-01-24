@@ -9,10 +9,11 @@ public class TransactionVO {
     public BigDecimal amount;
     public String orderNo;
     public Long categoryId;
+    public String categoryValue;
+    public String categoryIcon;
     public String description;
     public Long locationId;
     public String datetime;
     public Integer count;
-    public String categoryValue;
     public Object location;
 }
