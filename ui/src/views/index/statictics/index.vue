@@ -203,6 +203,21 @@ export default class StatisticIndexView extends Vue {
                 this.percent = resp.percent;
                 this.lastMonthTotal = resp.last_month_total;
                 this.thisMonthTotal = resp.this_month_total;
+
+                if (this.lastMonthTotal.indexOf('.') !== -1) {
+                    this.lastMonthTotal = this.lastMonthTotal.substring(
+                        0,
+                        this.lastMonthTotal.indexOf('.') + 3,
+                    );
+                }
+
+                if (this.thisMonthTotal.indexOf('.') !== -1) {
+                    this.thisMonthTotal = this.thisMonthTotal.substring(
+                        0,
+                        this.thisMonthTotal.indexOf('.') + 3,
+                    );
+                }
+
                 this.typeRankList = resp.type_rank_list;
                 this.rankList = resp.rank_list;
                 this.getPercent();
@@ -309,6 +324,21 @@ export default class StatisticIndexView extends Vue {
                 this.percent = resp.percent;
                 this.lastMonthTotal = resp.last_month_total;
                 this.thisMonthTotal = resp.this_month_total;
+
+                if (this.lastMonthTotal.indexOf('.') !== -1) {
+                    this.lastMonthTotal = this.lastMonthTotal.substring(
+                        0,
+                        this.lastMonthTotal.indexOf('.') + 3,
+                    );
+                }
+
+                if (this.thisMonthTotal.indexOf('.') !== -1) {
+                    this.thisMonthTotal = this.thisMonthTotal.substring(
+                        0,
+                        this.thisMonthTotal.indexOf('.') + 3,
+                    );
+                }
+
                 this.typeRankList = resp.type_rank_list;
                 this.rankList = resp.rank_list;
                 this.getPercent();
