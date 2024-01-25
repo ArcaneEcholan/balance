@@ -309,6 +309,14 @@ export default class TransactionListComponent extends Vue {
             method: 'get',
         })
             .then((resp: any) => {
+                Cache.getAllKeys().then((keys: any[]) => {
+                    keys.forEach((it) => {
+                        if (it.startsWith('transaction_list_')) {
+                            Cache.removeItem(it);
+                        }
+                    });
+                });
+
                 this.ledgerPickerShow = true;
                 let ledgerList = resp.data;
 
