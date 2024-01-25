@@ -157,6 +157,7 @@ import KeyBoardComponent from '@/views/index/index/components/KeyBoardComponent.
 import settings from '@/settings';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import request from '@/ts/request';
+import Cache from '@/ts/cache';
 
 class FormItemField {
     value: string | null = null;
@@ -711,6 +712,23 @@ export default class AddTransactionEditorComponent extends Vue {
             },
         })
             .then((resp) => {
+                let currentDate = eventBus.$emitWithReturnValue(
+                    'on-get-main-page-cur-date',
+                    null,
+                );
+                let ledgerName = eventBus.$emitWithReturnValue(
+                    'on-get-current-ledger-name',
+                    null,
+                );
+                const key = `transaction_list_${ledgerName}_${currentDate}`;
+                Cache.getAllKeys().then((keys: any[]) => {
+                    keys.forEach((it) => {
+                        if (it === key) {
+                            Cache.removeItem(it);
+                        }
+                    });
+                });
+
                 Notify({
                     message: 'save successfully',
                     type: 'success',
