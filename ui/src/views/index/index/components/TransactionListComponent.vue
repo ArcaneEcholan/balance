@@ -349,6 +349,39 @@ export default class TransactionListComponent extends Vue {
                     this.updateTransaction(newTransaction),
             },
             {
+                eventName: 'on-transaction-removed',
+                handler: (record: any) => {
+                    let found = this.flatMapRecordsForSearching().find(
+                        (item) => {
+                            return item.id === record.id;
+                        },
+                    );
+                    if (found) {
+                        let removeWholeDay = false;
+                        this.recordsListByDay.forEach((it) => {
+                            let records = it.records;
+                            let found = records.find(
+                                (it) => it.id === record.id,
+                            );
+
+                            if (found) {
+                                records.splice(records.indexOf(found), 1);
+                                if (records.length === 0) {
+                                    removeWholeDay = true;
+                                }
+                            }
+                        });
+
+                        if (removeWholeDay) {
+                            this.recordsListByDay =
+                                this.recordsListByDay.filter(
+                                    (it) => it.records.length > 0,
+                                );
+                        }
+                    }
+                },
+            },
+            {
                 eventName: 'on-cur-ledger-changed',
                 handler: () => this.onRefreshTransactionList(),
             },
@@ -563,8 +596,11 @@ export default class TransactionListComponent extends Vue {
             return;
         }
 
+        let ledgerName = this.getCurrentLedgerName();
+
         eventBus.$emit('on-click-record-item', {
             id: foundTrans.id,
+            ledgerName: ledgerName,
             amount: foundTrans.amount,
             datetime: foundTrans.datetime,
             count: foundTrans.count,

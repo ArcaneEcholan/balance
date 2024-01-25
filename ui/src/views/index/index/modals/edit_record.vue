@@ -133,6 +133,9 @@ export default class EditRecordView extends Vue {
             },
         })
             .then((resp) => {
+                eventBus.$emit('on-transaction-removed', {
+                    id: this.recordId,
+                });
                 Cache.getAllKeys().then((keys: any[]) => {
                     keys.forEach((it) => {
                         if (it.startsWith('transaction_list_')) {
@@ -255,6 +258,14 @@ export default class EditRecordView extends Vue {
             description,
         )
             .then((resp: any) => {
+                Cache.getAllKeys().then((keys: any[]) => {
+                    keys.forEach((it) => {
+                        if (it.startsWith('transaction_list_')) {
+                            Cache.removeItem(it);
+                        }
+                    });
+                });
+
                 let newTrans = resp.data;
                 this.categoryValue = newTrans.categoryValue;
                 this.amount = newTrans.amount;
@@ -282,7 +293,7 @@ export default class EditRecordView extends Vue {
     datetime: string | null = null;
     count: string | null = null;
     description: string | null = null;
-
+    ledgerName: string | null = null;
     created() {
         let mountProp = stripType(this.$options).$mountProp;
 
@@ -290,6 +301,7 @@ export default class EditRecordView extends Vue {
 
         this.recordId = mountProp.id;
         this.amount = mountProp.amount;
+        this.ledgerName = mountProp.ledgerName;
         this.datetime = mountProp.datetime;
         this.count = mountProp.count;
         this.categoryValue = mountProp.categoryValue;
@@ -319,6 +331,11 @@ export default class EditRecordView extends Vue {
             ledgerList.forEach((it: any) => {
                 it.checked = it.related;
             });
+
+            this.pickedLedger = ledgerList.find(
+                (it) => it.name === this.ledgerName,
+            );
+            this.pickedLedgerName = this.ledgerName!;
 
             this.ledgerList = ledgerList;
         });
