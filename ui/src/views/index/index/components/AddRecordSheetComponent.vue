@@ -52,29 +52,25 @@
                                     <van-icon class="fs24" name="question-o" />
                                 </div>
 
-                                <div v-else class="type-icon-cell w100p">
-                                    <div class="flex column center w100p">
-                                        <div
-                                            :class="`flex flex-center type-icon`"
-                                        >
-                                            <i
-                                                :class="recordRow['type-icon']"
-                                                style="font-size: inherit"
-                                            ></i>
-                                        </div>
-                                        <div style="height: 4px"></div>
-                                        <div
-                                            class="w100p textcenter"
-                                            style="
-                                                font-size: 14px;
-                                                text-overflow: ellipsis;
-                                                -webkit-line-clamp: 1;
-                                                overflow: hidden;
-                                                -webkit-box-orient: vertical;
-                                            "
-                                        >
-                                            {{ recordRow['type'] }}
-                                        </div>
+                                <div v-else class="flex column center w100p">
+                                    <div :class="`flex flex-center type-icon`">
+                                        <i
+                                            :class="recordRow['type-icon']"
+                                            style="font-size: inherit"
+                                        ></i>
+                                    </div>
+                                    <div style="height: 4px"></div>
+                                    <div
+                                        class="w100p textcenter"
+                                        style="
+                                            font-size: 14px;
+                                            text-overflow: ellipsis;
+                                            -webkit-line-clamp: 1;
+                                            overflow: hidden;
+                                            -webkit-box-orient: vertical;
+                                        "
+                                    >
+                                        {{ recordRow['type'] }}
                                     </div>
                                 </div>
                             </clickable>
