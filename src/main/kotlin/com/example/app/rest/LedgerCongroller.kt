@@ -1,6 +1,10 @@
 package com.example.app.rest
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.example.app.dao.UserConfigMapper
+import com.example.app.dao.UserConfigPO
+import com.example.app.dao.UserPO
+import com.example.app.dao.UserUserConfigMapper
 import com.example.app.dao.mapper.LedgerMapper
 import com.example.app.dao.mapper.LedgerTransactionMapper
 import com.example.app.dao.po.LedgerPO
@@ -14,6 +18,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.NotNull
 
 class CreateLedgerDTO {
     @NotEmpty
@@ -21,6 +26,8 @@ class CreateLedgerDTO {
 }
 
 class EditLedgerDTO {
+    @NotNull
+    var id: Long? = null
     @NotEmpty
     var name: String? = null
 }
@@ -61,9 +68,13 @@ class LedgerCongroller {
         return ResponseEntity.ok(null);
     }
 
-    @PutMapping("/ledger/{id}")
-    fun tesfas5t1(@PathVariable id: Long, @Valid @RequestBody editLedgerDTO: EditLedgerDTO): ResponseEntity<Any> {
-        var e = ledgerMapper.selectById(id)
+    @PutMapping("/ledger")
+    @Transactional
+    @AuthLogin
+    fun tesfas5t1(@Valid @RequestBody editLedgerDTO: EditLedgerDTO): ResponseEntity<Any> {
+        var user = requestCtx.get()["user"] as UserPO
+
+        var e = ledgerMapper.selectById(editLedgerDTO.id)
         if (e == null) {
             return ResponseEntity.ok(null);
         }
@@ -72,18 +83,30 @@ class LedgerCongroller {
 
         var b = ledgerMapper.selectList(
             QueryWrapper<LedgerPO>().eq("name", name)
-                .ne("id", id)
+                .ne("id", editLedgerDTO.id)
         )
 
         if (b != null && b.size > 0) {
             return ResponseEntity.badRequest().body(objectMapper.writeValueAsString("name already exists"));
         }
 
-        var a = LedgerPO(id, name, null);
+        var a = LedgerPO(editLedgerDTO.id, name, null);
         ledgerMapper.updateById(a)
 
-        return ResponseEntity.ok(null);
+        var defaultLedgerName = userUserConfigMapper.getUserConfigByKey(user.id!!, "default_ledger")
+        if (defaultLedgerName == null) {
+            return ResponseEntity.ok(null);
+        }
+
+        if (defaultLedgerName.value == e.name) {
+            userConfigMapper.updateById(UserConfigPO(defaultLedgerName.userConfigId!!, defaultLedgerName.key, name))
+        }
+        return ResponseEntity.ok(null)
     }
+    @Autowired
+    lateinit var userConfigMapper: UserConfigMapper
+    @Autowired
+    lateinit var userUserConfigMapper: UserUserConfigMapper
 
     @Autowired
     lateinit var ledgerTransactionMapper: LedgerTransactionMapper

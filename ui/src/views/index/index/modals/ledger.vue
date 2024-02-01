@@ -104,6 +104,9 @@ import {
 } from '@/ts/utils';
 import SolidIcon from '@/views/components/SolidIcon.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
+import request from '@/ts/request';
+import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
+import store from '@/ts/store';
 let that: any;
 @Component({
     components: {
@@ -259,8 +262,18 @@ export default class ManageLedgerView extends Vue {
 
     submitEditLedger() {
         this.editLedgerLoading = true;
-        setTimeout(() => {
-            this.editLedgerLoading = false;
+        globalLoadingStart();
+        request({
+            url: '/ledger',
+            method: 'put',
+            data: {
+                id: this.editLedgerId,
+                name: this.editLedgerName,
+            },
+            headers: {
+                'entity-token': store.getters.token,
+            },
+        }).then((resp) => {
             Notify({
                 type: 'success',
                 message: 'Update success',
@@ -272,7 +285,8 @@ export default class ManageLedgerView extends Vue {
                     item.name = this.editLedgerName;
                 }
             });
-        }, 500);
+            globalLoadingStop();
+        });
     }
 
     ledgersLoading = false;
