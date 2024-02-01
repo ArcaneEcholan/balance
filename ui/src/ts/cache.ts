@@ -12,9 +12,22 @@ class Cache {
         };
 
         openRequest.onupgradeneeded = function (event) {
+            debugger;
             // @ts-ignore
             let db = event.target.result;
-            db.createObjectStore('caches', { keyPath: 'key' });
+            let names = db.objectStoreNames;
+            if (names == null || names.length === 0) {
+                db.createObjectStore('caches', {
+                    keyPath: 'key',
+                });
+            } else {
+                if (names.contains('caches')) {
+                    db.deleteObjectStore('caches');
+                    db.createObjectStore('caches', {
+                        keyPath: 'key',
+                    });
+                }
+            }
         };
 
         return openRequest;
