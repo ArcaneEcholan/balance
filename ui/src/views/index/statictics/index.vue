@@ -50,10 +50,7 @@
                         {{ $t('statistics.ledger_picker.title') }}
                     </div>
                     <div style="width: 20%">
-                        <custom-button
-                            @click="init(pickedLedger.id)"
-                            type="inline"
-                        >
+                        <custom-button @click="onPickLedger" type="inline">
                             {{ $t('save') }}
                         </custom-button>
                     </div>
@@ -281,8 +278,13 @@ export default class StatisticIndexView extends Vue {
     }
 
     onPickDate() {
-        this.init(null);
+        this.init(null, null);
         this.show = false;
+    }
+
+    onPickLedger() {
+        this.init(this.pickedLedger!.id, this.pickedLedger!.name);
+        this.ledgerPickerShow = false;
     }
 
     onCancel() {
@@ -311,34 +313,39 @@ export default class StatisticIndexView extends Vue {
     }
 
     created() {
-        this.init(null);
+        this.init(null, null);
     }
 
-    init(ledgerId: null | number) {
+    init(ledgerId: null | number, ledgerName: null | string) {
+        debugger;
         globalLoadingStart();
         let cacheKey = (ledgerName) => {
             return `statistics_${ledgerName}_${this.getCurrentDate()}`;
         };
+        let p: Promise<any> | null = null;
         let ledgerName1: any = null;
-        getDefaultLedger()
-            .then((ledgerName) => {
-                ledgerName1 = ledgerName;
-                return Cache.getItem(cacheKey(ledgerName));
-            })
-            .then((cv) => {
-                debugger;
-                if (cv) {
-                    this.afterGetValue(cv);
-                } else {
-                    Client.getStatisticsData(
-                        this.getCurrentDate(),
-                        ledgerId,
-                    ).then((resp: any) => {
+        if (ledgerName == null) {
+            p = getDefaultLedger().then((defaultName) => {
+                ledgerName1 = defaultName;
+                return Cache.getItem(cacheKey(defaultName));
+            });
+        } else {
+            ledgerName1 = ledgerName;
+            p = Cache.getItem(cacheKey(ledgerName));
+        }
+
+        p.then((cv) => {
+            if (cv) {
+                this.afterGetValue(cv);
+            } else {
+                Client.getStatisticsData(this.getCurrentDate(), ledgerId).then(
+                    (resp: any) => {
                         Cache.setItem(cacheKey(ledgerName1), resp.data);
                         this.afterGetValue(resp.data);
-                    });
-                }
-            })
+                    },
+                );
+            }
+        })
             .catch((err) => {
                 console.log(err);
             })

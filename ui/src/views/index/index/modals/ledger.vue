@@ -255,6 +255,19 @@ export default class ManageLedgerView extends Vue {
                 this.ledgers = this.ledgers.filter(
                     (item: any) => item.id != ledgerId,
                 );
+
+                cache
+                    .filterPairs((cursor) => {
+                        let key = cursor.key as string;
+                        let regex = `^statistics_${ledgeName}_\\d{4,4}-\\d{1,2}$`;
+                        return new RegExp(regex).test(key);
+                    })
+                    .then((dataSet) => {
+                        dataSet.forEach((item: any) => {
+                            cache.removeItem(item.key);
+                        });
+                    });
+
                 eventBus.$emit('ledger-deleted', ledgerId);
             })
             .catch((httpErr: HttpError) => {
