@@ -3,7 +3,7 @@ import store from '@/ts/store';
 import eventBus from '@/ts/EventBus';
 import Cache from '@/ts/cache';
 
-export function getDefaultLedger() {
+export function getDefaultLedger(): Promise<string> {
     return new Promise((resolve, reject) => {
         let afterGetUserConfigs = (userConfigs: any[]) => {
             let findLedgerName = () => {

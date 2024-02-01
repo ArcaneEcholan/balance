@@ -246,7 +246,7 @@ export default class StatisticIndexView extends Vue {
     ledgerPickerShow = false;
 
     ledgerList: any[] = [];
-    pickedLedgerName = '';
+    pickedLedgerName: string | null = null;
     pickedLedger: any = null;
     onSelectLedger(ledger) {
         this.pickedLedgerName = ledger.name;
@@ -262,14 +262,15 @@ export default class StatisticIndexView extends Vue {
                 this.ledgerPickerShow = true;
                 let ledgerList = resp.data;
                 this.ledgerList = ledgerList;
-                let userconfigs = this.$store.getters.userConfigs;
-                let defaultLedgerName = userconfigs.find(
-                    (it) => it.key === 'default_ledger',
-                );
-                this.pickedLedgerName = defaultLedgerName.value;
-                this.pickedLedger = ledgerList.find(
-                    (i) => i.name === defaultLedgerName.value,
-                );
+
+                if (this.pickedLedger == null) {
+                    getDefaultLedger().then((defaultName) => {
+                        this.pickedLedgerName = defaultName;
+                        this.pickedLedger = ledgerList.find(
+                            (i) => i.name === defaultName,
+                        );
+                    });
+                }
                 globalLoadingStop();
             })
             .catch((resp) => {
