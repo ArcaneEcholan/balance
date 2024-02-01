@@ -278,7 +278,11 @@ export default class StatisticIndexView extends Vue {
     }
 
     onPickDate() {
-        this.init(null, null);
+        if (this.pickedLedger != null) {
+            this.init(this.pickedLedger.id, this.pickedLedger.name);
+        } else {
+            this.init(null, null);
+        }
         this.show = false;
     }
 
@@ -317,7 +321,6 @@ export default class StatisticIndexView extends Vue {
     }
 
     init(ledgerId: null | number, ledgerName: null | string) {
-        debugger;
         globalLoadingStart();
         let cacheKey = (ledgerName) => {
             return `statistics_${ledgerName}_${this.getCurrentDate()}`;
