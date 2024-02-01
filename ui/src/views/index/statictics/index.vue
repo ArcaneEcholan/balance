@@ -50,7 +50,10 @@
                         {{ $t('statistics.ledger_picker.title') }}
                     </div>
                     <div style="width: 20%">
-                        <custom-button @click="pickLedger" type="inline">
+                        <custom-button
+                            @click="init(pickedLedger.id)"
+                            type="inline"
+                        >
                             {{ $t('save') }}
                         </custom-button>
                     </div>
@@ -133,7 +136,7 @@
         <div class="record-header">{{ $t('statistics.exp_ranking.type') }}</div>
 
         <panel>
-            <div v-for="i in typeRankList" class="record-row">
+            <div :key="i.id" v-for="i in typeRankList" class="record-row">
                 <div class="left">
                     <div>{{ i.type }}</div>
                     <div class="google-gray-400">
@@ -154,7 +157,7 @@
         </div>
 
         <panel>
-            <div v-for="i in rankList" class="record-row">
+            <div :key="i.id" v-for="i in rankList" class="record-row">
                 <div class="left">
                     <div>{{ i.type }}</div>
                     <div class="google-gray-400">
@@ -197,42 +200,34 @@ import { getDefaultLedger } from '@/ts/common';
     },
 })
 export default class StatisticIndexView extends Vue {
-    pickLedger() {
-        globalLoadingStart();
-        Client.getStatisticsData(this.getCurrentDate(), this.pickedLedger!.id)
-            .then((resp: any) => {
-                resp = resp.data;
-                this.percent = resp.percent;
-                this.lastMonthTotal = resp.last_month_total;
-                this.thisMonthTotal = resp.this_month_total;
+    afterGetValue(v) {
+        let resp = v;
+        this.percent = resp.percent;
+        this.lastMonthTotal = resp.last_month_total;
+        this.thisMonthTotal = resp.this_month_total;
 
-                if (this.lastMonthTotal.indexOf('.') !== -1) {
-                    this.lastMonthTotal = this.lastMonthTotal.substring(
-                        0,
-                        this.lastMonthTotal.indexOf('.') + 3,
-                    );
-                }
+        if (this.lastMonthTotal.indexOf('.') !== -1) {
+            this.lastMonthTotal = this.lastMonthTotal.substring(
+                0,
+                this.lastMonthTotal.indexOf('.') + 3,
+            );
+        }
 
-                if (this.thisMonthTotal.indexOf('.') !== -1) {
-                    this.thisMonthTotal = this.thisMonthTotal.substring(
-                        0,
-                        this.thisMonthTotal.indexOf('.') + 3,
-                    );
-                }
+        if (this.thisMonthTotal.indexOf('.') !== -1) {
+            this.thisMonthTotal = this.thisMonthTotal.substring(
+                0,
+                this.thisMonthTotal.indexOf('.') + 3,
+            );
+        }
 
-                this.typeRankList = resp.type_rank_list;
-                this.rankList = resp.rank_list;
-                this.getPercent();
-                this.$nextTick(() => {
-                    this.centerPercentText();
-                });
-                this.ledgerPickerShow = false;
-                globalLoadingStop();
-            })
-            .catch((resp) => {
-                globalLoadingStop();
-            });
+        this.typeRankList = resp.type_rank_list;
+        this.rankList = resp.rank_list;
+        this.getPercent();
+        this.$nextTick(() => {
+            this.centerPercentText();
+        });
     }
+
     show = false;
     minDate = new Date(2020, 0, 1);
     maxDate = new Date(2100, 0, 1);
@@ -286,7 +281,7 @@ export default class StatisticIndexView extends Vue {
     }
 
     onPickDate() {
-        this.init();
+        this.init(null);
         this.show = false;
     }
 
@@ -316,54 +311,40 @@ export default class StatisticIndexView extends Vue {
     }
 
     created() {
-        this.init();
+        this.init(null);
     }
 
-    init() {
-        let afterGetValue = (v) => {
-            let resp = v;
-            this.percent = resp.percent;
-            this.lastMonthTotal = resp.last_month_total;
-            this.thisMonthTotal = resp.this_month_total;
-
-            if (this.lastMonthTotal.indexOf('.') !== -1) {
-                this.lastMonthTotal = this.lastMonthTotal.substring(
-                    0,
-                    this.lastMonthTotal.indexOf('.') + 3,
-                );
-            }
-
-            if (this.thisMonthTotal.indexOf('.') !== -1) {
-                this.thisMonthTotal = this.thisMonthTotal.substring(
-                    0,
-                    this.thisMonthTotal.indexOf('.') + 3,
-                );
-            }
-
-            this.typeRankList = resp.type_rank_list;
-            this.rankList = resp.rank_list;
-            this.getPercent();
-            this.$nextTick(() => {
-                this.centerPercentText();
-            });
-        };
+    init(ledgerId: null | number) {
+        globalLoadingStart();
         let cacheKey = (ledgerName) => {
             return `statistics_${ledgerName}_${this.getCurrentDate()}`;
         };
-        getDefaultLedger().then((ledgerName) => {
-            Cache.getItem(cacheKey(ledgerName)).then((cv) => {
+        let ledgerName1: any = null;
+        getDefaultLedger()
+            .then((ledgerName) => {
+                ledgerName1 = ledgerName;
+                return Cache.getItem(cacheKey(ledgerName));
+            })
+            .then((cv) => {
+                debugger;
                 if (cv) {
-                    afterGetValue(cv);
+                    this.afterGetValue(cv);
                 } else {
-                    Client.getStatisticsData(this.getCurrentDate(), null).then(
-                        (resp: any) => {
-                            Cache.setItem(cacheKey(ledgerName), resp.data);
-                            afterGetValue(resp.data);
-                        },
-                    );
+                    Client.getStatisticsData(
+                        this.getCurrentDate(),
+                        ledgerId,
+                    ).then((resp: any) => {
+                        Cache.setItem(cacheKey(ledgerName1), resp.data);
+                        this.afterGetValue(resp.data);
+                    });
                 }
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+            .finally(() => {
+                globalLoadingStop();
             });
-        });
     }
 
     format() {
