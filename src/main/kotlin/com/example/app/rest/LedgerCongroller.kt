@@ -63,7 +63,25 @@ class LedgerCongroller {
     }
 
     @DeleteMapping("/ledger/{id}")
+    @AuthLogin
     fun tes5t11(@PathVariable id: Long): ResponseEntity<Any> {
+        var user = requestCtx.get()["user"] as UserPO
+        var ledger = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("id", id))
+
+        if (ledger != null) {
+            var ledgername = ledger.name!!
+            var config = userUserConfigMapper.getUserConfigByKey(user.id!!, "default_ledger")
+            if (config != null) {
+                var userDefault = config.value
+                if (userDefault == ledgername) {
+                    return ResponseEntity.internalServerError()
+                        .body(objectMapper.writeValueAsString(object {
+                            var message = "can not delete default ledger"
+                        }));
+                }
+            }
+        }
+
         ledgerMapper.deleteById(id)
         return ResponseEntity.ok(null);
     }
@@ -158,13 +176,13 @@ class LedgerCongroller {
     @PutMapping("/record/ledgers")
     @Transactional
     fun updateRecordLedgers(@RequestBody @Valid updateRecordLedgersReq: UpdateRecordLedgersReq): Any {
-        if(updateRecordLedgersReq.ledger_ids!!.filterNotNull().size < updateRecordLedgersReq.ledger_ids!!.size){
+        if (updateRecordLedgersReq.ledger_ids!!.filterNotNull().size < updateRecordLedgersReq.ledger_ids!!.size) {
             return ResponseEntity.badRequest().body(objectMapper.writeValueAsString(object {
                 var message = "ledger id can not be null"
             }));
         }
 
-        if(updateRecordLedgersReq.record_ids!!.filterNotNull().size < updateRecordLedgersReq.record_ids!!.size){
+        if (updateRecordLedgersReq.record_ids!!.filterNotNull().size < updateRecordLedgersReq.record_ids!!.size) {
             return ResponseEntity.badRequest().body(objectMapper.writeValueAsString(object {
                 var message = "record id can not be null"
             }));
@@ -173,7 +191,7 @@ class LedgerCongroller {
         updateRecordLedgersReq.record_ids!!.forEach { recordId ->
             ledgerTransactionMapper.deleteByMap(mapOf("transaction_id" to recordId))
             updateRecordLedgersReq.ledger_ids!!.forEach {
-                ledgerTransactionMapper.insert(LedgerTransactionPO(null, it, recordId ))
+                ledgerTransactionMapper.insert(LedgerTransactionPO(null, it, recordId))
             }
         }
 

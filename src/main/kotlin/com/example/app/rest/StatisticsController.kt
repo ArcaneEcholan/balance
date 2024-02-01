@@ -242,11 +242,4 @@ class StatisticsController {
         return r
     }
 
-    private fun checkLedgerExist(ledgerName: String): LedgerPO {
-        val selectOne = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("name", ledgerName))
-        if (selectOne == null) {
-            throw ApiException(HttpStatus.NOT_FOUND, "Ledger not found")
-        }
-        return selectOne
-    }
 }

@@ -2,6 +2,8 @@ package com.example.app.rest
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.example.app.dao.*
+import com.example.app.dao.mapper.LedgerMapper
+import com.example.app.dao.po.LedgerPO
 import com.example.app.rest.CommonConstant.ENTITY_TOKEN
 import com.example.app.rest.JWTProperties.JWTExpirationTimeUnits.DAY
 import com.example.app.rest.JWTProperties.JWTExpirationTimeUnits.HOUR
@@ -147,6 +149,7 @@ class UserController {
     }
 
     @GetMapping("/user/configs")
+    @Transactional
     @AuthLogin
     fun getUserConfigs(): Any {
 
@@ -162,8 +165,25 @@ class UserController {
             userConfigMapper.selectById(it.userConfigId)
         }.toList()
 
+        var defaultLedgername = userConfigs.filterNotNull().filter { it -> it.key == "default_ledger" }.first().value
+        if(defaultLedgername != null) {
+            var defaultLedger = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("name", defaultLedgername))
+            if(defaultLedger != null) {
+            } else {
+                // reset user default ledger if the ledger name is invalid
+                var config =
+                userConfigs.find { it -> it.key == "default_ledger" }
+                config?.let {
+                    it.value = "default"
+                    userConfigMapper.updateById(it)
+                }
+            }
+        }
         return userConfigs
     }
+
+    @Autowired
+    lateinit var ledgerMapper: LedgerMapper
 
     @PostMapping("/user/configs")
     @AuthLogin
@@ -242,6 +262,21 @@ class UserController {
         var userConfigs = selectList.map {
             userConfigMapper.selectById(it.userConfigId)
         }.toList()
+
+        var defaultLedgername = userConfigs.filterNotNull().filter { it -> it.key == "default_ledger" }.first().value
+        if(defaultLedgername != null) {
+            var defaultLedger = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("name", defaultLedgername))
+            if(defaultLedger != null) {
+            } else {
+                // reset user default ledger if the ledger name is invalid
+                var config =
+                    userConfigs.find { it -> it.key == "default_ledger" }
+                config?.let {
+                    it.value = "default"
+                    userConfigMapper.updateById(it)
+                }
+            }
+        }
 
         return object {
             var configs = userConfigs

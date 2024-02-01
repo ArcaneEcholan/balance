@@ -32,6 +32,46 @@ class Cache {
         return openRequest;
     }
 
+    filterPairs(
+        predicate: (cursor: IDBCursorWithValue) => boolean,
+    ): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            let openRequest = this.whoKnowsTheName(reject);
+            openRequest.onsuccess = function (event) {
+                // @ts-ignore
+                let db = event.target.result;
+                let transaction = db.transaction(['caches'], 'readonly');
+                let objectStore = transaction.objectStore('caches');
+                const getRequest = objectStore.openCursor();
+
+                getRequest.onerror = function (event) {
+                    reject(
+                        new Error(
+                            'Error filtering data from the database: ' +
+                                // @ts-ignore
+                                event.target.error.message,
+                        ),
+                    );
+                };
+
+                let results: any[] = [];
+                getRequest.onsuccess = function (event) {
+                    const cursor = event.target.result;
+                    if (cursor) {
+                        // Assuming 'cursor.value' is the object and 'field' is the field you want to search
+                        if (predicate(cursor)) {
+                            // cursor is the pair
+                            results.push(cursor.value);
+                        }
+                        cursor.continue();
+                    } else {
+                        resolve(results);
+                    }
+                };
+            };
+        });
+    }
+
     getItem(key: string) {
         return new Promise((resolve, reject) => {
             let openRequest = this.whoKnowsTheName(reject);

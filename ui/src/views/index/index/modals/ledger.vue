@@ -104,9 +104,10 @@ import {
 } from '@/ts/utils';
 import SolidIcon from '@/views/components/SolidIcon.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
-import request from '@/ts/request';
+import request, { HttpError } from '@/ts/request';
 import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import store from '@/ts/store';
+import cache from '@/ts/cache';
 let that: any;
 @Component({
     components: {
@@ -239,7 +240,13 @@ export default class ManageLedgerView extends Vue {
     }
 
     onClickDelete(ledgerId: number, ledgeName: string) {
-        Client.deleteLedger(ledgerId)
+        request({
+            url: `/ledger/${ledgerId}`,
+            method: 'delete',
+            headers: {
+                'entity-token': store.getters.token,
+            },
+        })
             .then(() => {
                 Notify({
                     type: 'success',
@@ -250,10 +257,10 @@ export default class ManageLedgerView extends Vue {
                 );
                 eventBus.$emit('ledger-deleted', ledgerId);
             })
-            .catch(() => {
+            .catch((httpErr: HttpError) => {
                 Notify({
                     type: 'danger',
-                    message: 'Delete failed',
+                    message: 'Delete failed: ' + httpErr.resp!.data!.message,
                 });
             });
     }
@@ -278,6 +285,18 @@ export default class ManageLedgerView extends Vue {
                 type: 'success',
                 message: 'Update success',
             });
+
+            cache
+                .filterPairs((cursor) => {
+                    let key = cursor.key as string;
+                    let regex = `^statistics_${this.editLedgerName}_\\d{4,4}-\\d{1,2}$`;
+                    return new RegExp(regex).test(key);
+                })
+                .then((dataSet) => {
+                    dataSet.forEach((item: any) => {
+                        cache.removeItem(item.key);
+                    });
+                });
 
             this.show = false;
             this.ledgers.filter((item: any) => {
