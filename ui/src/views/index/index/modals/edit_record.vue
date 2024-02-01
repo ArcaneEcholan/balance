@@ -108,6 +108,8 @@ import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import request from '@/ts/request';
 import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import Cache from '@/ts/cache';
+import storage from '@/ts/storage';
+import { getYearAndMonthAsString } from '@/ts/time';
 @Component({
     components: {
         CommonActionSheet,
@@ -195,6 +197,25 @@ export default class EditRecordView extends Vue {
     }
 
     checkValidationOfData() {
+        let datetime = this.datetime;
+
+        if (datetime != null) {
+            datetime = datetime.trim();
+            const datetimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+
+            if (!datetimeRegex.test(datetime)) {
+                this.submitEnable = true;
+                throw new Error(
+                    'Datetime Invalid. Valid format: xxxx-xx-xx xx:xx:xx',
+                );
+            }
+        } else {
+            this.submitEnable = true;
+            throw new Error(
+                'Datetime Invalid. Valid format: xxxx-xx-xx xx:xx:xx',
+            );
+        }
+
         if (this.amount == null || this.count == null) {
             Notify({
                 type: 'danger',
@@ -214,30 +235,8 @@ export default class EditRecordView extends Vue {
         }
     }
 
-    normalizeDateTime() {
-        let datetime = this.datetime;
-
-        if (datetime != null) {
-            datetime = datetime.trim();
-            const datetimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
-
-            if (!datetimeRegex.test(datetime)) {
-                Notify({
-                    type: 'danger',
-                    message: 'Information format invalid',
-                });
-                this.submitEnable = true;
-                return;
-            }
-        }
-        this.datetime = datetime;
-    }
-
     submit() {
         this.submitEnable = false;
-
-        this.normalizeDateTime();
-        let description = this.description;
 
         try {
             this.checkValidationOfData();
@@ -246,6 +245,7 @@ export default class EditRecordView extends Vue {
                 type: 'danger',
                 message: 'Information format invalid',
             });
+            return;
         }
 
         // format check pass
@@ -255,15 +255,18 @@ export default class EditRecordView extends Vue {
             this.amount!,
             this.datetime,
             this.count!,
-            description,
+            this.description,
         )
             .then((resp: any) => {
-                Cache.getAllKeys().then((keys: any[]) => {
-                    keys.forEach((it) => {
-                        if (it.startsWith('transaction_list_')) {
-                            Cache.removeItem(it);
-                        }
-                    });
+                storage.getDefaultLedger().then((ledgerName) => {
+                    let month = getYearAndMonthAsString(this.datetime!);
+
+                    storage.purgeRecordsCacheByLedgerNameAndMonth(
+                        ledgerName,
+                        month,
+                    );
+
+                    storage.purgeStatisticsCacheByLedgerName(ledgerName);
                 });
 
                 let newTrans = resp.data;

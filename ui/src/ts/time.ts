@@ -9,3 +9,8 @@ export function getCurrentMonth() {
 export function getCurrentYearAndMonth() {
     return `${getCurrentYear()}-${getCurrentMonth()}`;
 }
+
+export function getYearAndMonthAsString(date: string | Date) {
+    let currentDate = new Date(date);
+    return currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1);
+}

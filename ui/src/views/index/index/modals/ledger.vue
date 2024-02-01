@@ -108,7 +108,6 @@ import request, { HttpError } from '@/ts/request';
 import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import store from '@/ts/store';
 import cache from '@/ts/cache';
-import { getDefaultLedger } from '@/ts/common';
 import storage from '@/ts/storage';
 let that: any;
 @Component({

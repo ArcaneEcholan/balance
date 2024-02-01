@@ -182,11 +182,8 @@ import AddRecordSheetComponent from '@/views/index/index/components/AddRecordShe
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import CustomButton from '@/views/components/CustomButton.vue';
 import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
-import request from '@/ts/request';
 import Cache from '@/ts/cache';
-import { getDefaultLedger } from '@/ts/common';
 import storage from '@/ts/storage';
-import eventBus from '@/ts/EventBus';
 
 @Component({
     methods: { shallowMount },
@@ -264,7 +261,7 @@ export default class StatisticIndexView extends Vue {
                 this.ledgerPickerShow = true;
 
                 if (this.pickedLedger == null) {
-                    getDefaultLedger().then((defaultName) => {
+                    storage.getDefaultLedger().then((defaultName) => {
                         this.pickedLedgerName = defaultName;
                         this.pickedLedger = ledgerList.find(
                             (i) => i.name === defaultName,
@@ -331,7 +328,7 @@ export default class StatisticIndexView extends Vue {
         let p: Promise<any> | null = null;
         let ledgerName1: any = null;
         if (ledgerName == null) {
-            p = getDefaultLedger().then((defaultName) => {
+            p = storage.getDefaultLedger().then((defaultName) => {
                 ledgerName1 = defaultName;
                 return Cache.getItem(cacheKey(defaultName));
             });

@@ -32,6 +32,7 @@ import { provideListeners } from '@/page-eventbus-registration-mixin';
 import CommonButton from '@/views/components/CommonButton.vue';
 import AddRecordSheetComponent from '@/views/index/index/components/AddRecordSheetComponent.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
+import { getYearAndMonthAsString } from '@/ts/time';
 
 @Component({
     components: { CommonActionSheet, AddRecordSheetComponent, CommonButton },
@@ -65,11 +66,7 @@ export default class MainPageCurrentDatePickerComponent extends Vue {
     }
 
     getCurrentDate() {
-        return (
-            this.currentDate.getFullYear() +
-            '-' +
-            (this.currentDate.getMonth() + 1)
-        );
+        return getYearAndMonthAsString(this.currentDate);
     }
 }
 </script>

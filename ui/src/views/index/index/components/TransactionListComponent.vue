@@ -186,7 +186,7 @@ import CustomButton from '@/views/components/CustomButton.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import Cache from '@/ts/cache';
-import { getDefaultLedger } from '@/ts/common';
+import storage from '@/ts/storage';
 
 @Component({
     components: { CommonActionSheet, CustomButton, GapComponent, Panel },
@@ -480,7 +480,7 @@ export default class TransactionListComponent extends Vue {
 
     onRefreshTransactionList() {
         try {
-            getDefaultLedger().then((ledgerName: any) => {
+            storage.getDefaultLedger().then((ledgerName: any) => {
                 this.recordsListLoading = true;
 
                 let date = this.getCurrentDate();

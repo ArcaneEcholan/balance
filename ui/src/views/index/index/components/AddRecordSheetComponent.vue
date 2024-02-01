@@ -152,9 +152,7 @@ import KeyBoardComponent from '@/views/index/index/components/KeyBoardComponent.
 import settings from '@/settings';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import request from '@/ts/request';
-import Cache from '@/ts/cache';
-import store from '@/ts/store';
-import { getDefaultLedger } from '@/ts/common';
+import storage from '@/ts/storage';
 
 class FormItemField {
     value: string | null = null;
@@ -605,7 +603,7 @@ export default class AddTransactionEditorComponent extends Vue {
         try {
             this.checkAddTransData();
 
-            getDefaultLedger().then((ledgerName) => {
+            storage.getDefaultLedger().then((ledgerName) => {
                 let trans: any[] = this.newRecordRows;
                 {
                     this.addRecordsLoading = true;
@@ -644,19 +642,19 @@ export default class AddTransactionEditorComponent extends Vue {
                         },
                     })
                         .then((resp) => {
-                            // cache transactions
                             let currentDate = eventBus.$emitWithReturnValue(
                                 'on-get-main-page-cur-date',
                                 null,
                             );
-                            const key = `transaction_list_${ledgerName}_${currentDate}`;
-                            Cache.getAllKeys().then((keys: any[]) => {
-                                keys.forEach((it) => {
-                                    if (it === key) {
-                                        Cache.removeItem(it);
-                                    }
-                                });
-                            });
+
+                            storage.purgeRecordsCacheByLedgerNameAndMonth(
+                                ledgerName,
+                                currentDate,
+                            );
+
+                            storage.purgeStatisticsCacheByLedgerName(
+                                ledgerName,
+                            );
 
                             Notify({
                                 message: 'save successfully',
