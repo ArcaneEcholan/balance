@@ -45,6 +45,9 @@ import request from '@/ts/request';
 import { Toast } from 'vant';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import Cache from '@/ts/cache';
+import cache from '@/ts/cache';
+import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
+import storage from '@/ts/storage';
 
 @Component({
     methods: { getI18nValue },
@@ -62,23 +65,19 @@ export default class LedgerSwitcherComponent extends Vue {
     ledgerList: any[] = [];
 
     onLedgerPickerSheetOpen() {
-        // ensure the loading does not happen when user repeatly close and open the ledger
-        if (!this.ledgersListLoadedFirstTime) {
-            return;
-        }
+        globalLoadingStart();
 
-        this.ledgersLoading = true;
-        Client.getLedgerList()
-            .then((resp: any) => {
-                this.ledgersListLoadedFirstTime = false;
-                this.ledgersLoading = false;
-                this.ledgerList = resp.data;
-
+        storage
+            .getLedgers()
+            .then((ledgers) => {
+                this.ledgerList = ledgers;
                 eventBus.$emit('ledges-changes', this.ledgerList);
             })
-            .catch((err: any) => {
-                this.ledgersLoading = false;
+            .catch((err) => {
                 console.error(err);
+            })
+            .finally(() => {
+                globalLoadingStop();
             });
     }
 

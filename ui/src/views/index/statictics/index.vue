@@ -185,6 +185,8 @@ import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import request from '@/ts/request';
 import Cache from '@/ts/cache';
 import { getDefaultLedger } from '@/ts/common';
+import storage from '@/ts/storage';
+import eventBus from '@/ts/EventBus';
 
 @Component({
     methods: { shallowMount },
@@ -254,14 +256,12 @@ export default class StatisticIndexView extends Vue {
     }
     onClickPickLedger() {
         globalLoadingStart();
-        request({
-            url: '/ledgers',
-            method: 'get',
-        })
-            .then((resp: any) => {
-                this.ledgerPickerShow = true;
-                let ledgerList = resp.data;
+
+        storage
+            .getLedgers()
+            .then((ledgerList) => {
                 this.ledgerList = ledgerList;
+                this.ledgerPickerShow = true;
 
                 if (this.pickedLedger == null) {
                     getDefaultLedger().then((defaultName) => {
@@ -271,9 +271,11 @@ export default class StatisticIndexView extends Vue {
                         );
                     });
                 }
-                globalLoadingStop();
             })
-            .catch((resp) => {
+            .catch((err) => {
+                console.error(err);
+            })
+            .finally(() => {
                 globalLoadingStop();
             });
     }

@@ -135,13 +135,6 @@ class Client {
         });
     }
 
-    static getLedgerList() {
-        return request({
-            url: `/ledgers`,
-            method: 'get',
-        });
-    }
-
     static addLedger(addLedgerName: string) {
         return request({
             url: `/ledger`,
