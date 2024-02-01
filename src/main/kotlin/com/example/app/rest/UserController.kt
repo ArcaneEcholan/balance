@@ -224,9 +224,7 @@ class UserController {
             userConfigMapper.selectById(it.userConfigId)
         }.toList()
 
-        return object {
-            var configs = userConfigs1
-        }
+        return userConfigs1
     }
 
     @GetMapping("/user/info")

@@ -44,6 +44,7 @@ import store from '@/ts/store';
 import request from '@/ts/request';
 import { Toast } from 'vant';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
+import Cache from '@/ts/cache';
 
 @Component({
     methods: { getI18nValue },
@@ -173,8 +174,8 @@ export default class LedgerSwitcherComponent extends Vue {
                 'entity-token': store.getters.token,
             },
         }).then((resp) => {
-            console.log(resp);
-            console.debug('current ledger changed to: ', ledger);
+            let userConfigs = resp.data;
+            Cache.setItem('user_configs', userConfigs);
 
             this.toggleLedgerSelection();
 
