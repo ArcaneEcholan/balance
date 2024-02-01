@@ -435,7 +435,7 @@ export default class TransactionListComponent extends Vue {
             Cache.getItem(cacheKey)
                 .then((cachedData: any) => {
                     if (cachedData) {
-                        let tranList = JSON.parse(cachedData);
+                        let tranList = cachedData;
                         tranList.forEach((it: any) => {
                             if (it.id === newTransaction.id) {
                                 updateFunc(it, newTransaction);
@@ -489,7 +489,7 @@ export default class TransactionListComponent extends Vue {
                 Cache.getItem(cacheKey)
                     .then((cachedData: any) => {
                         if (cachedData) {
-                            let tranList = JSON.parse(cachedData);
+                            let tranList = cachedData;
                             this.postProcessFetchTranList(this, tranList);
                         } else {
                             Client.getTransactionListByLedgerName(

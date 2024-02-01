@@ -62,12 +62,15 @@ class Cache {
 
                 let data = {
                     key: key,
-                    value: JSON.stringify(value),
+                    value: value,
                 };
                 let request = store.put(data);
 
                 request.onsuccess = function () {
-                    resolve(null);
+                    resolve({
+                        key,
+                        value,
+                    });
                     console.log('Data set to the database');
                 };
 

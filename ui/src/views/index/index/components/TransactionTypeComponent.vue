@@ -253,7 +253,6 @@ export default class TransTypeComponent extends Vue {
                 this.initTransactionTypes();
             })
             .catch((err) => {
-                debugger;
                 Notify({
                     type: 'danger',
                     message: err.response.data.message,
