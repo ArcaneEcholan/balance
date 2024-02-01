@@ -265,42 +265,44 @@ export default class TransactionListComponent extends Vue {
     onClickEditRecordLedgers() {
         let recordIds = this.getSelectedRecords.map((it) => it.id);
 
-        let ledgerName = this.pickedLedgerName;
-        if (ledgerName === this.getCurrentLedgerName()) {
-            Notify({
-                type: 'success',
-                message: this.$t('success') as string,
-            });
-            return;
-        }
-        let ledger = this.ledgerList.find((it) => it.name === ledgerName);
-        globalLoadingStart();
-        request({
-            url: '/record/ledgers',
-            method: 'put',
-            data: {
-                record_ids: recordIds,
-                ledger_ids: [ledger.id],
-            },
-        })
-            .then((resp) => {
-                this.recordsListByDay.forEach((it) => {
-                    it.records = it.records.filter((item) => {
-                        return !recordIds.includes(item.id);
-                    });
-                });
-
-                globalLoadingStop();
+        storage.getDefaultLedger().then((defaultLedgerName) => {
+            let ledgerName = this.pickedLedgerName;
+            if (ledgerName === defaultLedgerName) {
                 Notify({
                     type: 'success',
                     message: this.$t('success') as string,
                 });
-                this.ledgerPickerShow = false;
-                this.closeSelectBar();
+                return;
+            }
+            let ledger = this.ledgerList.find((it) => it.name === ledgerName);
+            globalLoadingStart();
+            request({
+                url: '/record/ledgers',
+                method: 'put',
+                data: {
+                    record_ids: recordIds,
+                    ledger_ids: [ledger.id],
+                },
             })
-            .catch((resp) => {
-                globalLoadingStop();
-            });
+                .then((resp) => {
+                    this.recordsListByDay.forEach((it) => {
+                        it.records = it.records.filter((item) => {
+                            return !recordIds.includes(item.id);
+                        });
+                    });
+
+                    globalLoadingStop();
+                    Notify({
+                        type: 'success',
+                        message: this.$t('success') as string,
+                    });
+                    this.ledgerPickerShow = false;
+                    this.closeSelectBar();
+                })
+                .catch((resp) => {
+                    globalLoadingStop();
+                });
+        });
     }
 
     onClickUpdateLedgerButton() {
@@ -308,6 +310,7 @@ export default class TransactionListComponent extends Vue {
             return;
         }
         globalLoadingStart();
+        let ledgerList: any[] = [];
         request({
             url: '/ledgers',
             method: 'get',
@@ -322,9 +325,12 @@ export default class TransactionListComponent extends Vue {
                 });
 
                 this.ledgerPickerShow = true;
-                let ledgerList = resp.data;
+                ledgerList = resp.data;
 
-                this.pickedLedgerName = this.getCurrentLedgerName();
+                return storage.getDefaultLedger();
+            })
+            .then((defaultLedgerName) => {
+                this.pickedLedgerName = defaultLedgerName;
                 this.ledgerList = ledgerList;
                 globalLoadingStop();
             })
@@ -432,26 +438,6 @@ export default class TransactionListComponent extends Vue {
         if (found) {
             // update view
             updateFunc(found, newTransaction);
-
-            // update cache
-            let cacheKey = `transaction_list_${this.getCurrentLedgerName()}_${this.getCurrentDate()}`;
-            Cache.getItem(cacheKey)
-                .then((cachedData: any) => {
-                    if (cachedData) {
-                        let tranList = cachedData;
-                        tranList.forEach((it: any) => {
-                            if (it.id === newTransaction.id) {
-                                updateFunc(it, newTransaction);
-                            }
-                        });
-
-                        // update the cache
-                        Cache.setItem(cacheKey, tranList);
-                    }
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
         }
     }
 
@@ -519,18 +505,6 @@ export default class TransactionListComponent extends Vue {
         } catch (e) {
             console.log(e);
         }
-    }
-
-    getCurrentLedgerName(): string {
-        let currentLedgerName = eventBus.$emitWithReturnValue(
-            'on-get-current-ledger-name',
-            null,
-        );
-        if (currentLedgerName == null) {
-            Notify({ type: 'danger', message: 'current ledger is null' });
-            throw new Error('current ledger is null');
-        }
-        return currentLedgerName;
     }
 
     getCurrentDate() {
@@ -610,11 +584,8 @@ export default class TransactionListComponent extends Vue {
             return;
         }
 
-        let ledgerName = this.getCurrentLedgerName();
-
         eventBus.$emit('on-click-record-item', {
             id: foundTrans.id,
-            ledgerName: ledgerName,
             amount: foundTrans.amount,
             datetime: foundTrans.datetime,
             count: foundTrans.count,

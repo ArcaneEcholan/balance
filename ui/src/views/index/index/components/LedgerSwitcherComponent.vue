@@ -34,10 +34,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Client from '@/ts/request/client';
 import eventBus from '@/ts/EventBus';
 import CommonButton from '@/views/components/CommonButton.vue';
-import { provideListeners } from '@/page-eventbus-registration-mixin';
 import GapComponent from '@/views/components/GapComponent.vue';
 import CustomButton from '@/views/components/CustomButton.vue';
 import { getI18nValue } from '../../../../ts/utils';
@@ -46,7 +44,6 @@ import request from '@/ts/request';
 import { Toast } from 'vant';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import Cache from '@/ts/cache';
-import cache from '@/ts/cache';
 import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import storage from '@/ts/storage';
 
@@ -55,8 +52,6 @@ import storage from '@/ts/storage';
     components: { CommonActionSheet, CustomButton, GapComponent, CommonButton },
 })
 export default class LedgerSwitcherComponent extends Vue {
-    ledgersListLoadedFirstTime = true;
-
     visible = false;
 
     ledgersLoading = false;
@@ -72,7 +67,6 @@ export default class LedgerSwitcherComponent extends Vue {
             .getLedgers()
             .then((ledgers) => {
                 this.ledgerList = ledgers;
-                eventBus.$emit('ledges-changes', this.ledgerList);
             })
             .catch((err) => {
                 console.error(err);
@@ -87,67 +81,31 @@ export default class LedgerSwitcherComponent extends Vue {
     }
 
     created() {
-        provideListeners(this, [
-            {
-                eventName: 'on-get-current-ledger-name',
-                handler: () => {
-                    return this.currentLedger.name;
-                },
-            },
-            {
-                eventName: 'ledges-changes',
-                handler: (list: any) => {
-                    this.ledgerList = list;
-                },
-            },
-            {
-                eventName: 'ledger-deleted',
-                handler: (id: any) => {
-                    this.ledgerList = this.ledgerList.filter((item: any) => {
-                        return item.id !== id;
-                    });
-                    if (this.currentLedger.id == id) {
-                        if (this.ledgerList.length != 0) {
-                            this.currentLedger = this.ledgerList[0];
-                        } else {
-                            // this is undefined behavior
-                            this.currentLedger = { id: null, name: 'unknown' };
-                        }
-                    }
-                },
-            },
-        ]);
-
         // set default ledger
-        {
-            let userConfigs = store.getters.userConfigs;
-            if (userConfigs == null) {
-                this.currentLedger = {
-                    name: 'default',
-                };
-            }
-            let defaultLedgerConfig = userConfigs.filter(
-                (it: any) => it.key === 'default_ledger',
-            );
-            if (
-                defaultLedgerConfig == null ||
-                defaultLedgerConfig.length === 0
-            ) {
-                this.currentLedger = {
-                    name: 'default',
-                };
-            } else {
-                this.currentLedger = {
-                    name: defaultLedgerConfig[0].value,
-                };
-            }
-
-            // broadcast current ledger
-            eventBus.$emit(
-                'on-cur-ledger-changed',
-                Object.assign({}, this.currentLedger),
-            );
+        let userConfigs = store.getters.userConfigs;
+        if (userConfigs == null) {
+            this.currentLedger = {
+                name: 'default',
+            };
         }
+        let defaultLedgerConfig = userConfigs.filter(
+            (it: any) => it.key === 'default_ledger',
+        );
+        if (defaultLedgerConfig == null || defaultLedgerConfig.length === 0) {
+            this.currentLedger = {
+                name: 'default',
+            };
+        } else {
+            this.currentLedger = {
+                name: defaultLedgerConfig[0].value,
+            };
+        }
+
+        // broadcast current ledger
+        eventBus.$emit(
+            'on-cur-ledger-changed',
+            Object.assign({}, this.currentLedger),
+        );
     }
 
     onClickSwitchLedger(ledger: any) {

@@ -520,22 +520,6 @@ export default class AddTransactionEditorComponent extends Vue {
 
     curLedger: any = { name: 'default' };
 
-    created() {
-        provideListeners(this, [
-            {
-                eventName: 'on-cur-ledger-changed',
-                handler: (ledger: any) => {
-                    this.curLedger = ledger;
-                },
-            },
-        ]);
-        let ledgerName = eventBus.$emitWithReturnValue(
-            'on-get-current-ledger-name',
-            null,
-        );
-        this.curLedger = { name: ledgerName };
-    }
-
     mounted() {
         this.addRecordRow();
     }

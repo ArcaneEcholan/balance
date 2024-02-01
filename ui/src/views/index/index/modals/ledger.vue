@@ -109,6 +109,7 @@ import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import store from '@/ts/store';
 import cache from '@/ts/cache';
 import storage from '@/ts/storage';
+
 let that: any;
 @Component({
     components: {
@@ -224,7 +225,7 @@ export default class ManageLedgerView extends Vue {
                     ctime: resp.data.ctime,
                 });
 
-                this.purgeLedgerCache(name!);
+                storage.purgeLedgerCache(name!);
                 // we don't recover the loading status to prevent the user click submit button twice
             })
             .catch(() => {
@@ -240,24 +241,6 @@ export default class ManageLedgerView extends Vue {
         this.editLedgerId = ledgerId;
         this.editLedgerName = ledgerName;
         this.show = true;
-    }
-
-    purgeLedgerCache(ledgerName: string) {
-        // purge statistics data cache
-        cache
-            .filterPairs((cursor) => {
-                let key = cursor.key as string;
-                let regex = `^statistics_${ledgerName}_\\d{4,4}-\\d{1,2}$`;
-                return new RegExp(regex).test(key);
-            })
-            .then((dataSet) => {
-                dataSet.forEach((item: any) => {
-                    cache.removeItem(item.key);
-                });
-            });
-
-        // purge ledger list cache
-        cache.removeItem('ledgers');
     }
 
     onClickDelete(ledgerId: number, ledgerName: string) {
@@ -277,9 +260,7 @@ export default class ManageLedgerView extends Vue {
                     (item: any) => item.id != ledgerId,
                 );
 
-                this.purgeLedgerCache(ledgerName);
-
-                eventBus.$emit('ledger-deleted', ledgerId);
+                storage.purgeLedgerCache(ledgerName);
             })
             .catch((httpErr: HttpError) => {
                 Notify({
@@ -310,7 +291,7 @@ export default class ManageLedgerView extends Vue {
                 message: 'Update success',
             });
 
-            this.purgeLedgerCache(this.editLedgerName!);
+            storage.purgeLedgerCache(this.editLedgerName!);
 
             this.show = false;
             this.ledgers.filter((item: any) => {
@@ -318,12 +299,14 @@ export default class ManageLedgerView extends Vue {
                     item.name = this.editLedgerName;
                 }
             });
+
             globalLoadingStop();
         });
     }
 
     ledgersLoading = false;
     modalLifeCycleHooks: any;
+
     created() {
         this.modalLifeCycleHooks =
             stripType(this).$options.$mountProp.modalLifeCycleHooks;
@@ -333,7 +316,6 @@ export default class ManageLedgerView extends Vue {
             .getLedgers()
             .then((ledgerList) => {
                 this.ledgers = ledgerList;
-                eventBus.$emit('ledges-changes', this.ledgers);
             })
             .finally(() => {
                 globalLoadingStop();

@@ -307,7 +307,6 @@ export default class EditRecordView extends Vue {
 
         this.recordId = mountProp.id;
         this.amount = mountProp.amount;
-        this.ledgerName = mountProp.ledgerName;
         this.datetime = mountProp.datetime;
         this.count = mountProp.count;
         this.categoryValue = mountProp.categoryValue;
@@ -338,12 +337,14 @@ export default class EditRecordView extends Vue {
                 it.checked = it.related;
             });
 
-            this.pickedLedger = ledgerList.find(
-                (it) => it.name === this.ledgerName,
-            );
-            this.pickedLedgerName = this.ledgerName!;
+            storage.getDefaultLedger().then((ledgerName) => {
+                this.pickedLedger = ledgerList.find(
+                    (it) => it.name === ledgerName,
+                );
+                this.pickedLedgerName = ledgerName;
 
-            this.ledgerList = ledgerList;
+                this.ledgerList = ledgerList;
+            });
         });
     }
 }
