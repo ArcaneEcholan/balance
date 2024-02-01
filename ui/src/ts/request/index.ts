@@ -36,6 +36,23 @@ function logRequest(config: any) {
     console.log(logtag, config);
 }
 
+export class HttpResponse {
+    status: number;
+    data: any;
+    constructor(status: number, data: any) {
+        this.status = status;
+        this.data = data;
+    }
+}
+
+export class HttpError extends Error {
+    resp: HttpResponse | null;
+    constructor(msg: string | null, resp: HttpResponse | null) {
+        super(`HTTP Error ${msg}`);
+        this.resp = resp;
+    }
+}
+
 // response interceptor
 service.interceptors.response.use(
     (response) => {
@@ -43,7 +60,7 @@ service.interceptors.response.use(
 
         return Promise.resolve(response);
     },
-    (error) => {
+    (error): Promise<HttpError> => {
         console.log(error);
         let response = error.response;
 
@@ -54,7 +71,8 @@ service.interceptors.response.use(
         let status = response.status;
         let data = response.data;
         console.log({ type: 'danger', message: `${status}: ${data}` });
-        return Promise.reject(error);
+        let httpResp = new HttpResponse(status, data);
+        return Promise.reject(new HttpError(error.message, httpResp));
     },
 );
 
