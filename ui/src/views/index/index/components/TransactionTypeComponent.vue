@@ -47,6 +47,7 @@
         <div name="sheets">
             <!--add new types sheet-->
             <common-action-sheet
+                :fit-content="true"
                 :mount-point="`#vant-sheet-mount-point`"
                 :visible.sync="addTypeShow"
             >

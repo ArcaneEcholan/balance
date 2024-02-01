@@ -1,5 +1,6 @@
 <template>
     <common-action-sheet
+        :fit-content="true"
         :visible.sync="visible"
         @open="onLedgerPickerSheetOpen"
     >

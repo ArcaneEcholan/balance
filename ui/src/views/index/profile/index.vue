@@ -23,6 +23,7 @@
 
         <div name="sheets">
             <common-action-sheet
+                :fit-content="true"
                 name="language-picker-sheet"
                 :visible.sync="languagePickerShow"
             >
@@ -48,6 +49,7 @@
             </common-action-sheet>
 
             <common-action-sheet
+                :fit-content="true"
                 name="account-setting-sheet"
                 :visible.sync="accountSettingShow"
             >
@@ -75,6 +77,7 @@
             </common-action-sheet>
 
             <common-action-sheet
+                :fit-content="true"
                 name="change-password-sheet"
                 :visible.sync="changePasswordShow"
             >

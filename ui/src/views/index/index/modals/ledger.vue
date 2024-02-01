@@ -1,6 +1,6 @@
 <template>
     <modal-presentation :hooks="modalLifeCycleHooks" @closed="closed">
-        <common-action-sheet :visible.sync="show">
+        <common-action-sheet :fit-content="true" :visible.sync="show">
             <template #header>Edit Ledger</template>
             <template #body>
                 <div class="record-header"></div>
@@ -20,7 +20,7 @@
                 </common-button>
             </template>
         </common-action-sheet>
-        <common-action-sheet :visible.sync="addLedgerShow">
+        <common-action-sheet :fit-content="true" :visible.sync="addLedgerShow">
             <template #header>Add Ledger</template>
             <template #body>
                 <gap-component :value="'32px'"></gap-component>

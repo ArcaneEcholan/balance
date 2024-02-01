@@ -42,7 +42,10 @@
             </template>
         </common-action-sheet>
 
-        <common-action-sheet :visible.sync="ledgerPickerShow">
+        <common-action-sheet
+            :fit-content="true"
+            :visible.sync="ledgerPickerShow"
+        >
             <template #header>
                 <div style="width: 100%" class="flex">
                     <div style="width: 20%"></div>

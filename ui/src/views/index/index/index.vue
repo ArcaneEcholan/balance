@@ -76,7 +76,7 @@
 
         <div name="sheets">
             <!-- where user add new records -->
-            <common-action-sheet :visible.sync="show">
+            <common-action-sheet :fit-content="true" :visible.sync="show">
                 <template #header>
                     {{ $t('add_record.title') }}
                 </template>

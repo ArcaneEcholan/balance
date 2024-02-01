@@ -1,6 +1,9 @@
 <template>
     <div>
-        <common-action-sheet :visible.sync="chooseTypePanelShow">
+        <common-action-sheet
+            :fit-content="true"
+            :visible.sync="chooseTypePanelShow"
+        >
             <template #header>
                 {{ $t('add_record.choose_type.title') }}
             </template>
