@@ -1,6 +1,6 @@
 class Cache {
     whoKnowsTheName(reject) {
-        let openRequest = indexedDB.open('site_idb', 1);
+        let openRequest = indexedDB.open('site_idb', 2);
 
         openRequest.onerror = function (event) {
             reject(
@@ -12,7 +12,6 @@ class Cache {
         };
 
         openRequest.onupgradeneeded = function (event) {
-            debugger;
             // @ts-ignore
             let db = event.target.result;
             let names = db.objectStoreNames;

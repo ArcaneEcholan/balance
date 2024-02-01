@@ -183,6 +183,8 @@ import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import CustomButton from '@/views/components/CustomButton.vue';
 import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import request from '@/ts/request';
+import Cache from '@/ts/cache';
+import { getDefaultLedger } from '@/ts/common';
 
 @Component({
     methods: { shallowMount },
@@ -318,35 +320,50 @@ export default class StatisticIndexView extends Vue {
     }
 
     init() {
-        Client.getStatisticsData(this.getCurrentDate(), null).then(
-            (resp: any) => {
-                resp = resp.data;
-                this.percent = resp.percent;
-                this.lastMonthTotal = resp.last_month_total;
-                this.thisMonthTotal = resp.this_month_total;
+        let afterGetValue = (v) => {
+            let resp = v;
+            this.percent = resp.percent;
+            this.lastMonthTotal = resp.last_month_total;
+            this.thisMonthTotal = resp.this_month_total;
 
-                if (this.lastMonthTotal.indexOf('.') !== -1) {
-                    this.lastMonthTotal = this.lastMonthTotal.substring(
-                        0,
-                        this.lastMonthTotal.indexOf('.') + 3,
+            if (this.lastMonthTotal.indexOf('.') !== -1) {
+                this.lastMonthTotal = this.lastMonthTotal.substring(
+                    0,
+                    this.lastMonthTotal.indexOf('.') + 3,
+                );
+            }
+
+            if (this.thisMonthTotal.indexOf('.') !== -1) {
+                this.thisMonthTotal = this.thisMonthTotal.substring(
+                    0,
+                    this.thisMonthTotal.indexOf('.') + 3,
+                );
+            }
+
+            this.typeRankList = resp.type_rank_list;
+            this.rankList = resp.rank_list;
+            this.getPercent();
+            this.$nextTick(() => {
+                this.centerPercentText();
+            });
+        };
+        let cacheKey = (ledgerName) => {
+            return `statistics_${ledgerName}_${this.getCurrentDate()}`;
+        };
+        getDefaultLedger().then((ledgerName) => {
+            Cache.getItem(cacheKey(ledgerName)).then((cv) => {
+                if (cv) {
+                    afterGetValue(cv);
+                } else {
+                    Client.getStatisticsData(this.getCurrentDate(), null).then(
+                        (resp: any) => {
+                            Cache.setItem(cacheKey(ledgerName), resp.data);
+                            afterGetValue(resp.data);
+                        },
                     );
                 }
-
-                if (this.thisMonthTotal.indexOf('.') !== -1) {
-                    this.thisMonthTotal = this.thisMonthTotal.substring(
-                        0,
-                        this.thisMonthTotal.indexOf('.') + 3,
-                    );
-                }
-
-                this.typeRankList = resp.type_rank_list;
-                this.rankList = resp.rank_list;
-                this.getPercent();
-                this.$nextTick(() => {
-                    this.centerPercentText();
-                });
-            },
-        );
+            });
+        });
     }
 
     format() {
@@ -356,7 +373,6 @@ export default class StatisticIndexView extends Vue {
     centerPercentText() {
         let t = document.getElementById('compare-total-percentage');
         let tt = document.getElementById('compare-total-percentage-text');
-        let d = document.getElementById('compare-detail');
 
         let th = t!.clientHeight;
         let tw = t!.clientWidth;
