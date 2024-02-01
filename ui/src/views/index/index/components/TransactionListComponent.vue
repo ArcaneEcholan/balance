@@ -186,6 +186,7 @@ import CustomButton from '@/views/components/CustomButton.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import Cache from '@/ts/cache';
+import { getDefaultLedger } from '@/ts/common';
 
 @Component({
     components: { CommonActionSheet, CustomButton, GapComponent, Panel },
@@ -479,37 +480,39 @@ export default class TransactionListComponent extends Vue {
 
     onRefreshTransactionList() {
         try {
-            let currentLedgerName = this.getCurrentLedgerName();
-            let currentDate = this.getCurrentDate();
-            this.recordsListLoading = true;
+            getDefaultLedger().then((ledgerName: any) => {
+                this.recordsListLoading = true;
 
-            let ledgerName = currentLedgerName;
-            let date = currentDate;
-            let cacheKey = `transaction_list_${ledgerName}_${date}`;
+                let date = this.getCurrentDate();
+                let cacheKey = `transaction_list_${ledgerName}_${date}`;
 
-            Cache.getItem(cacheKey)
-                .then((cachedData: any) => {
-                    if (cachedData) {
-                        let tranList = JSON.parse(cachedData);
-                        this.postProcessFetchTranList(this, tranList);
-                    } else {
-                        Client.getTransactionListByLedgerName(
-                            currentLedgerName,
-                            currentDate,
-                        )
-                            .then((res) => {
-                                this.postProcessFetchTranList(this, res.data);
-                                Cache.setItem(cacheKey, res.data);
-                            })
-                            .catch((err) => {
-                                this.recordsListLoading = false;
-                                console.log(err);
-                            });
-                    }
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
+                Cache.getItem(cacheKey)
+                    .then((cachedData: any) => {
+                        if (cachedData) {
+                            let tranList = JSON.parse(cachedData);
+                            this.postProcessFetchTranList(this, tranList);
+                        } else {
+                            Client.getTransactionListByLedgerName(
+                                ledgerName,
+                                date,
+                            )
+                                .then((res) => {
+                                    this.postProcessFetchTranList(
+                                        this,
+                                        res.data,
+                                    );
+                                    Cache.setItem(cacheKey, res.data);
+                                })
+                                .catch((err) => {
+                                    this.recordsListLoading = false;
+                                    console.log(err);
+                                });
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
+            });
         } catch (e) {
             console.log(e);
         }

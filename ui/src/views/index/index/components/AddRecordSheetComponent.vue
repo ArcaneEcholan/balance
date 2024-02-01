@@ -142,7 +142,6 @@ import VanCursorEditorComponent from '@/views/components/VanCursorEditor.vue';
 import { timeout } from '@/ts/utils';
 import GapComponent from '@/views/components/GapComponent.vue';
 import { Notify, Toast } from 'vant';
-import Client from '@/ts/request/client';
 import eventBus from '@/ts/EventBus';
 import CommonButton from '@/views/components/CommonButton.vue';
 import { provideListeners } from '@/page-eventbus-registration-mixin';
@@ -154,6 +153,8 @@ import settings from '@/settings';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import request from '@/ts/request';
 import Cache from '@/ts/cache';
+import store from '@/ts/store';
+import { getDefaultLedger } from '@/ts/common';
 
 class FormItemField {
     value: string | null = null;
@@ -182,6 +183,7 @@ class FormItem {
 })
 export default class AddTransactionEditorComponent extends Vue {
     addRecordsLoading = false;
+
     onTouchCell(recordRow: any, attrName: string) {
         let oldRecordRef = this.cursor.recordRef;
         let oldAttrName = this.cursor.attrName;
@@ -602,10 +604,77 @@ export default class AddTransactionEditorComponent extends Vue {
     onAddTrans() {
         try {
             this.checkAddTransData();
-            this.addTransactionsByLedgerName(
-                this.curLedger.name,
-                this.newRecordRows,
-            );
+
+            getDefaultLedger().then((ledgerName) => {
+                let trans: any[] = this.newRecordRows;
+                {
+                    this.addRecordsLoading = true;
+                    Toast.loading({
+                        message: 'Loading...',
+                        forbidClick: true,
+                        duration: 0,
+                    });
+                    let loc = eventBus.$emitWithReturnValue(
+                        'on-get-cur-location',
+                        null,
+                    );
+                    if (loc == null) {
+                        loc = {
+                            latitude: null,
+                            longitude: null,
+                            formattedName: null,
+                        };
+                    }
+                    let requestTranList = trans.map((tran) => {
+                        return {
+                            categoryValue: tran.type,
+                            amount: tran.amount,
+                            count: tran.count,
+                            description: tran.desc,
+                            location: loc,
+                        };
+                    });
+
+                    request({
+                        url: `/transactions`,
+                        method: 'post',
+                        data: {
+                            transactionList: requestTranList,
+                            ledger_name: ledgerName,
+                        },
+                    })
+                        .then((resp) => {
+                            // cache transactions
+                            let currentDate = eventBus.$emitWithReturnValue(
+                                'on-get-main-page-cur-date',
+                                null,
+                            );
+                            const key = `transaction_list_${ledgerName}_${currentDate}`;
+                            Cache.getAllKeys().then((keys: any[]) => {
+                                keys.forEach((it) => {
+                                    if (it === key) {
+                                        Cache.removeItem(it);
+                                    }
+                                });
+                            });
+
+                            Notify({
+                                message: 'save successfully',
+                                type: 'success',
+                            });
+                            eventBus.$emit('refresh-transaction-list', null);
+
+                            this.clearAllRecords();
+                        })
+                        .catch((resp) => {
+                            this.addRecordsLoading = false;
+                            console.log(resp);
+                        })
+                        .finally(() => {
+                            Toast.clear();
+                        });
+                }
+            });
         } catch (e: any) {
             Notify({
                 message: e.message,
@@ -671,73 +740,6 @@ export default class AddTransactionEditorComponent extends Vue {
                 throw new Error('Information format invalid');
             }
         });
-    }
-
-    // assemble Add Transaction Request
-    addTransactionsByLedgerName(ledgerName: string, trans: any[]) {
-        this.addRecordsLoading = true;
-        Toast.loading({
-            message: 'Loading...',
-            forbidClick: true,
-            duration: 0,
-        });
-        let loc = eventBus.$emitWithReturnValue('on-get-cur-location', null);
-        if (loc == null) {
-            loc = {
-                latitude: null,
-                longitude: null,
-                formattedName: null,
-            };
-        }
-        let requestTranList = trans.map((tran) => {
-            return {
-                categoryValue: tran.type,
-                amount: tran.amount,
-                count: tran.count,
-                description: tran.desc,
-                location: loc,
-            };
-        });
-
-        request({
-            url: `/transactions`,
-            method: 'post',
-            data: {
-                transactionList: requestTranList,
-                ledger_name: ledgerName,
-            },
-        })
-            .then((resp) => {
-                let currentDate = eventBus.$emitWithReturnValue(
-                    'on-get-main-page-cur-date',
-                    null,
-                );
-                let ledgerName = eventBus.$emitWithReturnValue(
-                    'on-get-current-ledger-name',
-                    null,
-                );
-                const key = `transaction_list_${ledgerName}_${currentDate}`;
-                Cache.getAllKeys().then((keys: any[]) => {
-                    keys.forEach((it) => {
-                        if (it === key) {
-                            Cache.removeItem(it);
-                        }
-                    });
-                });
-
-                Notify({
-                    message: 'save successfully',
-                    type: 'success',
-                });
-                eventBus.$emit('refresh-transaction-list', null);
-
-                this.clearAllRecords();
-            })
-            .catch((resp) => {
-                Toast.clear();
-                this.addRecordsLoading = false;
-                console.log(resp);
-            });
     }
 }
 </script>
