@@ -463,43 +463,18 @@ export default class TransactionListComponent extends Vue {
     }
 
     onRefreshTransactionList() {
-        try {
-            storage.getDefaultLedger().then((ledgerName: any) => {
-                this.recordsListLoading = true;
-
-                let date = this.getCurrentDate();
-                let cacheKey = `transaction_list_${ledgerName}_${date}`;
-
-                Cache.getItem(cacheKey)
-                    .then((cachedData: any) => {
-                        if (cachedData) {
-                            let tranList = cachedData;
-                            this.postProcessFetchTranList(this, tranList);
-                        } else {
-                            Client.getTransactionListByLedgerName(
-                                ledgerName,
-                                date,
-                            )
-                                .then((res) => {
-                                    this.postProcessFetchTranList(
-                                        this,
-                                        res.data,
-                                    );
-                                    Cache.setItem(cacheKey, res.data);
-                                })
-                                .catch((err) => {
-                                    this.recordsListLoading = false;
-                                    console.log(err);
-                                });
-                        }
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                    });
-            });
-        } catch (e) {
-            console.log(e);
-        }
+        this.recordsListLoading = true;
+        storage.getDefaultLedger().then((ledgerName: any) => {
+            let date = this.getCurrentDate();
+            storage
+                .getRecords(ledgerName, date)
+                .then((resp) => {
+                    this.postProcessFetchTranList(this, resp);
+                })
+                .finally(() => {
+                    this.recordsListLoading = false;
+                });
+        });
     }
 
     getCurrentDate() {

@@ -3,6 +3,7 @@ import request from '@/ts/request';
 import store from '@/ts/store';
 import eventBus from '@/ts/EventBus';
 import Cache from '@/ts/cache';
+import Client from '@/ts/request/client';
 
 class Storage {
     purgeLedgerCache(ledgerName: string) {
@@ -139,6 +140,64 @@ class Storage {
                                 resolve(resp.data);
                             })
                             .catch((err: any) => {
+                                reject(err);
+                            });
+                    }
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+
+    getStatisticsData(
+        ledgerId: number | null,
+        ledgerName: string,
+        yearMonth: string,
+    ) {
+        let cacheKey = (ledgerName) => {
+            return `statistics_${ledgerName}_${yearMonth}`;
+        };
+        return new Promise((resolve, reject) => {
+            Cache.getItem(cacheKey(ledgerName))
+                .then((cv) => {
+                    if (cv) {
+                        resolve(cv);
+                    } else {
+                        Client.getStatisticsData(yearMonth, ledgerId)
+                            .then((resp: any) => {
+                                Cache.setItem(cacheKey(ledgerName), resp.data);
+                                resolve(resp.data);
+                            })
+                            .catch((err) => {
+                                reject(err);
+                            });
+                    }
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+
+    getRecords(ledgerName: string, yearMonth: string) {
+        return new Promise((resolve, reject) => {
+            let cacheKey = `transaction_list_${ledgerName}_${yearMonth}`;
+
+            Cache.getItem(cacheKey)
+                .then((cachedData: any) => {
+                    if (cachedData) {
+                        resolve(cachedData);
+                    } else {
+                        Client.getTransactionListByLedgerName(
+                            ledgerName,
+                            yearMonth,
+                        )
+                            .then((res) => {
+                                Cache.setItem(cacheKey, res.data);
+                                resolve(cachedData);
+                            })
+                            .catch((err) => {
                                 reject(err);
                             });
                     }

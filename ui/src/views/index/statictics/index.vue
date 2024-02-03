@@ -325,32 +325,23 @@ export default class StatisticIndexView extends Vue {
 
     init(ledgerId: null | number, ledgerName: null | string) {
         globalLoadingStart();
-        let cacheKey = (ledgerName) => {
-            return `statistics_${ledgerName}_${this.getCurrentDate()}`;
-        };
+
+        let currentDate = this.getCurrentDate();
         let p: Promise<any> | null = null;
-        let ledgerName1: any = null;
         if (ledgerName == null) {
             p = storage.getDefaultLedger().then((defaultName) => {
-                ledgerName1 = defaultName;
-                return Cache.getItem(cacheKey(defaultName));
+                return storage.getStatisticsData(
+                    ledgerId,
+                    defaultName,
+                    currentDate,
+                );
             });
         } else {
-            ledgerName1 = ledgerName;
-            p = Cache.getItem(cacheKey(ledgerName));
+            p = storage.getStatisticsData(ledgerId, ledgerName, currentDate);
         }
 
-        p.then((cv) => {
-            if (cv) {
-                this.afterGetValue(cv);
-            } else {
-                Client.getStatisticsData(this.getCurrentDate(), ledgerId).then(
-                    (resp: any) => {
-                        Cache.setItem(cacheKey(ledgerName1), resp.data);
-                        this.afterGetValue(resp.data);
-                    },
-                );
-            }
+        p.then((resp) => {
+            this.afterGetValue(resp);
         })
             .catch((err) => {
                 console.log(err);
@@ -358,10 +349,6 @@ export default class StatisticIndexView extends Vue {
             .finally(() => {
                 globalLoadingStop();
             });
-    }
-
-    format() {
-        return '';
     }
 
     centerPercentText() {
