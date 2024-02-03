@@ -1,10 +1,7 @@
 package com.example.app.rest
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
-import com.example.app.dao.UserConfigMapper
-import com.example.app.dao.UserConfigPO
-import com.example.app.dao.UserPO
-import com.example.app.dao.UserUserConfigMapper
+import com.example.app.dao.*
 import com.example.app.dao.mapper.LedgerMapper
 import com.example.app.dao.mapper.LedgerTransactionMapper
 import com.example.app.dao.po.LedgerPO
@@ -28,10 +25,10 @@ class CreateLedgerDTO {
 class EditLedgerDTO {
     @NotNull
     var id: Long? = null
+
     @NotEmpty
     var name: String? = null
 }
-
 
 @RequestMapping("/api")
 @RestController
@@ -44,41 +41,70 @@ class LedgerCongroller {
     @Autowired
     lateinit var ledgerMapper: LedgerMapper
 
+    @Autowired
+    lateinit var userLedgerMapper: UserLedgerMapper
+
     @PostMapping("/ledger")
+    @AuthLogin
+    @Transactional
     fun tes5t1(@Valid @RequestBody createLedgerDTO: CreateLedgerDTO): ResponseEntity<Any> {
         val name = createLedgerDTO.name!!
 
-        var b = ledgerMapper.selectList(
-            QueryWrapper<LedgerPO>().eq("name", name)
-        )
+        val user = getCurrentUser()
+        var b = userLedgerMapper.getUserLedgers(user.id!!)
+        var bb = b.filter { it -> it.ledgerName == name }
 
-        if (b != null && b.size > 0) {
+
+        if (bb != null && bb.size > 0) {
             return ResponseEntity.badRequest().body(objectMapper.writeValueAsString("name already exists"));
         }
 
-        var a = LedgerPO(null, name, DateTime.now().toString());
-        ledgerMapper.insert(a)
+        var newLedger = LedgerPO(null, name, DateTime.now().toString());
+        ledgerMapper.insert(newLedger)
 
-        return ResponseEntity.ok(a);
+        userLedgerMapper.insert(UserLedgerPO(null, user.id!!, newLedger.id!!))
+
+        return ResponseEntity.ok(newLedger);
     }
 
     @DeleteMapping("/ledger/{id}")
     @AuthLogin
+    @Transactional
     fun tes5t11(@PathVariable id: Long): ResponseEntity<Any> {
-        var user = requestCtx.get()["user"] as UserPO
-        var ledger = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("id", id))
+        var user = getCurrentUser()
 
-        if (ledger != null) {
-            var ledgername = ledger.name!!
-            var config = userUserConfigMapper.getUserConfigByKey(user.id!!, "default_ledger")
-            if (config != null) {
-                var userDefault = config.value
-                if (userDefault == ledgername) {
-                    return ResponseEntity.internalServerError()
-                        .body(objectMapper.writeValueAsString(object {
-                            var message = "can not delete default ledger"
-                        }));
-                }
+        var ledger1: UserLedgerMapperResult? = null
+
+        var found = false
+        var jalf = userLedgerMapper.getUserLedgers(user.id!!)
+        jalf.forEach {
+            if (it.ledgerId == id) {
+                found = true
+                ledger1 = it
+            }
+        }
+
+        if (found == false) {
+            return ResponseEntity.internalServerError()
+                .body(objectMapper.writeValueAsString(object {
+                    var message = "ledger not found"
+                }));
+        }
+
+        var ledger = LedgerPO().apply {
+            this.id = ledger1!!.ledgerId
+            this.name = ledger1!!.ledgerName
+        }
+
+        var ledgername = ledger.name!!
+        var config = userUserConfigMapper.getUserConfigByKey(user.id!!, "default_ledger")
+        if (config != null) {
+            var userDefault = config.value
+            if (userDefault == ledgername) {
+                return ResponseEntity.internalServerError()
+                    .body(objectMapper.writeValueAsString(object {
+                        var message = "can not delete default ledger"
+                    }));
             }
         }
 
@@ -92,10 +118,21 @@ class LedgerCongroller {
     fun tesfas5t1(@Valid @RequestBody editLedgerDTO: EditLedgerDTO): ResponseEntity<Any> {
         var user = requestCtx.get()["user"] as UserPO
 
-        var e = ledgerMapper.selectById(editLedgerDTO.id)
-        if (e == null) {
-            return ResponseEntity.ok(null);
-        }
+        var userledgers =
+            userLedgerMapper.getUserLedgers(user.id!!)
+
+
+        userledgers.filter { it -> editLedgerDTO.id == it.ledgerId }
+            .ifEmpty {
+                return ResponseEntity.ok(null);
+            }
+
+        var e = userledgers.map {
+            LedgerPO().apply {
+                this.id = it.ledgerId
+                this.name = it.ledgerName
+            }
+        }.first()
 
         val name = editLedgerDTO.name!!
 
@@ -121,8 +158,10 @@ class LedgerCongroller {
         }
         return ResponseEntity.ok(null)
     }
+
     @Autowired
     lateinit var userConfigMapper: UserConfigMapper
+
     @Autowired
     lateinit var userUserConfigMapper: UserUserConfigMapper
 
@@ -130,41 +169,25 @@ class LedgerCongroller {
     lateinit var ledgerTransactionMapper: LedgerTransactionMapper
 
     @GetMapping("/ledgers")
+    @AuthLogin
+    @Transactional
     fun getLedgers(@RequestParam(value = "record_id", required = false) recordId: Long?): ResponseEntity<Any> {
 
-        var allLedgers = ledgerMapper.selectList(null)
+        var user = getCurrentUser()
 
-        if (recordId != null) {
-            var temp = ledgerTransactionMapper.selectByMap(mapOf("transaction_id" to recordId))
-            var recordRelatedLedger = temp.map {
-                var tempLedger = ledgerMapper.selectById(it.ledgerId)
-                tempLedger
-            }.filterNotNull().map { it.id }.toMutableList();
+        var userLedgers = userLedgerMapper.getUserLedgers(user.id!!)
 
-            allLedgers.map {
-                if (recordRelatedLedger.contains(it.id)) {
-                    object {
-                        var id = it.id
-                        var name = it.name
-                        var related = true
-                    }
-                } else {
-                    object {
-                        var id = it.id
-                        var name = it.name
-                        var related = false
-                    }
-                }
-            }.toList().apply {
-                return ResponseEntity.ok(this)
+        var allLedgers = userLedgers.map {
+            LedgerPO().apply {
+                this.id = it.ledgerId
+                this.name = it.ledgerName
             }
-
         }
 
         return ResponseEntity.ok(allLedgers)
     }
 
-    class UpdateRecordLedgersReq {
+    class transferLRecordsReq {
 
         @Valid
         var record_ids: List<Long>? = null
@@ -174,23 +197,44 @@ class LedgerCongroller {
     }
 
     @PutMapping("/record/ledgers")
+    @AuthLogin
     @Transactional
-    fun updateRecordLedgers(@RequestBody @Valid updateRecordLedgersReq: UpdateRecordLedgersReq): Any {
-        if (updateRecordLedgersReq.ledger_ids!!.filterNotNull().size < updateRecordLedgersReq.ledger_ids!!.size) {
+    fun transferLRecordsBetweenLedgers(@RequestBody @Valid transferLRecordsReq: transferLRecordsReq): Any {
+        if (transferLRecordsReq.ledger_ids!!.size > 1 || transferLRecordsReq.ledger_ids!!.size == 0) {
+            return ResponseEntity.badRequest().body(objectMapper.writeValueAsString(object {
+                var message = "ledger id only supports 1 element"
+            }));
+        }
+
+        if (transferLRecordsReq.ledger_ids!!.filterNotNull().size < transferLRecordsReq.ledger_ids!!.size) {
             return ResponseEntity.badRequest().body(objectMapper.writeValueAsString(object {
                 var message = "ledger id can not be null"
             }));
         }
 
-        if (updateRecordLedgersReq.record_ids!!.filterNotNull().size < updateRecordLedgersReq.record_ids!!.size) {
+        if (transferLRecordsReq.record_ids!!.filterNotNull().size < transferLRecordsReq.record_ids!!.size) {
             return ResponseEntity.badRequest().body(objectMapper.writeValueAsString(object {
                 var message = "record id can not be null"
             }));
         }
 
-        updateRecordLedgersReq.record_ids!!.forEach { recordId ->
+        var user = getCurrentUser()
+
+        var userLedgers =
+            userLedgerMapper.getUserLedgers(user.id!!)
+
+        var ledgerId = transferLRecordsReq.ledger_ids!!.first()
+        userLedgers.map { it.ledgerId }.contains(ledgerId).not().apply {
+            if (this) {
+                return ResponseEntity.badRequest().body(objectMapper.writeValueAsString(object {
+                    var message = "ledger not found"
+                }));
+            }
+        }
+
+        transferLRecordsReq.record_ids!!.forEach { recordId ->
             ledgerTransactionMapper.deleteByMap(mapOf("transaction_id" to recordId))
-            updateRecordLedgersReq.ledger_ids!!.forEach {
+            transferLRecordsReq.ledger_ids!!.forEach {
                 ledgerTransactionMapper.insert(LedgerTransactionPO(null, it, recordId))
             }
         }

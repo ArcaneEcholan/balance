@@ -1,15 +1,7 @@
 package com.example.app.rest
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
-import com.example.app.dao.TransactionCategoryDao
-import com.example.app.dao.TransactionCategoryPO
-import com.example.app.dao.mapper.LedgerMapper
-import com.example.app.dao.po.LedgerPO
-import com.example.app.service.TransactionCategoryService
-import com.example.app.service.TransactionCategoryVO
+import com.example.app.dao.*
 import com.example.app.service.TransactionService
-import com.example.app.service.TransactionVO
-import com.example.app.utils.DateTime
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -42,19 +34,6 @@ class SaveTranDTO {
     var location: Map<String, String>? = null
 }
 
-//     SaveTranDTO:
-//       type: object
-//       properties:
-//         categoryValue:
-//           type: string
-//         amount:
-//           type: string
-//         count:
-//           type: integer
-//         description:
-//           type: string
-//         location:
-//           type: object
 class SaveTransDTO {
     @NotNull
     @Valid
@@ -63,14 +42,6 @@ class SaveTransDTO {
     @NotEmpty
     var ledger_name: String? = null
 }
-
-//     SaveTransDTO:
-//       type: object
-//       properties:
-//         transactionList:
-//           type: array
-//           items:
-//             $ref: '#/definitions/SaveTranDTO'
 
 @RequestMapping("/api")
 @RestController
@@ -82,77 +53,65 @@ class TransController {
     lateinit var transactionService: TransactionService
 
     @Autowired
-    lateinit var categoryDao: TransactionCategoryDao
+    lateinit var userLedgerMapper: UserLedgerMapper
 
-    // @PostMapping("/transactions")
-    // fun saveTransactions(@RequestBody @Valid transactionList: SaveTransDTO):
-    //         ResponseEntity<*> {
-    //     transactionList.transactionList!!.map {
-    //         var cateId = categoryDao.getOneByMap("value", it.categoryValue)?.id
-    //
-    //         transactionService.insert(
-    //             amount = BigDecimal(it.amount),
-    //             categoryId = cateId ?: 0,
-    //             count = it.count!!,
-    //             description = it.description,
-    //             datetime = DateTime.now().toString(),
-    //             // leave location as empty, support it later
-    //             location = it.location ?: mapOf(
-    //             )
-    //         )
-    //     }.toList().apply {
-    //         return ResponseEntity.ok(this)
-    //     }
-    // }
+    @Autowired
+    lateinit var userDao: UserDao
 
 
     @PostMapping("/transactions")
+    @Transactional
+    @AuthLogin
     fun saveTransactions(
         @RequestBody @Valid transactionList: SaveTransDTO,
-    ):
-            ResponseEntity<*> {
-        transactionList.transactionList!!.map {
-            var cateId = categoryDao.getOneByMap("value", it.categoryValue)?.id
+    ): ResponseEntity<*> {
+        var user = getCurrentUser()
 
-            transactionService.insert(
-                ledgerName = transactionList.ledger_name!!,
-                amount = BigDecimal(it.amount),
-                categoryId = cateId ?: 0,
-                count = it.count!!,
-                description = it.description,
-                datetime = DateTime.now().toString(),
-                // leave location as empty, support it later
-                location = it.location!!
-            )
+        var userLedgers =
+            userLedgerMapper.getUserLedgers(user.id!!)
+
+        var filterList = userLedgers.filter { it -> it.ledgerName == transactionList.ledger_name }
+        if (filterList.isEmpty()) {
+            return ResponseEntity.badRequest().body(object {
+                var message = "ledger not found"
+            })
+        }
+
+        transactionList.transactionList!!.map {
+            userDao.addRecordToUser(it, user.id!!, transactionList.ledger_name!!)
         }.toList().apply {
             return ResponseEntity.ok(this)
         }
     }
 
-    @Autowired
-    lateinit var ledgerMapper: LedgerMapper
-
     @GetMapping("/transactions")
+    @AuthLogin
+    @Transactional
     fun getTransactions(
         @RequestParam("ledger_name") ledgerName: String,
         @Valid @NotNull month: String,
-    ): ResponseEntity<List<TransactionVO>> {
-        val selectOne = ledgerMapper.selectOne(
-            QueryWrapper<LedgerPO>()
-                .eq("name", ledgerName)
-        )
-        if (selectOne == null) {
-            return ResponseEntity.ok(listOf());
+    ): ResponseEntity<Any> {
+        var user = getCurrentUser()
+
+        var ll = userLedgerMapper.getUserLedgers(user.id!!).filter { it -> it.ledgerName == ledgerName }
+
+        if(ll.isEmpty()) {
+            return ResponseEntity.badRequest().body(object  {
+                var message = "ledger not found"
+            })
         }
 
-        return ResponseEntity.ok(transactionService.list(selectOne.id!!, month));
+        return ResponseEntity.ok(transactionService.list(ll.first().ledgerId!!, month));
     }
 
     @PutMapping("/transaction")
+    @AuthLogin
+    @Transactional
     fun updateTransaction(
         @RequestBody
         updateTransactionDTO: @NotNull UpdateTransactionDTO,
-    ): ResponseEntity<TransactionVO> {
+    ): ResponseEntity<Any> {
+
         var updated = transactionService.update(
             updateTransactionDTO.transactionId!!,
             updateTransactionDTO.categoryValue!!,
@@ -166,16 +125,26 @@ class TransController {
     }
 
     @Autowired
-    lateinit var transactionCategoryService: TransactionCategoryService
+    lateinit var userRecordTypeMapper: UserRecordTypeMapper
 
     @GetMapping("/transaction/category")
-    fun getTransactionCategories(): List<TransactionCategoryVO> {
-        return transactionCategoryService.getAll()
+    @Transactional
+    @AuthLogin
+    fun getTransactionCategories(): Any {
+        var user = getCurrentUser()
+        var userRecordTypeList =
+        userRecordTypeMapper.getUserRecordTypes(user.id!!).map {
+            object  {
+                var id: Long = it.typeId!!
+                var value: String = it.typeValue!!
+                var icon: String = it.typeIcon!!
+            }
+        }
+        return userRecordTypeList
     }
 
     @Autowired
-    lateinit var transDao: TransactionCategoryDao
-
+    lateinit var recordTypesDao: TransactionCategoryDao
 
     class CreateTransTypeReq {
         @NotEmpty
@@ -217,15 +186,17 @@ class TransController {
             })
         }
 
-        var oneByMap = transDao.getOneByMap("value", name)
-        if (oneByMap != null) {
+        userRecordTypeMapper.getUserRecordByValue(getCurrentUser().id!!, name!!)?.let {
             return ResponseEntity.badRequest().body(object {
                 var message = "name already exists"
             })
         }
 
         var newCat = TransactionCategoryPO(null, name, icon)
-        transDao.save(newCat)
+        recordTypesDao.save(newCat)
+
+        var newUserCat = UserRecordTypePO(null, getCurrentUser().id, newCat.id)
+        userRecordTypeMapper.insert(newUserCat)
 
         return ResponseEntity.ok(object {
             var id: Long = newCat.id!!

@@ -4,7 +4,6 @@ import com.example.app.utils.ClassUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -15,7 +14,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.multipart.MaxUploadSizeExceededException
 import org.springframework.web.multipart.support.MissingServletRequestPartException
 import javax.servlet.http.HttpServletResponse
@@ -34,28 +32,17 @@ enum class ErrorCode {
 
 class ApiException : RuntimeException {
     var httpStatus: HttpStatus
-    var msg: Any?
 
-    constructor(httpStatus: HttpStatus, msg: Any?) {
+    constructor(httpStatus: HttpStatus, msg: String?) : super(msg) {
         this.httpStatus = httpStatus
-        this.msg = msg
     }
 
-    constructor(message: String?, httpStatus: HttpStatus, msg: Any?) : super(message) {
+    constructor(httpStatus: HttpStatus, cause: Throwable) : super(cause.message, cause) {
         this.httpStatus = httpStatus
-        this.msg = msg
     }
 
-    constructor(message: String?, cause: Throwable?, httpStatus: HttpStatus, msg: Any?) : super(message, cause) {
+    constructor(httpStatus: HttpStatus, message: String?, cause: Throwable?) : super(message, cause) {
         this.httpStatus = httpStatus
-        this.msg = msg
-    }
-
-    override fun toString(): String {
-        return "ApiException{" +
-                "httpStatus=" + httpStatus +
-                ", msg=" + msg +
-                '}'
     }
 }
 
@@ -117,28 +104,20 @@ class GlobalExceptionHandler {
         }
         if (ex is HttpMessageNotReadableException) {
             return logExAndAssembleResponse(
-                ApiException(
-                    ex.message,
-                    ex,
-                    HttpStatus.BAD_REQUEST, ex.message,
-                )
+                ApiException(HttpStatus.BAD_REQUEST, ex)
             )
         }
         if (ex is MissingServletRequestParameterException) {
             return logExAndAssembleResponse(
                 ApiException(
-                    ex.message,
-                    ex, HttpStatus.BAD_REQUEST, "Required request body is missing"
+                    HttpStatus.BAD_REQUEST, ex
                 )
             )
         }
         if (ex is MaxUploadSizeExceededException) {
             return logExAndAssembleResponse(
                 ApiException(
-                    ex.message,
-                    ex,
-                    HttpStatus.PAYLOAD_TOO_LARGE,
-                    "Limitation: 100MB"
+                    HttpStatus.PAYLOAD_TOO_LARGE, "max file size: 100MB", ex,
                 )
             )
         }
@@ -152,32 +131,21 @@ class GlobalExceptionHandler {
     fun logExAndAssembleResponse(ex: ApiException): ResponseEntity<*> {
         log(ex)
 
-        return ResponseEntity(objectMapper.writeValueAsString(ex.msg), ex.httpStatus)
+        return ResponseEntity(objectMapper.writeValueAsString(object {
+            var message = ex.message
+        }), ex.httpStatus)
     }
 
     fun log(ex: ApiException) {
-        log.error { "restful server exception caught" }
-
-        log.error(
-            "cause: {} - {}",
-            ex.javaClass.typeName,
-            ex.message
-        )
-
         var r = getRootCause(ex)
+        var exMsgBuilder = StringBuilder("restful server exception caught, ")
+        exMsgBuilder.append("cause: [").append(ex.javaClass.typeName).append("] - ")
+            .append(ex.message)
         if (r != null) {
-            log.error(
-                "rootcause: {} - {}",
-                r.javaClass.typeName,
-                r.message
-            )
-        } else {
-            log.error(
-                "rootcause: {} - {}",
-                ex.javaClass.typeName,
-                ex.message
-            )
+            exMsgBuilder.append("cause: [").append(r.javaClass.typeName).append("] - ")
+                .append(r.message)
         }
+        log.error { exMsgBuilder }
     }
 
     fun getRootCause(throwable: Throwable): Throwable? {

@@ -91,10 +91,11 @@ create table if not exists user_ledger
     ledger_id int null,
     user_id   int null
 );
-create table if not exists user_transaction
+
+create table if not exists user_record_type
 (
-    id             int auto_increment
+    id      int auto_increment
     primary key,
-    user_id        int null,
-    transaction_id int null
+    type_id int null,
+    user_id int null
 );

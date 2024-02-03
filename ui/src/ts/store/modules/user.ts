@@ -1,5 +1,7 @@
 // @ts-ignore
 
+import cache from '@/ts/cache';
+
 const state = {
     token: localStorage.getItem('token'),
     username: localStorage.getItem('username'),
@@ -34,6 +36,11 @@ const mutations = {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('configs');
+        cache.getAllKeys().then((keys: string[]) => {
+            keys.forEach((key) => {
+                cache.removeItem(key);
+            });
+        });
     },
 };
 

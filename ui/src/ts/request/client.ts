@@ -10,6 +10,7 @@ class Client {
             data: {
                 transactionList: trans,
             },
+            headers: { 'entity-token': store.getters.token },
         });
     }
 
@@ -20,6 +21,7 @@ class Client {
             data: {
                 transactionList: trans,
             },
+            headers: { 'entity-token': store.getters.token },
         });
     }
 
@@ -92,6 +94,7 @@ class Client {
             url: `/transactions`,
             method: 'get',
             params: { month: yearHyphenMonth },
+            headers: { 'entity-token': store.getters.token },
         });
     }
 
@@ -103,6 +106,7 @@ class Client {
             url: `/transactions`,
             method: 'get',
             params: { month: yearHyphenMonth, ledger_name: ledgerName },
+            headers: { 'entity-token': store.getters.token },
         });
     }
 
@@ -125,6 +129,9 @@ class Client {
                 count,
                 description,
             },
+            headers: {
+                'entity-token': store.getters.token,
+            },
         });
     }
 
@@ -132,6 +139,9 @@ class Client {
         return request({
             url: `/transaction/category`,
             method: 'get',
+            headers: {
+                'entity-token': store.getters.token,
+            },
         });
     }
 
@@ -142,6 +152,9 @@ class Client {
             data: {
                 name: addLedgerName,
             },
+            headers: {
+                'entity-token': store.getters.token,
+            },
         });
     }
 
@@ -149,6 +162,9 @@ class Client {
         return request({
             url: `/ledger/${ledgerId}`,
             method: 'delete',
+            headers: {
+                'entity-token': store.getters.token,
+            },
         });
     }
 

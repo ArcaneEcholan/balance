@@ -62,7 +62,6 @@ class UserController {
         }
     }
 
-
     class UserAuthRequest {
         @NotEmpty
         var username: String? = null
@@ -166,13 +165,13 @@ class UserController {
         }.toList()
 
         var defaultLedgername = userConfigs.filterNotNull().filter { it -> it.key == "default_ledger" }.first().value
-        if(defaultLedgername != null) {
+        if (defaultLedgername != null) {
             var defaultLedger = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("name", defaultLedgername))
-            if(defaultLedger != null) {
+            if (defaultLedger != null) {
             } else {
                 // reset user default ledger if the ledger name is invalid
                 var config =
-                userConfigs.find { it -> it.key == "default_ledger" }
+                    userConfigs.find { it -> it.key == "default_ledger" }
                 config?.let {
                     it.value = "default"
                     userConfigMapper.updateById(it)
@@ -264,9 +263,9 @@ class UserController {
         }.toList()
 
         var defaultLedgername = userConfigs.filterNotNull().filter { it -> it.key == "default_ledger" }.first().value
-        if(defaultLedgername != null) {
+        if (defaultLedgername != null) {
             var defaultLedger = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("name", defaultLedgername))
-            if(defaultLedger != null) {
+            if (defaultLedger != null) {
             } else {
                 // reset user default ledger if the ledger name is invalid
                 var config =
@@ -300,6 +299,13 @@ object CommonConstant {
 
 val requestCtx = ThreadLocal<MutableMap<String, Any>>()
 
+fun getCurrentUser(): UserPO {
+    try {
+        return requestCtx.get()["user"] as UserPO
+    } catch (ex: Throwable) {
+        throw RuntimeException("user auth failed")
+    }
+}
 
 @Component
 class AuthInterceptor : HandlerInterceptor {

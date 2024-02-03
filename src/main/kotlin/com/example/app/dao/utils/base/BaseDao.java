@@ -141,7 +141,7 @@ public class BaseDao<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> imple
         PageConfig annotation = conditionObjClass.getAnnotation(PageConfig.class);
         if (annotation == null) {
             log.error("分页实体类：{}， 没有标注PageConfig注解", conditionObjClass.getName());
-            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, null);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "class ["+conditionObjClass.getTypeName()+"] is used as pagination config but not annotated by @PageConfig");
         }
 
         Page<T> page = new Page<>();

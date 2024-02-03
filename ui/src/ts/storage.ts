@@ -195,7 +195,7 @@ class Storage {
                         )
                             .then((res) => {
                                 Cache.setItem(cacheKey, res.data);
-                                resolve(cachedData);
+                                resolve(res.data);
                             })
                             .catch((err) => {
                                 reject(err);

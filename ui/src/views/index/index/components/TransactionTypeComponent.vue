@@ -221,7 +221,13 @@ export default class TransTypeComponent extends Vue {
     iconIdCounter = 0;
 
     initTransactionTypes() {
-        Client.getTransactionCategories().then((resp) => {
+        return request({
+            url: `/transaction/category`,
+            method: 'get',
+            headers: {
+                'entity-token': store.getters.token,
+            },
+        }).then((resp) => {
             let types = resp.data;
             types.forEach((it) => {
                 it.className = this.iconMap[it.icon];

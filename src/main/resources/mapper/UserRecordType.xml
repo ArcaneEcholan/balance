@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.app.dao.UserRecordTypeMapper">
+    <select id="getUserRecordTypes" resultType="com.example.app.dao.UserRecordTypeMapperResult">
+        select transaction_category.id as type_id, transaction_category.value as type_value, transaction_category.icon as type_icon
+        from user
+                 join user_record_type on user.id = user_record_type.user_id
+                 join transaction_category on user_record_type.type_id = transaction_category.id
+        where user.id = #{userId};
+    </select>
+
+    <select id="getUserRecordByValue" resultType="com.example.app.dao.UserRecordTypeMapperResult">
+        select transaction_category.id as type_id, transaction_category.value as type_value, transaction_category.icon as type_icon
+        from user
+                 join user_record_type on user.id = user_record_type.user_id
+                 join transaction_category on user_record_type.type_id = transaction_category.id
+        where transaction_category.value = #{value};
+    </select>
+
+</mapper>

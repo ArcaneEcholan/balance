@@ -156,6 +156,7 @@ import settings from '@/settings';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import request from '@/ts/request';
 import storage from '@/ts/storage';
+import store from '@/ts/store';
 
 class FormItemField {
     value: string | null = null;
@@ -627,6 +628,7 @@ export default class AddTransactionEditorComponent extends Vue {
                             transactionList: requestTranList,
                             ledger_name: ledgerName,
                         },
+                        headers: { 'entity-token': store.getters.token },
                     })
                         .then((resp) => {
                             let currentDate = eventBus.$emitWithReturnValue(

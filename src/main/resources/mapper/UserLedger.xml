@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.app.dao.UserLedgerMapper">
+    <select id="getUserLedgers" resultType="com.example.app.dao.UserLedgerMapperResult">
+        select user.id as user_id, user.username, ledger.id as ledger_id, ledger.name as ledger_name
+        from user
+                 join user_ledger on user.id = user_ledger.user_id
+                 join ledger on ledger.id = user_ledger.ledger_id
+        where user.id = #{userId};
+    </select>
+</mapper>

@@ -114,6 +114,7 @@ import Cache from '@/ts/cache';
 import storage from '@/ts/storage';
 import { getYearAndMonthAsString } from '@/ts/time';
 import cache from '@/ts/cache';
+import store from '@/ts/store';
 
 @Component({
     components: {
@@ -138,6 +139,9 @@ export default class EditRecordView extends Vue {
             data: {
                 record_ids: [this.recordId],
                 ledger_ids: [this.pickedLedger.id],
+            },
+            headers: {
+                'entity-token': store.getters.token,
             },
         })
             .then((resp) => {
@@ -317,6 +321,9 @@ export default class EditRecordView extends Vue {
             method: 'get',
             params: {
                 record_id: this.recordId,
+            },
+            headers: {
+                'entity-token': store.getters.token,
             },
         }).then((resp: any) => {
             this.ledgerList = [

@@ -177,7 +177,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { getTimeOnly } from '@/ts/utils';
+import { getI18nValue, getTimeOnly } from '@/ts/utils';
 import Client from '@/ts/request/client';
 import eventBus from '@/ts/EventBus';
 import { Notify } from 'vant';
@@ -191,6 +191,7 @@ import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import Cache from '@/ts/cache';
 import storage from '@/ts/storage';
 import cache from '@/ts/cache';
+import store from '@/ts/store';
 
 @Component({
     components: { CommonActionSheet, CustomButton, GapComponent, Panel },
@@ -220,7 +221,7 @@ import cache from '@/ts/cache';
                 furniture: 'ali-international-icon-furniture',
             };
             if (!iconName) {
-                return this.$t('unknown_record_type');
+                return getI18nValue('unknown_record_type');
             }
             return iconMap[iconName];
         },
@@ -284,6 +285,9 @@ export default class TransactionListComponent extends Vue {
                     record_ids: recordIds,
                     ledger_ids: [ledger.id],
                 },
+                headers: {
+                    'entity-token': store.getters.token,
+                },
             })
                 .then((resp) => {
                     this.recordsListByDay.forEach((it) => {
@@ -315,6 +319,9 @@ export default class TransactionListComponent extends Vue {
         request({
             url: '/ledgers',
             method: 'get',
+            headers: {
+                'entity-token': store.getters.token,
+            },
         })
             .then((resp: any) => {
                 storage.purgeAllRecordsCache();

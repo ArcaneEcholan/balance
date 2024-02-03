@@ -11,4 +11,7 @@ data class LedgerPO(
     var id: Long?,
     var name: String?,
     var ctime: String?,
-) : Serializable
+) : Serializable {
+    // default
+    constructor() : this(null, null, null)
+}
