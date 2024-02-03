@@ -113,6 +113,8 @@ import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import Cache from '@/ts/cache';
 import storage from '@/ts/storage';
 import { getYearAndMonthAsString } from '@/ts/time';
+import cache from '@/ts/cache';
+
 @Component({
     components: {
         CommonActionSheet,
@@ -127,6 +129,7 @@ export default class EditRecordView extends Vue {
     ledgerList: any[] = [];
     pickedLedgerName = '';
     pickedLedger: any = {};
+
     pickLedger() {
         globalLoadingStart();
         request({
@@ -141,13 +144,9 @@ export default class EditRecordView extends Vue {
                 eventBus.$emit('on-transaction-removed', {
                     id: this.recordId,
                 });
-                Cache.getAllKeys().then((keys: any[]) => {
-                    keys.forEach((it) => {
-                        if (it.startsWith('transaction_list_')) {
-                            Cache.removeItem(it);
-                        }
-                    });
-                });
+
+                storage.purgeAllRecordsCache();
+
                 globalLoadingStop();
                 Notify({
                     type: 'success',
@@ -300,6 +299,7 @@ export default class EditRecordView extends Vue {
     count: string | null = null;
     description: string | null = null;
     ledgerName: string | null = null;
+
     created() {
         let mountProp = stripType(this.$options).$mountProp;
 

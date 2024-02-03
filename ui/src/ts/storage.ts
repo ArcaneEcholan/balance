@@ -20,6 +20,20 @@ class Storage {
         cache.removeItem(transcachekey);
     }
 
+    purgeAllRecordsCache() {
+        cache
+            .filterPairs((cursor) => {
+                let key = cursor.key as string;
+                let regex = `transaction_list.*`;
+                return new RegExp(regex).test(key);
+            })
+            .then((dataSet) => {
+                dataSet.forEach((item: any) => {
+                    cache.removeItem(item.key);
+                });
+            });
+    }
+
     purgeStatisticsCacheByLedgerName(ledgerName: string) {
         // purge statistics data cache
         cache

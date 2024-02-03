@@ -190,6 +190,7 @@ import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
 import { globalLoadingStart, globalLoadingStop } from '@/ts/view';
 import Cache from '@/ts/cache';
 import storage from '@/ts/storage';
+import cache from '@/ts/cache';
 
 @Component({
     components: { CommonActionSheet, CustomButton, GapComponent, Panel },
@@ -316,13 +317,7 @@ export default class TransactionListComponent extends Vue {
             method: 'get',
         })
             .then((resp: any) => {
-                Cache.getAllKeys().then((keys: any[]) => {
-                    keys.forEach((it) => {
-                        if (it.startsWith('transaction_list_')) {
-                            Cache.removeItem(it);
-                        }
-                    });
-                });
+                storage.purgeAllRecordsCache();
 
                 this.ledgerPickerShow = true;
                 ledgerList = resp.data;
