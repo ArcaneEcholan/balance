@@ -84,3 +84,17 @@ create table if not exists user_user_config
     user_config_id int null
 );
 
+create table if not exists user_ledger
+(
+    id        int auto_increment
+    primary key,
+    ledger_id int null,
+    user_id   int null
+);
+create table if not exists user_transaction
+(
+    id             int auto_increment
+    primary key,
+    user_id        int null,
+    transaction_id int null
+);
