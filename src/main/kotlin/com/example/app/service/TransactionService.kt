@@ -11,6 +11,7 @@ import com.example.app.dao.utils.base.pagination.PageConfig
 import com.example.app.dao.utils.base.pagination.PageNo
 import com.example.app.dao.utils.base.pagination.PageSize
 import com.example.app.exception.ApiException
+import com.example.app.rest.getCurrentUser
 import com.example.app.utils.DateTime
 import com.example.app.utils.getMonthRange
 import org.springframework.beans.factory.annotation.Autowired
@@ -235,6 +236,9 @@ class TransactionServiceImpl : TransactionService {
         return fillVO(transaction)
     }
 
+    @Autowired
+    lateinit var userLedgerMapper: UserLedgerMapper
+
     override fun insert(
         ledgerName: String,
         amount: BigDecimal,
@@ -266,19 +270,23 @@ class TransactionServiceImpl : TransactionService {
 
         transactionDao.save(transaction)
 
+        var ledger: LedgerPO? = null
         // check ledger exist
-        var ledger = ledgerMapper.selectOne(
-            QueryWrapper<LedgerPO>().eq("name", ledgerName)
-        )
-
-        if (ledger == null) {
-            throw RuntimeException("ledger not found")
+        userLedgerMapper.getUserLedgers(getCurrentUser().id!!)
+            .forEach {
+                ledger = LedgerPO().apply {
+                    id = it.ledgerId
+                    name = it.ledgerName
+                }
+            }
+        if(ledger == null) {
+            throw ApiException(HttpStatus.NOT_FOUND, "ledger not found")
         }
 
         // save relation between transaction and ledger(whose name is default ledger)
         var ledgerTransaction = LedgerTransactionPO(
             null,
-            ledgerId = ledger.id,
+            ledgerId = ledger!!.id,
             transactionId = transaction.id
         )
 
