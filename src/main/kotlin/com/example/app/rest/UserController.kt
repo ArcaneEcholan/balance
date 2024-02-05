@@ -113,15 +113,19 @@ class UserController {
         var username: String? = null
     }
 
+    @Autowired
+    lateinit var recordTypeMapper: TransactionCategoryMapper
+
+    @Autowired
+    lateinit var userRecordTypeMapper: UserRecordTypeMapper
+
     @PostMapping("/user/generating")
     @Transactional
     fun generateUser(@RequestBody generateUserRequest: GenerateUserRequest): Any {
         var username = generateUserRequest.username!!;
         var exists = userDao.exists(QueryWrapper<UserPO>().eq("username", username))
         if (exists) {
-            return ResponseEntity.internalServerError().body(object {
-                var message = "user already exists"
-            })
+            throw RuntimeException("user already exists")
         }
 
         var user = UserPO()
@@ -148,6 +152,35 @@ class UserController {
 
         createUserConfig(user.id!!, "default_ledger", "default")
         createUserConfig(user.id!!, "language", "en")
+
+        var iconList = mapOf<String, String>(
+            "daily" to "daily",
+            "food_dish" to "food",
+            "fruit" to "fruit",
+            "drinks" to "drinks",
+            "beer" to "alcohol",
+            "transport" to "transportation",
+            "entertainment" to "entertainment",
+            "others" to "others",
+            "water_cup" to "water",
+            "icecream" to "snack",
+            "mobile_phone" to "electronic",
+            "medical_care" to "med",
+            "tools_hardware" to "maintenance",
+            "productivity" to "productivity",
+            "furniture" to "furniture",
+        )
+
+        iconList.forEach {
+            var recordType =
+                recordTypeMapper.selectOne(QueryWrapper<TransactionCategoryPO>().eq("value", it.value))
+            if (recordType == null) {
+                throw RuntimeException("icon not found")
+            }
+
+            var newUserCat = UserRecordTypePO(null, user.id, recordType.id)
+            userRecordTypeMapper.insert(newUserCat)
+        }
 
         var token = genToken(user.id.toString(), EntityType.WEB_USER)
         return object {
