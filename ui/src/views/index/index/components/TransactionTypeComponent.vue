@@ -47,7 +47,7 @@
         <div name="sheets">
             <!--add new types sheet-->
             <common-action-sheet
-                :fit-content="true"
+                :fit-content="false"
                 :mount-point="`#vant-sheet-mount-point`"
                 :visible.sync="addTypeShow"
             >
@@ -152,7 +152,7 @@ import SolidIcon from '@/views/components/SolidIcon.vue';
 import GapComponent from '@/views/components/GapComponent.vue';
 import CustomButton from '@/views/components/CustomButton.vue';
 import CommonActionSheet from '@/views/components/CommonActionSheet.vue';
-import request from '@/ts/request';
+import request, { HttpError } from '@/ts/request';
 import { Notify } from 'vant';
 import store from '@/ts/store';
 
@@ -259,10 +259,10 @@ export default class TransTypeComponent extends Vue {
                 });
                 this.initTransactionTypes();
             })
-            .catch((err) => {
+            .catch((err: HttpError) => {
                 Notify({
                     type: 'danger',
-                    message: err.response.data.message,
+                    message: err.resp?.data.message,
                 });
             });
     }

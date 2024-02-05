@@ -161,7 +161,7 @@ data class UserRecordTypePO(
 interface UserRecordTypeMapper : BaseMapper<UserRecordTypePO> {
     fun getUserRecordTypes(@Param("userId") userId: Long): MutableList<UserRecordTypeMapperResult>
 
-    fun getUserRecordByValue(@Param("userId") userId: Long, @Param("value") typeValue: String): UserRecordTypeMapperResult?
+    fun getUserRecordTypeByValue(@Param("userId") userId: Long, @Param("value") typeValue: String): UserRecordTypeMapperResult?
 }
 
 @Repository

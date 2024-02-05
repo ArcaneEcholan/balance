@@ -9,7 +9,7 @@
         where user.id = #{userId};
     </select>
 
-    <select id="getUserRecordByValue" resultType="com.example.app.dao.UserRecordTypeMapperResult">
+    <select id="getUserRecordTypeByValue" resultType="com.example.app.dao.UserRecordTypeMapperResult">
         select transaction_category.id as type_id, transaction_category.value as type_value, transaction_category.icon as type_icon
         from user
                  join user_record_type on user.id = user_record_type.user_id

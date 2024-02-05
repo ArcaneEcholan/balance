@@ -69,7 +69,7 @@ class UserMapperTest {
 
     @Test
     fun list_user_record_types() {
-        userRecordTypeMapper.getUserRecordByValue(1, "fruit").apply { println(this) }
+        userRecordTypeMapper.getUserRecordTypeByValue(1, "fruit").apply { println(this) }
         userRecordTypeMapper.getUserRecordTypes(1).forEach(::println)
     }
 

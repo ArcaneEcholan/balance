@@ -186,7 +186,7 @@ class TransController {
             })
         }
 
-        userRecordTypeMapper.getUserRecordByValue(getCurrentUser().id!!, name!!)?.let {
+        userRecordTypeMapper.getUserRecordTypeByValue(getCurrentUser().id!!, name!!)?.let {
             return ResponseEntity.badRequest().body(object {
                 var message = "name already exists"
             })
