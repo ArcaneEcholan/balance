@@ -11,6 +11,7 @@ import com.example.app.rest.JWTProperties.JWTExpirationTimeUnits.MINUTE
 import com.example.app.rest.JWTProperties.JWTExpirationTimeUnits.SECOND
 import com.example.app.rest.JWTProperties.JWTExpirationTimeUnits.WEEK
 import com.example.app.rest.JwtUtils.Companion.genToken
+import com.example.app.utils.DateTime
 import com.example.app.utils.VarCaseConvertUtils
 import io.jsonwebtoken.*
 import lombok.extern.slf4j.Slf4j
@@ -128,6 +129,26 @@ class UserController {
         user.password = generatePassayPassword()
         userDao.insert(user)
 
+        // create default ledger
+        var userledgers = userLedgerMapper.getUserLedgers(user.id!!)
+        var defaultLedger = userledgers.find { it.ledgerName == "default" }
+        if (defaultLedger == null) {
+            var newledger = LedgerPO(null, "default", DateTime.now().toString())
+            ledgerMapper.insert(newledger)
+            var userledger = UserLedgerPO(null, user.id, newledger.id)
+            userLedgerMapper.insert(userledger)
+        }
+
+        var createUserConfig = { userId: Long, key: String, value: String ->
+            var config = UserConfigPO(null, key, value)
+            userConfigMapper.insert(config)
+            var userUserConfig = UserUserConfigPO(null, userId, config.id)
+            userUserConfigMapper.insert(userUserConfig)
+        }
+
+        createUserConfig(user.id!!, "default_ledger", "default")
+        createUserConfig(user.id!!, "language", "en")
+
         var token = genToken(user.id.toString(), EntityType.WEB_USER)
         return object {
             var token = token;
@@ -152,7 +173,7 @@ class UserController {
     @AuthLogin
     fun getUserConfigs(): Any {
 
-        var user = requestCtx.get()["user"] as UserPO
+        var user = getCurrentUser()
 
         val selectList = userUserConfigMapper.selectList(
             QueryWrapper<UserUserConfigPO>().eq(
@@ -164,20 +185,6 @@ class UserController {
             userConfigMapper.selectById(it.userConfigId)
         }.toList()
 
-        var defaultLedgername = userConfigs.filterNotNull().filter { it -> it.key == "default_ledger" }.first().value
-        if (defaultLedgername != null) {
-            var defaultLedger = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("name", defaultLedgername))
-            if (defaultLedger != null) {
-            } else {
-                // reset user default ledger if the ledger name is invalid
-                var config =
-                    userConfigs.find { it -> it.key == "default_ledger" }
-                config?.let {
-                    it.value = "default"
-                    userConfigMapper.updateById(it)
-                }
-            }
-        }
         return userConfigs
     }
 
@@ -193,13 +200,11 @@ class UserController {
 
         val configs1 = updateUserConfigRequest.configs
 
-
         val selectList = userUserConfigMapper.selectList(
             QueryWrapper<UserUserConfigPO>().eq(
                 "user_id", user.id
             )
         )
-
 
         var userConfigs = selectList.map {
             userConfigMapper.selectById(it.userConfigId)
@@ -246,8 +251,12 @@ class UserController {
         return userConfigs1
     }
 
+    @Autowired
+    lateinit var userLedgerMapper: UserLedgerMapper
+
     @GetMapping("/user/info")
     @AuthLogin
+    @Transactional
     fun getUserInfo(): Any {
 
         var user = requestCtx.get()["user"] as UserPO
@@ -260,22 +269,8 @@ class UserController {
 
         var userConfigs = selectList.map {
             userConfigMapper.selectById(it.userConfigId)
-        }.toList()
+        }.filterNotNull().toList()
 
-        var defaultLedgername = userConfigs.filterNotNull().filter { it -> it.key == "default_ledger" }.first().value
-        if (defaultLedgername != null) {
-            var defaultLedger = ledgerMapper.selectOne(QueryWrapper<LedgerPO>().eq("name", defaultLedgername))
-            if (defaultLedger != null) {
-            } else {
-                // reset user default ledger if the ledger name is invalid
-                var config =
-                    userConfigs.find { it -> it.key == "default_ledger" }
-                config?.let {
-                    it.value = "default"
-                    userConfigMapper.updateById(it)
-                }
-            }
-        }
 
         return object {
             var configs = userConfigs

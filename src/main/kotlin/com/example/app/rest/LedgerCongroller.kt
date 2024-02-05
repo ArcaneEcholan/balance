@@ -97,14 +97,21 @@ class LedgerCongroller {
         }
 
         var ledgername = ledger.name!!
+        if(ledgername == "default") {
+            return ResponseEntity.internalServerError()
+                .body(objectMapper.writeValueAsString(object {
+                    var message = "can not delete default ledger"
+                }));
+        }
+
         var config = userUserConfigMapper.getUserConfigByKey(user.id!!, "default_ledger")
         if (config != null) {
             var userDefault = config.value
             if (userDefault == ledgername) {
                 return ResponseEntity.internalServerError()
                     .body(objectMapper.writeValueAsString(object {
-                        var message = "can not delete default ledger"
-                    }));
+                        var message = "can not delete current ledger"
+                    }))
             }
         }
 
@@ -116,11 +123,16 @@ class LedgerCongroller {
     @Transactional
     @AuthLogin
     fun tesfas5t1(@Valid @RequestBody editLedgerDTO: EditLedgerDTO): ResponseEntity<Any> {
+        if(editLedgerDTO.name == "default"){
+            return ResponseEntity.badRequest().body(object {
+                var message = "can not modify default ledger name"
+            });
+        }
+
         var user = requestCtx.get()["user"] as UserPO
 
         var userledgers =
             userLedgerMapper.getUserLedgers(user.id!!)
-
 
         userledgers.filter { it -> editLedgerDTO.id == it.ledgerId }
             .ifEmpty {
@@ -176,6 +188,14 @@ class LedgerCongroller {
         var user = getCurrentUser()
 
         var userLedgers = userLedgerMapper.getUserLedgers(user.id!!)
+
+        userLedgers.map { it -> it.ledgerName!! }.contains("default").not().apply {
+            if (this) {
+                var newledger = LedgerPO(null, "default", DateTime.now().toString())
+                ledgerMapper.insert(newledger)
+                userLedgerMapper.insert(UserLedgerPO(null, user.id!!, newledger.id!!))
+            }
+        }
 
         var allLedgers = userLedgers.map {
             LedgerPO().apply {

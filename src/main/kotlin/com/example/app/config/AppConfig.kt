@@ -1,10 +1,6 @@
 package com.example.app.config
 
 import com.example.app.dao.mapper.LedgerMapper
-import com.example.app.dao.po.LedgerPO
-import com.example.app.utils.DateTime
-import com.example.app.utils.DateUtils
-import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.web.server.ErrorPage
@@ -18,19 +14,13 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
 import java.util.*
-import javax.annotation.PostConstruct
 
 @Component
 class Test :CommandLineRunner{
     @Autowired
     lateinit var ledgerMapper: LedgerMapper
     override fun run(vararg args: String?) {
-        val selectByMap = ledgerMapper.selectByMap(mapOf("name" to "default"))
-        if (selectByMap.isEmpty()) {
-            ledgerMapper.insert(LedgerPO(null, "default", DateTime.now().toString()))
-        } else if (selectByMap.size > 1) {
-            throw RuntimeException("ledger name default should be only one")
-        }
+
     }
 
 
